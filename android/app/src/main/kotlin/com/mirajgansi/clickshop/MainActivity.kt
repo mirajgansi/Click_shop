@@ -1,4 +1,4 @@
-package mirajgansi.com.click_shop
+package com.mirajgansi.clickshop
 
 import io.flutter.embedding.android.FlutterActivity
 

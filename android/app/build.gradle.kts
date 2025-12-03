@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "mirajgansi.com.click_shop"
+    namespace = "com.mirajgansi.clickshop"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -21,7 +21,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "mirajgansi.com.click_shop"
+        applicationId = "com.mirajgansi.clickshop"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
