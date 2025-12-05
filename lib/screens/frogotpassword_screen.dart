@@ -18,6 +18,14 @@ class FrogotpasswordScreen extends StatelessWidget {
           children: <Widget>[
             Column(
               children: [
+                Center(
+                  child: Image.asset(
+                    'assets/images/Group.jpg',
+                    width: 60,
+                    height: 60,
+                    fit: BoxFit.cover,
+                  ),
+                ),
                 Padding(
                   padding: const EdgeInsets.only(top: 60.0),
                   child: Center(

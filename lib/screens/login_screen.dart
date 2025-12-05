@@ -19,6 +19,15 @@ class LoginScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Center(
+                  child: Image.asset(
+                    'assets/images/Group.jpg',
+                    width: 60,
+                    height: 60,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                SizedBox(height: 20),
                 Text(
                   'Login',
                   style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),

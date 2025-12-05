@@ -36,7 +36,28 @@ class _MyTextFieldWidgetsState extends State<MyTextFieldWidgets> {
       decoration: InputDecoration(
         hintText: widget.hintText,
         labelText: widget.text,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+        labelStyle: TextStyle(
+          fontSize: 16,
+          color: Colors.black,
+          fontWeight: FontWeight.normal,
+        ),
+
+        enabledBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: Colors.grey),
+        ),
+
+        focusedBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: Colors.blueGrey, width: 2),
+        ),
+
+        errorBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: Colors.red, width: 2),
+        ),
+
+        focusedErrorBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: Colors.red, width: 2),
+        ),
+
         suffixIcon: widget.obscureText
             ? IconButton(
                 icon: Icon(_obscure ? Icons.visibility_off : Icons.visibility),

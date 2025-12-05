@@ -19,6 +19,14 @@ class SignupScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Center(
+                  child: Image.asset(
+                    'assets/images/Group.jpg',
+                    width: 60,
+                    height: 60,
+                    fit: BoxFit.cover,
+                  ),
+                ),
                 Text(
                   'Signup',
                   style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
