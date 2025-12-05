@@ -11,7 +11,7 @@ class LoginScreen extends StatelessWidget {
     final emailController = TextEditingController();
     final passwordController = TextEditingController();
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(automaticallyImplyLeading: false),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: SingleChildScrollView(
@@ -60,7 +60,12 @@ class LoginScreen extends StatelessWidget {
                   },
                 ),
                 const SizedBox(height: 20),
-                MyButtonWidgets(onPressed: () {}, text: "log in"),
+                MyButtonWidgets(
+                  onPressed: () {
+                    Navigator.pushNamed(context, '/dashboard');
+                  },
+                  text: "Log in",
+                ),
                 SizedBox(height: 20),
                 Center(
                   child: RichText(

@@ -1,6 +1,8 @@
+import 'package:click_shop/screens/dashboard_screen.dart';
 import 'package:click_shop/screens/frogotpassword_screen.dart';
 import 'package:click_shop/screens/onboarding.dart';
 import 'package:click_shop/screens/login_screen.dart';
+import 'package:click_shop/screens/signup_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -17,9 +19,11 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialRoute: '/',
       routes: {
-        '/': (context) => const Dashboard(),
+        '/': (context) => const Onboarding(),
         '/login': (context) => const LoginScreen(),
         '/forgotpassword': (context) => const FrogotpasswordScreen(),
+        '/signup': (context) => const SignupScreen(),
+        '/dashboard': (context) => const DashboardScreen(),
       },
     );
   }
