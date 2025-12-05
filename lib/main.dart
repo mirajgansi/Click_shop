@@ -1,3 +1,4 @@
+import 'package:click_shop/screens/frogotpassword_screen.dart';
 import 'package:click_shop/screens/onboarding.dart';
 import 'package:click_shop/screens/login_screen.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => const Dashboard(),
         '/login': (context) => const LoginScreen(),
+        '/forgotpassword': (context) => const FrogotpasswordScreen(),
       },
     );
   }

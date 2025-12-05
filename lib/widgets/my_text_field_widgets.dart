@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class MyTextFieldWidgets extends StatelessWidget {
+class MyTextFieldWidgets extends StatefulWidget {
   const MyTextFieldWidgets({
     super.key,
     required this.controller,
@@ -15,24 +15,46 @@ class MyTextFieldWidgets extends StatelessWidget {
   final String text;
   final String? Function(String?)? validator;
   final bool obscureText;
+
   @override
+  State<MyTextFieldWidgets> createState() => _MyTextFieldWidgetsState();
+}
+
+class _MyTextFieldWidgetsState extends State<MyTextFieldWidgets> {
+  late bool _obscure;
+
+  @override
+  void initState() {
+    super.initState();
+    _obscure = widget.obscureText;
+  }
+
   Widget build(BuildContext context) {
     return TextFormField(
+      controller: widget.controller,
+      obscureText: _obscure,
       decoration: InputDecoration(
-        hint: Text(hintText),
-        labelText: text,
+        hintText: widget.hintText,
+        labelText: widget.text,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-        filled: true,
-        fillColor: Colors.white,
+        suffixIcon: widget.obscureText
+            ? IconButton(
+                icon: Icon(_obscure ? Icons.visibility_off : Icons.visibility),
+                onPressed: () {
+                  setState(() {
+                    _obscure = !_obscure;
+                  });
+                },
+              )
+            : null,
       ),
-      controller: controller,
+
       validator: (value) {
         if (value!.isEmpty) {
-          return ('Please enter $text');
+          return ('Please enter ${widget.text}');
         }
         return null;
       },
-      obscureText: obscureText,
     );
   }
 }
