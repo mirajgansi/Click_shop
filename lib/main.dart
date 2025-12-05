@@ -1,4 +1,4 @@
-import 'package:click_shop/dashboard.dart';
+import 'package:click_shop/screens/onboarding.dart';
 import 'package:click_shop/screens/login_screen.dart';
 import 'package:flutter/material.dart';
 

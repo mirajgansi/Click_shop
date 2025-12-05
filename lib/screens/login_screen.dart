@@ -7,8 +7,8 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _emailController = TextEditingController();
-    final _passwordController = TextEditingController();
+    final emailController = TextEditingController();
+    final passwordController = TextEditingController();
     return Scaffold(
       appBar: AppBar(),
       body: Padding(
@@ -32,13 +32,13 @@ class LoginScreen extends StatelessWidget {
               ),
               SizedBox(height: 20),
               MyTextFieldWidgets(
-                controller: _emailController,
+                controller: emailController,
                 hintText: "example600@gmail.com",
                 text: "Email",
               ),
               SizedBox(height: 10),
               MyTextFieldWidgets(
-                controller: _passwordController,
+                controller: passwordController,
                 hintText: "*******",
                 text: "Password",
                 obscureText: true,
