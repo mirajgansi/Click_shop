@@ -1,4 +1,4 @@
-import 'package:click_shop/screens/dashboard_screen.dart';
+import 'package:click_shop/screens/bottom_navigation_screen.dart';
 import 'package:click_shop/screens/frogotpassword_screen.dart';
 import 'package:click_shop/screens/onboarding.dart';
 import 'package:click_shop/screens/login_screen.dart';
