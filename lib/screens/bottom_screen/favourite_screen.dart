@@ -1,3 +1,4 @@
+import 'package:click_shop/widgets/my_card_widgets.dart';
 import 'package:flutter/material.dart';
 
 class FavouriteScreen extends StatelessWidget {
@@ -5,8 +6,18 @@ class FavouriteScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox.expand(
-      child: Center(child: Text("Welcome to the Favourite Screen")),
+    return GridView.builder(
+      padding: EdgeInsets.all(12),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: 0.65,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+      ),
+      itemCount: 10,
+      itemBuilder: (context, index) {
+        return CardWidget();
+      },
     );
   }
 }

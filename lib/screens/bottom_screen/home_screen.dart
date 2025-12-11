@@ -14,11 +14,9 @@ class _HomeScreenState extends State<HomeScreen> {
       child: GridView.count(
         crossAxisCount: 2,
         childAspectRatio: 0.7,
-
         children: List.generate(20, (index) {
           return Card(
             margin: const EdgeInsets.all(10.0),
-
             child: Stack(
               clipBehavior: Clip.none,
               children: [
