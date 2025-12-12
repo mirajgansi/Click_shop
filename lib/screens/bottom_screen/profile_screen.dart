@@ -1,3 +1,5 @@
+import 'package:click_shop/widgets/my_button_widgets.dart';
+import 'package:click_shop/widgets/my_menu_items_widgets.dart';
 import 'package:flutter/material.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -50,6 +52,32 @@ class ProfileScreen extends StatelessWidget {
                 ],
               ),
             ],
+          ),
+          const Divider(),
+          const MyMenuItemsWidgets(
+            icon: Icons.shopping_bag_outlined,
+            title: 'Order',
+          ),
+          const MyMenuItemsWidgets(
+            icon: Icons.card_travel,
+            title: 'My details',
+          ),
+          const MyMenuItemsWidgets(
+            icon: Icons.location_on_outlined,
+            title: 'Delivery address',
+          ),
+          const MyMenuItemsWidgets(
+            icon: Icons.notifications_none,
+            title: 'Notifications',
+          ),
+          const MyMenuItemsWidgets(icon: Icons.help_outline, title: 'Help'),
+          const MyMenuItemsWidgets(icon: Icons.info_outline, title: 'About'),
+          SizedBox(height: 25),
+          MyButtonWidgets(
+            text: 'Log  Out',
+            onPressed: () {
+              Navigator.pushNamed(context, '/login');
+            },
           ),
         ],
       ),
