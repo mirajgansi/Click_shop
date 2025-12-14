@@ -12,7 +12,9 @@ class CardWidget extends StatelessWidget {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute<void>(builder: (context) => const ProductScreen()),
+          MaterialPageRoute<void>(
+            builder: (context) => const ProductDetailScreen(),
+          ),
         );
       },
       child: SizedBox(
