@@ -1,3 +1,4 @@
+import 'package:click_shop/screens/product_screen.dart';
 import 'package:click_shop/widgets/my_card_widgets.dart';
 import 'package:flutter/material.dart';
 
@@ -20,6 +21,7 @@ class _HomeScreenState extends State<HomeScreen> {
         mainAxisSpacing: 10,
       ),
       itemCount: 10,
+
       itemBuilder: (context, index) {
         return CardWidget();
       },
