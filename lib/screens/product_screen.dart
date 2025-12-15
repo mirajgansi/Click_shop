@@ -45,7 +45,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             onPressed: () {},
             child: const Text(
               "Add To Basket",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
             ),
           ),
         ),

@@ -4,6 +4,7 @@ import 'package:click_shop/screens/bottom_screen/cart_sreen.dart';
 import 'package:click_shop/screens/bottom_screen/home_screen.dart';
 import 'package:click_shop/screens/bottom_screen/profile_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -39,24 +40,31 @@ class _DashboardScreenState extends State<DashboardScreen> {
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         iconSize: 30,
-        items: const [
+        items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.house_rounded),
+            icon: SvgPicture.asset(
+              'assets/icons/home.svg',
+              width: 30,
+              height: 30,
+              color: _selectedIndex == 0
+                  ? const Color(0xFF53B175)
+                  : Colors.black,
+            ),
             label: 'Home',
           ),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.search_rounded),
             label: 'Explore',
           ),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.shopping_cart_outlined),
             label: 'Cart',
           ),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.favorite_outline),
             label: 'Favourite',
           ),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.person_3_outlined),
             label: 'Account',
           ),
