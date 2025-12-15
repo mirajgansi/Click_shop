@@ -36,10 +36,12 @@ class Onboarding extends StatelessWidget {
                 const Text(
                   'Welcome\nto our store',
                   textAlign: TextAlign.center,
+
                   style: TextStyle(
+                    fontFamily: 'Poppins',
                     fontSize: 40,
                     color: Colors.black,
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 20),
