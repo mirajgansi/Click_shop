@@ -24,6 +24,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
     const ProfileScreen(),
   ];
 
+  BottomNavigationBarItem _svgNavItem({
+    required String asset,
+    required String label,
+    required int index,
+  }) {
+    return BottomNavigationBarItem(
+      icon: SvgPicture.asset(
+        asset,
+        width: 25,
+        height: 25,
+        color: _selectedIndex == index ? const Color(0xFF53B175) : Colors.black,
+      ),
+      label: label,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,44 +55,37 @@ class _DashboardScreenState extends State<DashboardScreen> {
       body: lstBottomScreen[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
-        iconSize: 30,
-        items: [
-          BottomNavigationBarItem(
-            icon: SvgPicture.asset(
-              'assets/icons/home.svg',
-              width: 30,
-              height: 30,
-              color: _selectedIndex == 0
-                  ? const Color(0xFF53B175)
-                  : Colors.black,
-            ),
-            label: 'Home',
-          ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.search_rounded),
-            label: 'Explore',
-          ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart_outlined),
-            label: 'Cart',
-          ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.favorite_outline),
-            label: 'Favourite',
-          ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.person_3_outlined),
-            label: 'Account',
-          ),
-        ],
-        selectedItemColor: Color(0xFF53B175),
-        unselectedItemColor: Colors.black,
         currentIndex: _selectedIndex,
+        selectedItemColor: const Color(0xFF53B175),
+        unselectedItemColor: Colors.black,
         onTap: (index) {
           setState(() {
             _selectedIndex = index;
           });
         },
+        items: [
+          _svgNavItem(asset: 'assets/icons/home.svg', label: 'Home', index: 0),
+          _svgNavItem(
+            asset: 'assets/icons/explore.svg',
+            label: 'Explore',
+            index: 1,
+          ),
+          _svgNavItem(
+            asset: 'assets/icons/cart.svg',
+            label: 'Account',
+            index: 2,
+          ),
+          _svgNavItem(
+            asset: 'assets/icons/favriout.svg',
+            label: 'Account',
+            index: 3,
+          ),
+          _svgNavItem(
+            asset: 'assets/icons/profile.svg',
+            label: 'Account',
+            index: 4,
+          ),
+        ],
       ),
     );
   }
