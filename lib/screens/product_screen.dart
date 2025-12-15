@@ -1,3 +1,5 @@
+import 'package:click_shop/widgets/my_favourite_button_widgets.dart';
+import 'package:click_shop/widgets/my_review_button_widgets.dart';
 import 'package:flutter/material.dart';
 
 class ProductDetailScreen extends StatefulWidget {
@@ -9,7 +11,7 @@ class ProductDetailScreen extends StatefulWidget {
 
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
   int quantity = 1;
-
+  int rating = 0;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,7 +55,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            /// Product Image
             Container(
               height: 240,
               margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -71,13 +72,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
             const SizedBox(height: 20),
 
-            /// Product Info
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  /// Title + Wishlist
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: const [
@@ -88,7 +87,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      Icon(Icons.favorite_border),
+                      MyFavouriteButtonWidgets(),
                     ],
                   ),
 
@@ -97,11 +96,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
                   const SizedBox(height: 16),
 
-                  /// Quantity + Price
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      /// Quantity Selector
                       Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12),
@@ -165,13 +162,17 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     title: "Review",
                     trailingWidget: Row(
                       mainAxisSize: MainAxisSize.min,
-                      children: const [
-                        Icon(Icons.star, size: 18, color: Colors.orange),
-                        Icon(Icons.star, size: 18, color: Colors.orange),
-                        Icon(Icons.star, size: 18, color: Colors.orange),
-                        Icon(Icons.star, size: 18, color: Colors.orange),
-                        Icon(Icons.star, size: 18, color: Colors.orange),
-                      ],
+                      children: List.generate(
+                        5,
+                        (index) => MyReviewButtonWidgets(
+                          isRated: index < rating,
+                          onTap: () {
+                            setState(() {
+                              rating = index + 1;
+                            });
+                          },
+                        ),
+                      ),
                     ),
                   ),
 
@@ -185,7 +186,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  /// Section Title Widget
   Widget _sectionTitle(String title) {
     return Text(
       title,
@@ -193,7 +193,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  /// List Tile Row
   Widget _listTile({
     required String title,
     String? trailing,
