@@ -148,7 +148,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   const SizedBox(height: 24),
                   const Divider(),
 
-                  _sectionTitle("Product Detail"),
+                  sectionTitle("Product Detail"),
                   const SizedBox(height: 8),
                   Text(
                     "Wai Wai is a popular instant noodle brand loved for its unique taste and quick preparation. It can be eaten straight from the packet, boiled, or fried.",
@@ -158,11 +158,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
                   const Divider(),
 
-                  _listTile(title: "Nutritions", trailing: "100g"),
+                  listTile(title: "Nutritions", trailing: "100g"),
 
                   const Divider(),
 
-                  _listTile(
+                  listTile(
                     title: "Review",
                     trailingWidget: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -190,14 +190,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     );
   }
 
-  Widget _sectionTitle(String title) {
+  Widget sectionTitle(String title) {
     return Text(
       title,
       style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
     );
   }
 
-  Widget _listTile({
+  Widget listTile({
     required String title,
     String? trailing,
     Widget? trailingWidget,
