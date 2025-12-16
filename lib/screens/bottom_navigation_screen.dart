@@ -70,14 +70,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
             label: 'Explore',
             index: 1,
           ),
-          _svgNavItem(
-            asset: 'assets/icons/cart.svg',
-            label: 'Account',
-            index: 2,
-          ),
+          _svgNavItem(asset: 'assets/icons/cart.svg', label: 'Cart', index: 2),
           _svgNavItem(
             asset: 'assets/icons/favriout.svg',
-            label: 'Account',
+            label: 'Faviout',
             index: 3,
           ),
           _svgNavItem(
