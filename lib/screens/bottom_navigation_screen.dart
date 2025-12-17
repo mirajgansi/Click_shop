@@ -1,3 +1,4 @@
+import 'package:click_shop/screens/bottom_screen/admin_screen.dart';
 import 'package:click_shop/screens/bottom_screen/explore_screen.dart';
 import 'package:click_shop/screens/bottom_screen/favourite_screen.dart';
 import 'package:click_shop/screens/bottom_screen/cart_sreen.dart';
@@ -22,6 +23,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     const CartScreen(),
     const FavouriteScreen(),
     const ProfileScreen(),
+    const AddProduct(),
   ];
 
   BottomNavigationBarItem _svgNavItem({
@@ -80,6 +82,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
             asset: 'assets/icons/profile.svg',
             label: 'Account',
             index: 4,
+          ),
+          _svgNavItem(
+            asset: 'assets/icons/profile.svg',
+            label: 'admin',
+            index: 5,
           ),
         ],
       ),
