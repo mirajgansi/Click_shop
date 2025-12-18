@@ -12,18 +12,29 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
-    return GridView.builder(
-      padding: EdgeInsets.all(12),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        childAspectRatio: 0.65,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 10,
-      ),
-      itemCount: 10,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        int crossAxisCount = 2;
 
-      itemBuilder: (context, index) {
-        return CardWidget();
+        if (constraints.maxWidth >= 900) {
+          crossAxisCount = 4;
+        } else if (constraints.maxWidth >= 600) {
+          crossAxisCount = 3;
+        }
+
+        return GridView.builder(
+          padding: const EdgeInsets.all(12),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            childAspectRatio: 0.65,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+          ),
+          itemCount: 10,
+          itemBuilder: (context, index) {
+            return CardWidget();
+          },
+        );
       },
     );
   }

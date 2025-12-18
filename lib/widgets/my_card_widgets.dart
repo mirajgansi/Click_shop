@@ -6,107 +6,96 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class CardWidget extends StatelessWidget {
+  const CardWidget({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute<void>(
-            builder: (context) => const ProductDetailScreen(),
-          ),
-        );
-      },
-      child: SizedBox(
-        height: 220,
-        width: 200,
-        child: Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Stack(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final bool isTablet = constraints.maxWidth >= 250;
+
+        final double padding = isTablet ? 6 : 8;
+        final double iconSize = isTablet ? 20 : 25;
+        final double fontSizeTitle = isTablet ? 14 : 16;
+        final double fontSizePrice = isTablet ? 13 : 14;
+
+        return AspectRatio(
+          aspectRatio: 0.7, // width : height ratio for the card
+          child: GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ProductDetailScreen(),
+                ),
+              );
+            },
+            child: Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Padding(
+                padding: EdgeInsets.all(padding),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      height: 150,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        image: DecorationImage(
-                          image: AssetImage("assets/images/Group.jpg"),
-                          fit: BoxFit.cover,
-                        ),
+                    // IMAGE
+                    AspectRatio(
+                      aspectRatio: 1, // keeps image square
+                      child: Stack(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              image: const DecorationImage(
+                                image: AssetImage("assets/images/Group.jpg"),
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+                          const Positioned(
+                            top: 6,
+                            right: 6,
+                            child: MyFavouriteButtonWidgets(),
+                          ),
+                        ],
                       ),
                     ),
 
-                    Positioned(
-                      right: 8,
-                      top: 8,
-                      child: MyFavouriteButtonWidgets(),
-                    ),
-                    Positioned(
-                      right: 8,
-                      bottom: 1,
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Color(0xFFD4F7D2).withOpacity(0.9),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            SvgPicture.asset(
-                              'assets/icons/gravity-ui_seal-check.svg',
-                              width: 18,
-                              height: 18,
-                              color: Color(0xFF12A807),
-                            ),
-                            SizedBox(width: 4),
-                            Text(
-                              "50+ in stock",
-                              style: TextStyle(
-                                color: Color(0xff12A807),
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
+                    const SizedBox(height: 6),
+
+                    // TITLE
+                    Text(
+                      "Happy Cookie",
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: fontSizeTitle,
                       ),
+                    ),
+
+                    // PRICE + CART BUTTON
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "Rs 299 / kg",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                            fontSize: fontSizePrice,
+                          ),
+                        ),
+                        MyCartButtonWidget(),
+                      ],
                     ),
                   ],
                 ),
-
-                SizedBox(height: 8),
-
-                Text(
-                  "Happy Cookie",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                ),
-
-                Text(
-                  "\RS299 /per kg",
-                  style: TextStyle(fontWeight: FontWeight.w400, fontSize: 20),
-                ),
-
-                SizedBox(height: 8),
-
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: MyCartButtonWidget(),
-                ),
-              ],
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
