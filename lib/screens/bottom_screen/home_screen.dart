@@ -1,5 +1,5 @@
 import 'package:click_shop/screens/product_screen.dart';
-import 'package:click_shop/widgets/my_card_widgets.dart';
+import 'package:click_shop/core/widgets/my_card_widgets.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {

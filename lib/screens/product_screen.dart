@@ -1,5 +1,5 @@
-import 'package:click_shop/widgets/my_favourite_button_widgets.dart';
-import 'package:click_shop/widgets/my_review_button_widgets.dart';
+import 'package:click_shop/core/widgets/my_favourite_button_widgets.dart';
+import 'package:click_shop/core/widgets/my_review_button_widgets.dart';
 import 'package:flutter/material.dart';
 
 class ProductDetailScreen extends StatefulWidget {

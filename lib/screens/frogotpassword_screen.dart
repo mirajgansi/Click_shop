@@ -1,5 +1,5 @@
-import 'package:click_shop/widgets/my_button_widgets.dart';
-import 'package:click_shop/widgets/my_text_field_widgets.dart';
+import 'package:click_shop/core/widgets/my_button_widgets.dart';
+import 'package:click_shop/core/widgets/my_text_field_widgets.dart';
 import 'package:flutter/material.dart';
 
 class FrogotpasswordScreen extends StatelessWidget {
