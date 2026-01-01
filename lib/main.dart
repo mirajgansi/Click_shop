@@ -1,8 +1,8 @@
 import 'package:click_shop/screens/bottom_navigation_screen.dart';
-import 'package:click_shop/screens/frogotpassword_screen.dart';
+import 'package:click_shop/features/auth/presentation/pages/frogotpassword_screen.dart';
 import 'package:click_shop/screens/onboarding.dart';
-import 'package:click_shop/screens/login_screen.dart';
-import 'package:click_shop/screens/signup_screen.dart';
+import 'package:click_shop/features/auth/presentation/pages/login_screen.dart';
+import 'package:click_shop/features/auth/presentation/pages/signup_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
