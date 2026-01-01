@@ -1,8 +1,13 @@
 import 'package:click_shop/core/constants/hive_table_constants.dart';
 import 'package:click_shop/features/auth/data/models/auth_hive_model.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 
 import 'package:path_provider/path_provider.dart';
+
+final HiveServiceProvider = Provider<HiveService>((ref) {
+  return HiveService();
+});
 
 class HiveService {
   Future<void> init() async {
@@ -23,7 +28,7 @@ class HiveService {
     }
   }
 
-  Future<void> openBoxed() async {
+  Future<void> openBoxed([AuthHiveModel model]) async {
     await Hive.openBox<AuthHiveModel>(HiveTableConstants.authTable);
   }
 
@@ -75,5 +80,33 @@ class HiveService {
   Future<AuthHiveModel> registerUser(AuthHiveModel model) async {
     await _authBox.put(model.userId, model);
     return model;
+  }
+
+  //login user
+
+  Future<AuthHiveModel?> loginUser(String email, String password) async {
+    final users = _authBox.values.where(
+      (user) => user.email == email && user.password == password,
+    );
+    if (users.isNotEmpty) {
+      return users.first;
+    }
+    return null;
+  }
+
+  //logout user
+  Future<void> logoutUser() async {}
+
+  //get current user
+  AuthHiveModel? getCurrentUser(String userId) {
+    return _authBox.get(userId);
+  }
+
+  //is email exists
+  bool isEmailExists(String email) {
+    final users = _authBox.values.where(
+      (user) => user.email.toLowerCase() == email.toLowerCase(),
+    );
+    return users.isNotEmpty;
   }
 }
