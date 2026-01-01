@@ -72,9 +72,8 @@ class HiveService {
   Box<AuthHiveModel> get _authBox =>
       Hive.box<AuthHiveModel>(HiveTableConstants.authTable);
 
-      Future<AuthHiveModel> registerUser(AuthHiveModel model) async {
-        await _authBox.put(model.userId, model);
-        return model;
-      }
-
+  Future<AuthHiveModel> registerUser(AuthHiveModel model) async {
+    await _authBox.put(model.userId, model);
+    return model;
+  }
 }
