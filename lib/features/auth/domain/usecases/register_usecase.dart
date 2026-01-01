@@ -1,9 +1,11 @@
 import 'package:click_shop/core/error/failures.dart';
 import 'package:click_shop/core/usecase/app_usecase.dart';
+import 'package:click_shop/features/auth/data/repositories/auth_repository.dart';
 import 'package:click_shop/features/auth/domain/entities/auth_entity.dart';
 import 'package:click_shop/features/auth/domain/repositories/auth_repository.dart';
 import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class RegisterUsecaseParams extends Equatable {
   final String userName;
@@ -22,6 +24,12 @@ class RegisterUsecaseParams extends Equatable {
   // TODO: implement props
   List<Object?> get props => [userName, email, password, profileImage];
 }
+
+//provider for Register usecase
+final RegisterUsecaseProvider = Provider<RegisterUsecase>((ref) {
+  final authRepository = ref.watch(authRepositoryProvider);
+  return RegisterUsecase(authRepository: authRepository);
+});
 
 class RegisterUsecase
     implements UsecaseWithParams<bool, RegisterUsecaseParams> {

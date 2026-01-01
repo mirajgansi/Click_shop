@@ -9,7 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 //Provider
 
-final authRepoositoryProvider = Provider<IAuthRepository>((ref) {
+final authRepositoryProvider = Provider<IAuthRepository>((ref) {
   final authDatasource = ref.watch(AuthLocalDatasourceProvider);
   return AuthRepository(authDatasource: authDatasource);
 });
