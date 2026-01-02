@@ -1,4 +1,5 @@
-import 'package:click_shop/common/my_snack_bar.dart';
+import 'package:click_shop/core/utils/my_snack_bar.dart';
+import 'package:click_shop/core/utils/snackbar_utils.dart';
 import 'package:click_shop/core/widgets/my_button_widgets.dart';
 import 'package:click_shop/core/widgets/my_text_field_widgets.dart';
 import 'package:flutter/gestures.dart';

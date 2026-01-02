@@ -21,14 +21,14 @@ class HiveService {
 
   void _registerAdapter() {
     if (!Hive.isAdapterRegistered(HiveTableConstants.ProductTypeId)) {
-      Hive.registerAdapter(BatchHiveModelAdapter());
+      Hive.registerAdapter(AuthHiveModelAdapter());
     }
     if (!Hive.isAdapterRegistered(HiveTableConstants.authtypeId)) {
       Hive.registerAdapter(AuthHiveModelAdapter());
     }
   }
 
-  Future<void> openBoxed([AuthHiveModel model]) async {
+  Future<void> openBoxed() async {
     await Hive.openBox<AuthHiveModel>(HiveTableConstants.authTable);
   }
 
