@@ -4,18 +4,20 @@ import 'package:click_shop/core/utils/snackbar_utils.dart';
 import 'package:click_shop/core/widgets/my_button_widgets.dart';
 import 'package:click_shop/core/widgets/my_text_field_widgets.dart';
 import 'package:click_shop/features/auth/presentation/pages/login_screen.dart';
+import 'package:click_shop/features/auth/presentation/state/auth_state.dart';
 import 'package:click_shop/features/auth/presentation/view_model/auth_view_model.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class SignupScreen extends StatefulWidget {
+class SignupScreen extends ConsumerStatefulWidget {
   const SignupScreen({super.key});
 
   @override
-  State<SignupScreen> createState() => _SignupScreenState();
+  ConsumerState<SignupScreen> createState() => _SignupScreenState();
 }
 
-class _SignupScreenState extends State<SignupScreen> {
+class _SignupScreenState extends ConsumerState<SignupScreen> {
   final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
@@ -24,11 +26,8 @@ class _SignupScreenState extends State<SignupScreen> {
 
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
-  bool _isLoading = false;
   bool _agreedToTerms = false;
-  String? _selectedBatch;
 
-  final authState = ref.watch(AuthViewModelProvider);
   @override
   void dispose() {
     _usernameController.dispose();
@@ -48,18 +47,13 @@ class _SignupScreenState extends State<SignupScreen> {
     }
 
     if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
-
-      await Future.delayed(const Duration(seconds: 2));
-
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-        AppRoutes.pushReplacement(context, const LoginScreen());
-      }
+      ref
+          .read(AuthViewModelProvider.notifier)
+          .register(
+            email: _emailController.text.trim(),
+            password: _passwordController.text.trim(),
+            userName: _usernameController.text.trim().split('@').first,
+          );
     }
   }
 
@@ -69,6 +63,19 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(AuthViewModelProvider);
+    //Listen to auth state changes
+    ref.listen<AuthState>(AuthViewModelProvider, (previous, next) {
+      if (next.status == AuthStatus.error) {
+        SnackbarUtils.showError(
+          context,
+          next.errorMessage ?? 'An error occurred',
+        );
+      } else if (next.status == AuthStatus.authenticated) {
+        SnackbarUtils.showSuccess(context, 'Signup successful! Please log in.');
+      }
+    });
+
     return Scaffold(
       //auth satate
       appBar: AppBar(),
@@ -248,7 +255,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                 color: Colors.green,
                               );
 
-                              Future.delayed(const Duration(seconds: 1), () {
+                              Future.delayed(const Duration(seconds: 2), () {
                                 Navigator.pushNamed(context, '/login');
                               });
                             },

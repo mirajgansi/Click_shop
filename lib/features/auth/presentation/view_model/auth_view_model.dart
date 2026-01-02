@@ -26,6 +26,8 @@ class AuthViewModel extends Notifier<AuthState> {
     String? profileImage,
   }) async {
     state = state.copyWith(status: AuthStatus.loading);
+    // wait for 2 seconds to simulate network request
+    await Future.delayed(const Duration(seconds: 2));
     final result = await _registerUsecase(
       RegisterUsecaseParams(
         userName: userName,
