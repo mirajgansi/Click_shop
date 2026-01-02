@@ -43,7 +43,7 @@ class AuthViewModel extends Notifier<AuthState> {
           errorMessage: failure.message,
         );
       },
-      (isRegistered) {
+      (isRegistered) async {
         if (!isRegistered) {
           state = state.copyWith(
             status: AuthStatus.error,
@@ -54,36 +54,26 @@ class AuthViewModel extends Notifier<AuthState> {
         }
       },
     );
+  }
 
-    Future<void> login({
-      required String email,
-      required String password,
-      required String userName,
-    }) async {
-      state = state.copyWith(status: AuthStatus.loading);
+  Future<void> login({required String email, required String password}) async {
+    state = state.copyWith(status: AuthStatus.loading);
+    final params = LoginUsecaseParams(email: email, password: password);
+    final result = await _loginUsecase(params);
 
-      final params = LoginUsecaseParams(
-        email: email,
-        password: password,
-        userName: userName,
-      );
-
-      final result = await _loginUsecase(params);
-
-      result.fold(
-        (failure) {
-          state = state.copyWith(
-            status: AuthStatus.error,
-            errorMessage: failure.message,
-          );
-        },
-        (authEntity) {
-          state = state.copyWith(
-            status: AuthStatus.authenticated,
-            authEntity: authEntity,
-          );
-        },
-      );
-    }
+    result.fold(
+      (failure) {
+        state = state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: failure.message,
+        );
+      },
+      (authEntity) {
+        state = state.copyWith(
+          status: AuthStatus.authenticated,
+          authEntity: authEntity,
+        );
+      },
+    );
   }
 }

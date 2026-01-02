@@ -1,6 +1,8 @@
+import 'package:click_shop/app/routes/app_routes.dart';
 import 'package:click_shop/core/utils/snackbar_utils.dart';
 import 'package:click_shop/core/widgets/my_button_widgets.dart';
 import 'package:click_shop/core/widgets/my_text_field_widgets.dart';
+import 'package:click_shop/features/auth/presentation/pages/login_screen.dart';
 import 'package:click_shop/features/auth/presentation/state/auth_state.dart';
 import 'package:click_shop/features/auth/presentation/view_model/auth_view_model.dart';
 import 'package:flutter/gestures.dart';
@@ -72,7 +74,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
 
       if (next.status == AuthStatus.registered) {
         SnackbarUtils.showSuccess(context, 'Signup successful!');
-        Navigator.pushReplacementNamed(context, '/login');
+        AppRoutes.pushReplacement(context, LoginPage());
       }
     });
 
