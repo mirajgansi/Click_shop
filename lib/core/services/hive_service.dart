@@ -20,9 +20,6 @@ class HiveService {
   }
 
   void _registerAdapter() {
-    if (!Hive.isAdapterRegistered(HiveTableConstants.ProductTypeId)) {
-      Hive.registerAdapter(AuthHiveModelAdapter());
-    }
     if (!Hive.isAdapterRegistered(HiveTableConstants.authtypeId)) {
       Hive.registerAdapter(AuthHiveModelAdapter());
     }

@@ -102,6 +102,8 @@ class ProfileScreen extends StatelessWidget {
                   onPressed: () {
                     Navigator.pushNamed(context, '/login');
                   },
+                  height: 12,
+                  borderRadius: 12,
                 ),
               ),
             ],

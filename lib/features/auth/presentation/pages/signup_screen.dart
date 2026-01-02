@@ -1,9 +1,6 @@
-import 'package:click_shop/app/routes/app_routes.dart';
-import 'package:click_shop/core/utils/my_snack_bar.dart';
 import 'package:click_shop/core/utils/snackbar_utils.dart';
 import 'package:click_shop/core/widgets/my_button_widgets.dart';
 import 'package:click_shop/core/widgets/my_text_field_widgets.dart';
-import 'package:click_shop/features/auth/presentation/pages/login_screen.dart';
 import 'package:click_shop/features/auth/presentation/state/auth_state.dart';
 import 'package:click_shop/features/auth/presentation/view_model/auth_view_model.dart';
 import 'package:flutter/gestures.dart';
@@ -69,10 +66,13 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
       if (next.status == AuthStatus.error) {
         SnackbarUtils.showError(
           context,
-          next.errorMessage ?? 'An error occurred',
+          next.errorMessage ?? 'Registration failed',
         );
-      } else if (next.status == AuthStatus.authenticated) {
-        SnackbarUtils.showSuccess(context, 'Signup successful! Please log in.');
+      }
+
+      if (next.status == AuthStatus.registered) {
+        SnackbarUtils.showSuccess(context, 'Signup successful!');
+        Navigator.pushReplacementNamed(context, '/login');
       }
     });
 
@@ -139,6 +139,15 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                             controller: _usernameController,
                             hintText: "John Doe",
                             text: "Username",
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return "Username is required";
+                              }
+                              if (value.length < 3) {
+                                return "Username must be at least 3 characters";
+                              }
+                              return null;
+                            },
                           ),
 
                           const SizedBox(height: 10),
@@ -147,6 +156,17 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                             controller: _emailController,
                             hintText: "example600@gmail.com",
                             text: "Email",
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return "Email is required";
+                              }
+                              if (!RegExp(
+                                r'^[^@]+@[^@]+\.[^@]+',
+                              ).hasMatch(value)) {
+                                return "Enter a valid email";
+                              }
+                              return null;
+                            },
                           ),
 
                           const SizedBox(height: 10),
@@ -156,6 +176,15 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                             hintText: "*******",
                             text: "Password",
                             obscureText: true,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return "Password is required";
+                              }
+                              if (value.length < 6) {
+                                return "Password must be at least 6 characters";
+                              }
+                              return null;
+                            },
                           ),
 
                           const SizedBox(height: 10),
@@ -165,105 +194,47 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                             hintText: "*******",
                             text: "Confirm Password",
                             obscureText: true,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return "Confirm your password";
+                              }
+                              if (value != _passwordController.text) {
+                                return "Passwords do not match";
+                              }
+                              return null;
+                            },
                           ),
 
                           const SizedBox(height: 20),
-
-                          const Text(
-                            "By continuing you agree to our Terms of Service and Privacy Policy.",
-                            style: TextStyle(fontSize: 14),
+                          Row(
+                            children: [
+                              Checkbox(
+                                value: _agreedToTerms,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _agreedToTerms = value ?? false;
+                                  });
+                                },
+                              ),
+                              const Expanded(
+                                child: Text(
+                                  "I agree to the Terms of Service and Privacy Policy",
+                                  style: TextStyle(fontSize: 14),
+                                ),
+                              ),
+                            ],
                           ),
-
                           const SizedBox(height: 20),
 
                           MyButtonWidgets(
-                            onPressed: () {
-                              final username = _usernameController.text.trim();
-                              final email = _emailController.text.trim();
-                              final password = _passwordController.text.trim();
-                              final confirmPassword = _confirmPasswordController
-                                  .text
-                                  .trim();
-
-                              if (username.isEmpty) {
-                                showMySnackBar(
-                                  context: context,
-                                  message: "Username can't be empty",
-                                  color: Colors.red,
-                                );
-                                return;
-                              }
-
-                              if (email.isEmpty) {
-                                showMySnackBar(
-                                  context: context,
-                                  message: "Email can't be empty",
-                                  color: Colors.red,
-                                );
-                                return;
-                              }
-
-                              if (!RegExp(r'\S+@\S+\.\S+').hasMatch(email)) {
-                                showMySnackBar(
-                                  context: context,
-                                  message: "Enter a valid email",
-                                  color: Colors.red,
-                                );
-                                return;
-                              }
-
-                              if (password.isEmpty) {
-                                showMySnackBar(
-                                  context: context,
-                                  message: "Password can't be empty",
-                                  color: Colors.red,
-                                );
-                                return;
-                              }
-
-                              if (password.length < 8) {
-                                showMySnackBar(
-                                  context: context,
-                                  message:
-                                      "Password must be at least 8 characters",
-                                  color: Colors.red,
-                                );
-                                return;
-                              }
-
-                              if (confirmPassword.isEmpty) {
-                                showMySnackBar(
-                                  context: context,
-                                  message: "Confirm Password can't be empty",
-                                  color: Colors.red,
-                                );
-                                return;
-                              }
-
-                              if (password != confirmPassword) {
-                                showMySnackBar(
-                                  context: context,
-                                  message: "Passwords do not match",
-                                  color: Colors.red,
-                                );
-                                return;
-                              }
-
-                              showMySnackBar(
-                                context: context,
-                                message: "Signup successful",
-                                color: Colors.green,
-                              );
-
-                              Future.delayed(const Duration(seconds: 2), () {
-                                Navigator.pushNamed(context, '/login');
-                              });
-                            },
+                            onPressed: _handleSignup,
+                            isLoading: authState.status == AuthStatus.loading,
                             text: "Sign up",
+                            height: 50,
+                            borderRadius: 16,
                           ),
 
                           const SizedBox(height: 20),
-
                           Center(
                             child: RichText(
                               text: TextSpan(

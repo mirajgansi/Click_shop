@@ -1,14 +1,7 @@
 import 'package:click_shop/features/auth/domain/entities/auth_entity.dart';
 import 'package:equatable/equatable.dart';
 
-enum AuthStatus {
-  initial,
-  authenticated,
-  unauthenticated,
-  loading,
-  register,
-  error,
-}
+enum AuthStatus { initial, loading, registered, authenticated, error }
 
 class AuthState extends Equatable {
   final AuthStatus status;

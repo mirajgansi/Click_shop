@@ -50,6 +50,8 @@ class Onboarding extends StatelessWidget {
                     Navigator.pushNamed(context, '/login');
                   },
                   text: 'Get Started',
+                  height: 12,
+                  borderRadius: 12,
                 ),
               ],
             ),

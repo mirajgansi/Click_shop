@@ -1,17 +1,74 @@
+import 'package:click_shop/app/routes/app_routes.dart';
 import 'package:click_shop/core/utils/my_snack_bar.dart';
 import 'package:click_shop/core/utils/snackbar_utils.dart';
 import 'package:click_shop/core/widgets/my_button_widgets.dart';
 import 'package:click_shop/core/widgets/my_text_field_widgets.dart';
+import 'package:click_shop/features/auth/presentation/pages/signup_screen.dart';
+import 'package:click_shop/screens/bottom_screen/home_screen.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class LoginScreen extends StatelessWidget {
-  const LoginScreen({super.key});
+class LoginPage extends ConsumerStatefulWidget {
+  const LoginPage({super.key});
 
   @override
+  ConsumerState<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends ConsumerState<LoginPage> {
+  @override
   Widget build(BuildContext context) {
-    final emailController = TextEditingController();
-    final passwordController = TextEditingController();
+    final _formKey = GlobalKey<FormState>();
+    final _emailController = TextEditingController();
+    final _passwordController = TextEditingController();
+    bool _obscurePassword = true;
+    bool _isLoading = false;
+
+    @override
+    void dispose() {
+      _emailController.dispose();
+      _passwordController.dispose();
+      super.dispose();
+    }
+
+    Future<void> _handleLogin() async {
+      if (_formKey.currentState!.validate()) {
+        setState(() {
+          _isLoading = true;
+        });
+
+        // TODO: Implement login logic
+        await Future.delayed(const Duration(seconds: 2));
+
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+          // Navigate to dashboard
+          AppRoutes.pushReplacement(context, const HomeScreen());
+        }
+      }
+    }
+
+    void _navigateToSignup() {
+      AppRoutes.push(context, const SignupScreen());
+    }
+
+    void _handleForgotPassword() {
+      // TODO: Implement forgot password
+      SnackbarUtils.showInfo(context, 'Forgot password feature coming soon');
+    }
+
+    void _handleGoogleSignIn() {
+      // TODO: Implement Google Sign In
+      SnackbarUtils.showInfo(context, 'Google Sign In coming soon');
+    }
+
+    void _handleAppleSignIn() {
+      // TODO: Implement Apple Sign In
+      SnackbarUtils.showInfo(context, 'Apple Sign In coming soon');
+    }
 
     return Scaffold(
       appBar: AppBar(automaticallyImplyLeading: false),
@@ -76,7 +133,7 @@ class LoginScreen extends StatelessWidget {
                       const SizedBox(height: 20),
 
                       MyTextFieldWidgets(
-                        controller: emailController,
+                        controller: _emailController,
                         hintText: "example600@gmail.com",
                         text: "Email",
                       ),
@@ -84,7 +141,7 @@ class LoginScreen extends StatelessWidget {
                       const SizedBox(height: 10),
 
                       MyTextFieldWidgets(
-                        controller: passwordController,
+                        controller: _passwordController,
                         hintText: "*******",
                         text: "Password",
                         obscureText: true,
@@ -109,8 +166,8 @@ class LoginScreen extends StatelessWidget {
 
                       MyButtonWidgets(
                         onPressed: () {
-                          final email = emailController.text.trim();
-                          final password = passwordController.text.trim();
+                          final email = _emailController.text.trim();
+                          final password = _passwordController.text.trim();
 
                           if (email.isEmpty) {
                             showMySnackBar(
@@ -159,6 +216,8 @@ class LoginScreen extends StatelessWidget {
                           });
                         },
                         text: "Log in",
+                        height: 12,
+                        borderRadius: 12,
                       ),
 
                       const SizedBox(height: 20),

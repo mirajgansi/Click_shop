@@ -26,8 +26,7 @@ class AuthViewModel extends Notifier<AuthState> {
     String? profileImage,
   }) async {
     state = state.copyWith(status: AuthStatus.loading);
-    // wait for 2 seconds to simulate network request
-    await Future.delayed(const Duration(seconds: 2));
+
     final result = await _registerUsecase(
       RegisterUsecaseParams(
         userName: userName,
@@ -36,6 +35,7 @@ class AuthViewModel extends Notifier<AuthState> {
         profileImage: profileImage,
       ),
     );
+
     result.fold(
       (failure) {
         state = state.copyWith(
@@ -44,40 +44,46 @@ class AuthViewModel extends Notifier<AuthState> {
         );
       },
       (isRegistered) {
-        if (isRegistered) {
-          state = state.copyWith(status: AuthStatus.register);
-        } else {
+        if (!isRegistered) {
           state = state.copyWith(
             status: AuthStatus.error,
             errorMessage: 'Registration failed',
           );
-        }
-
-        //login after registration
-        Future<void> login({required String email}) async {
-          state = state.copyWith(status: AuthStatus.loading);
-          final params = LoginUsecaseParams(
-            email: email,
-            password: password,
-            userName: userName,
-          );
-          final result = await _loginUsecase(params);
-          result.fold(
-            (failure) {
-              state = state.copyWith(
-                status: AuthStatus.error,
-                errorMessage: failure.message,
-              );
-            },
-            (authEntity) {
-              state = state.copyWith(
-                status: AuthStatus.authenticated,
-                authEntity: authEntity,
-              );
-            },
-          );
+        } else {
+          state = state.copyWith(status: AuthStatus.registered);
         }
       },
     );
+
+    Future<void> login({
+      required String email,
+      required String password,
+      required String userName,
+    }) async {
+      state = state.copyWith(status: AuthStatus.loading);
+
+      final params = LoginUsecaseParams(
+        email: email,
+        password: password,
+        userName: userName,
+      );
+
+      final result = await _loginUsecase(params);
+
+      result.fold(
+        (failure) {
+          state = state.copyWith(
+            status: AuthStatus.error,
+            errorMessage: failure.message,
+          );
+        },
+        (authEntity) {
+          state = state.copyWith(
+            status: AuthStatus.authenticated,
+            authEntity: authEntity,
+          );
+        },
+      );
+    }
   }
 }

@@ -91,6 +91,8 @@ class _AddProductState extends State<AddProduct> {
                 child: MyButtonWidgets(
                   onPressed: _submitProduct,
                   text: 'Add Product',
+                  height: 12,
+                  borderRadius: 12,
                 ),
               ),
             ],

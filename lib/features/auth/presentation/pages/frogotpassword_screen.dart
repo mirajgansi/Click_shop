@@ -106,6 +106,8 @@ class FrogotpasswordScreen extends StatelessWidget {
                     // ),
                     onPressed: () {},
                     text: 'Submit',
+                    height: 12,
+                    borderRadius: 12,
                   ),
                 ),
               ],
