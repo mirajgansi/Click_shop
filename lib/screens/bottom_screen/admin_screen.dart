@@ -1,4 +1,4 @@
-import 'package:click_shop/core/widgets/my_button_widgets.dart';
+import 'package:click_shop/features/auth/presentation/widgets/my_button_widgets.dart';
 import 'package:click_shop/core/widgets/my_product_text_fiedl_widgets.dart';
 import 'package:flutter/material.dart';
 

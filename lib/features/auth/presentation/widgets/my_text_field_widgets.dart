@@ -70,12 +70,14 @@ class _MyTextFieldWidgetsState extends State<MyTextFieldWidgets> {
             : null,
       ),
 
-      validator: (value) {
-        if (value!.isEmpty) {
-          return ('Please enter ${widget.text}');
-        }
-        return null;
-      },
+      validator:
+          widget.validator ??
+          (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter ${widget.text}';
+            }
+            return null;
+          },
     );
   }
 }

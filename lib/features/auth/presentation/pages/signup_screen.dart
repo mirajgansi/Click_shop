@@ -1,7 +1,7 @@
 import 'package:click_shop/app/routes/app_routes.dart';
 import 'package:click_shop/core/utils/snackbar_utils.dart';
-import 'package:click_shop/core/widgets/my_button_widgets.dart';
-import 'package:click_shop/core/widgets/my_text_field_widgets.dart';
+import 'package:click_shop/features/auth/presentation/widgets/my_button_widgets.dart';
+import 'package:click_shop/features/auth/presentation/widgets/my_text_field_widgets.dart';
 import 'package:click_shop/features/auth/presentation/pages/login_screen.dart';
 import 'package:click_shop/features/auth/presentation/state/auth_state.dart';
 import 'package:click_shop/features/auth/presentation/view_model/auth_view_model.dart';
@@ -37,6 +37,10 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
   }
 
   Future<void> _handleSignup() async {
+    final isFormValid = _formKey.currentState?.validate() ?? false;
+    if (!isFormValid) {
+      return;
+    }
     if (!_agreedToTerms) {
       SnackbarUtils.showError(
         context,
@@ -44,16 +48,13 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
       );
       return;
     }
-
-    if (_formKey.currentState!.validate()) {
-      ref
-          .read(AuthViewModelProvider.notifier)
-          .register(
-            email: _emailController.text.trim(),
-            password: _passwordController.text.trim(),
-            userName: _usernameController.text.trim().split('@').first,
-          );
-    }
+    ref
+        .read(AuthViewModelProvider.notifier)
+        .register(
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+          userName: _usernameController.text.trim().split('@').first,
+        );
   }
 
   void _navigateToLogin() {
