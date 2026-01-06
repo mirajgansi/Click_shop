@@ -12,9 +12,9 @@ class HiveTableConstants {
   static const int OrderTypeId = 2;
   static const String OrderTable = 'order_table';
 
-  static const int CategoryTypeId = 4;
+  static const int CategoryTypeId = 3;
   static const String CategoryTable = 'category_table';
 
-  static const int CartTypeId = 5;
+  static const int CartTypeId = 4;
   static const String CartTable = 'cart_table';
 }

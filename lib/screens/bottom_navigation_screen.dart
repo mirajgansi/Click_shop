@@ -1,4 +1,4 @@
-import 'package:click_shop/screens/bottom_screen/admin_screen.dart';
+import 'package:click_shop/features/product/presentation/pages/add_product_screen.dart';
 import 'package:click_shop/screens/bottom_screen/explore_screen.dart';
 import 'package:click_shop/screens/bottom_screen/favourite_screen.dart';
 import 'package:click_shop/screens/bottom_screen/cart_sreen.dart';

@@ -1,5 +1,6 @@
+import 'package:click_shop/core/utils/snackbar_utils.dart';
 import 'package:click_shop/features/auth/presentation/widgets/my_button_widgets.dart';
-import 'package:click_shop/core/widgets/my_product_text_fiedl_widgets.dart';
+import 'package:click_shop/features/product/presentation/widgets/my_product_text_fied_widgets.dart';
 import 'package:flutter/material.dart';
 
 class AddProduct extends StatefulWidget {
@@ -18,6 +19,14 @@ class _AddProductState extends State<AddProduct> {
   final TextEditingController _detailsController = TextEditingController();
   final TextEditingController _imageController = TextEditingController();
 
+  String? _selectedCategory;
+  final List<String> _categories = [
+    "Beverages",
+    "Snacks",
+    "Dairy",
+    "Fruits",
+    "Vegetables",
+  ];
   @override
   void dispose() {
     _nameController.dispose();
@@ -30,21 +39,28 @@ class _AddProductState extends State<AddProduct> {
 
   void _submitProduct() {
     if (_formKey.currentState!.validate()) {
+      if (_selectedCategory == null) {
+        SnackbarUtils.showError(context, 'Please select a category');
+
+        return;
+      }
       final product = {
         "name": _nameController.text,
         "price": double.parse(_priceController.text),
         "nutrition": _nutritionController.text,
         "details": _detailsController.text,
         "image": _imageController.text,
+        "category": _selectedCategory!,
       };
 
       debugPrint(product.toString());
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Product added successfully")),
-      );
+      SnackbarUtils.showSuccess(context, 'Product added successfully');
 
       _formKey.currentState!.reset();
+      setState(() {
+        _selectedCategory = null;
+      });
     }
   }
 
@@ -85,13 +101,40 @@ class _AddProductState extends State<AddProduct> {
                 label: "Image URL",
                 icon: Icons.image,
               ),
+              DropdownButtonFormField<String>(
+                value: _selectedCategory,
+                decoration: InputDecoration(
+                  labelText: "Category",
+                  prefixIcon: const Icon(Icons.category),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                items: _categories
+                    .map(
+                      (category) => DropdownMenuItem<String>(
+                        value: category,
+                        child: Text(category),
+                      ),
+                    )
+                    .toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _selectedCategory = value;
+                  });
+                },
+                validator: (value) {
+                  if (value == null) return "Please select a category";
+                  return null;
+                },
+              ),
               const SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,
                 child: MyButtonWidgets(
                   onPressed: _submitProduct,
                   text: 'Add Product',
-                  height: 12,
+                  height: 54,
                   borderRadius: 12,
                 ),
               ),
