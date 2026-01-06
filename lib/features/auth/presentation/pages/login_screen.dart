@@ -1,3 +1,4 @@
+import 'package:click_shop/app/app_color.dart';
 import 'package:click_shop/app/routes/app_routes.dart';
 import 'package:click_shop/core/utils/my_snack_bar.dart';
 import 'package:click_shop/core/utils/snackbar_utils.dart';
@@ -10,6 +11,7 @@ import 'package:click_shop/screens/bottom_navigation_screen.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/svg.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -63,6 +65,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final secondaryTextColor =
+        Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textMuted;
+
     final authState = ref.watch(AuthViewModelProvider);
 
     ref.listen<AuthState>(AuthViewModelProvider, (previous, next) {
@@ -178,7 +184,83 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                           borderRadius: 16,
                         ),
 
-                        const SizedBox(height: 20),
+                        Row(
+                          children: [
+                            Expanded(child: Divider()),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                              ),
+                              child: Text(
+                                'OR',
+                                style: TextStyle(
+                                  color: secondaryTextColor,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                            Expanded(child: Divider()),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+
+                        // Social Login Buttons
+                        Row(
+                          children: [
+                            Expanded(
+                              child: OutlinedButton.icon(
+                                onPressed: _handleGoogleSignIn,
+                                icon: SvgPicture.asset(
+                                  'assets/svg/google_logo.svg',
+                                  width: 20,
+                                  height: 20,
+                                  colorFilter: isDarkMode
+                                      ? const ColorFilter.mode(
+                                          AppColors.darkTextPrimary,
+                                          BlendMode.srcIn,
+                                        )
+                                      : null,
+                                ),
+                                label: Text('Google'),
+                                style: OutlinedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 16,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: OutlinedButton.icon(
+                                onPressed: _handleAppleSignIn,
+                                icon: SvgPicture.asset(
+                                  'assets/svg/apple_logo.svg',
+                                  width: 20,
+                                  height: 20,
+                                  colorFilter: isDarkMode
+                                      ? const ColorFilter.mode(
+                                          AppColors.darkTextPrimary,
+                                          BlendMode.srcIn,
+                                        )
+                                      : null,
+                                ),
+                                label: Text('Apple'),
+                                style: OutlinedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 16,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
 
                         Center(
                           child: RichText(
