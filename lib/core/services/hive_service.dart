@@ -1,5 +1,7 @@
 import 'package:click_shop/core/constants/hive_table_constants.dart';
 import 'package:click_shop/features/auth/data/models/auth_hive_model.dart';
+import 'package:click_shop/features/product/data/model/product_hive_model.dart';
+import 'package:click_shop/features/product/data/repositories/product_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 
@@ -107,3 +109,65 @@ class HiveService {
     return users.isNotEmpty;
   }
 }
+
+//Prodyct Box
+Box<ProductHiveModel> get _productBox =>
+    Hive.box<ProductHiveModel>(HiveTableConstants.productTable);
+
+Future<ProductHiveModel> createProduct(ProductHiveModel model) async {
+  await _productBox.put(model.productId, model);
+  return model;
+}
+
+Future<List<ProductHiveModel>> getAllProducts() async {
+  return _productBox.values.toList();
+}
+
+Future<ProductHiveModel?> getProductById(String productId) async {
+  return _productBox.get(productId);
+}
+
+Future<bool> updateProduct(ProductHiveModel model) async {
+  final exists = _productBox.containsKey(model.productId);
+  if (!exists) return false;
+
+  await _productBox.put(model.productId, model);
+  return true;
+}
+
+Future<bool> deleteProduct(String productId) async {
+  final exists = _productBox.containsKey(productId);
+  if (!exists) return false;
+
+  await _productBox.delete(productId);
+  return true;
+}
+
+  // Future<List<ProductHiveModel>> getProductsByCategory(String categoryId) async {
+  //   return _productBox.values
+  //       .where((p) => p.categoryId == categoryId)
+  //       .toList();
+  // }
+
+  // Future<List<ProductHiveModel>> searchProducts(String query) async {
+  //   final q = query.trim().toLowerCase();
+  //   if (q.isEmpty) return [];
+
+  //   return _productBox.values
+  //       .where((p) => p.name.toLowerCase().contains(q))
+  //       .toList();
+  // }
+
+  // Future<bool> toggleFavorite(String productId) async {
+  //   final product = _productBox.get(productId);
+  //   if (product == null) return false;
+
+  //   final updated = product.copyWith(isFavorite: !product.isFavorite);
+  //   await _productBox.put(productId, updated);
+  //   return true;
+  // }
+
+  // Future<List<ProductHiveModel>> getFavoriteProducts() async {
+  //   return _productBox.values.where((p) => p.isFavorite).toList();
+  // }
+
