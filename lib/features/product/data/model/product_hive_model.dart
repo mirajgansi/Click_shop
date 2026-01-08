@@ -6,7 +6,7 @@ import 'package:uuid/uuid.dart';
 
 part 'product_hive_model.g.dart';
 
-@HiveType(typeId: HiveTableConstants.ProductTypeId)
+@HiveType(typeId: HiveTableConstants.productTypeId)
 class ProductHiveModel extends HiveObject {
   @HiveField(0)
   final String? productId;
