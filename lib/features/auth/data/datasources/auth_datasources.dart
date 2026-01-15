@@ -1,3 +1,4 @@
+import 'package:click_shop/features/auth/data/models/auth_api_model.dart';
 import 'package:click_shop/features/auth/data/models/auth_hive_model.dart';
 
 // abstract interface class IAuthDatasource {
@@ -22,16 +23,13 @@ abstract interface class IAuthLocalDataSource {
 }
 
 abstract interface class IAuthRemoteDataSource {
-  Future<AuthHiveModel> register(AuthHiveModel user);
+  Future<AuthApiModel> register(AuthApiModel user);
 
-  Future<AuthHiveModel> login({
-    required String email,
-    required String password,
-  });
+  Future<AuthApiModel?> login(String email, String password);
 
-  Future<AuthHiveModel> getUserById(String userId);
+  Future<AuthApiModel> getUserById(String userId);
 
-  Future<AuthHiveModel> updateUser(AuthHiveModel user);
+  Future<AuthApiModel> updateUser(AuthApiModel user);
 
   Future<bool> deleteUser(String userId);
 }

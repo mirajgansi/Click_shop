@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:click_shop/features/auth/domain/entities/auth_entity.dart';
 
 class AuthApiModel {
@@ -51,6 +53,7 @@ class AuthApiModel {
     return AuthApiModel(
       username: entity.username,
       email: entity.email,
+      password: entity.password,
       profilePicture: entity.profileImage,
     );
   }
