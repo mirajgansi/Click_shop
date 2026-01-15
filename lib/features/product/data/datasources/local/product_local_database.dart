@@ -1,4 +1,4 @@
-import 'package:click_shop/core/services/hive_service.dart';
+import 'package:click_shop/core/services/hive/hive_service.dart';
 import 'package:click_shop/features/product/data/datasources/remote/product_database.dart';
 import 'package:click_shop/features/product/domain/entities/product_entity.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

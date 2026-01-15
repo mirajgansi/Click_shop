@@ -53,7 +53,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
         .register(
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
-          userName: _usernameController.text.trim().split('@').first,
+          username: _usernameController.text.trim().split('@').first,
         );
   }
 

@@ -1,6 +1,6 @@
 import 'package:click_shop/core/error/failures.dart';
 import 'package:click_shop/features/auth/data/datasources/local/auth_local_datasource.dart';
-import 'package:click_shop/features/auth/data/datasources/remote/auth_datasources.dart';
+import 'package:click_shop/features/auth/data/datasources/auth_datasources.dart';
 import 'package:click_shop/features/auth/data/models/auth_hive_model.dart';
 import 'package:click_shop/features/auth/domain/entities/auth_entity.dart';
 import 'package:click_shop/features/auth/domain/repositories/auth_repository.dart';
@@ -15,9 +15,9 @@ final authRepositoryProvider = Provider<IAuthRepository>((ref) {
 });
 
 class AuthRepository implements IAuthRepository {
-  final IAuthDatasource _authDatasource;
+  final IAuthLocalDataSource _authDatasource;
 
-  AuthRepository({required IAuthDatasource authDatasource})
+  AuthRepository({required IAuthLocalDataSource authDatasource})
     : _authDatasource = authDatasource;
 
   @override
@@ -65,8 +65,8 @@ class AuthRepository implements IAuthRepository {
   @override
   Future<Either<Failure, bool>> register(AuthEntity authEntity) async {
     try {
-      final model = AuthHiveModel.fromEntity(authEntity);
-      final result = await _authDatasource.register(model);
+      final user = AuthHiveModel.fromEntity(authEntity);
+      final result = await _authDatasource.register(user) as bool;
       if (result) {
         return Right(true);
       }

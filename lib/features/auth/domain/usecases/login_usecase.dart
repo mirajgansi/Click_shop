@@ -34,6 +34,7 @@ class LoginUsecase
     final authEntity = AuthEntity(
       email: params.email,
       password: params.password,
+      username: '',
     );
     return _authRepository.login(params.email, params.password);
   }
