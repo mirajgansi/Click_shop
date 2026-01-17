@@ -4,18 +4,21 @@ import 'package:click_shop/features/auth/domain/entities/auth_entity.dart';
 
 class AuthApiModel {
   final String? userId;
-  final String username;
+  final String? username;
   final String email;
   final String? password;
   final String? profilePicture;
+  final String? confirmPassword;
+
   // final String role;
 
   AuthApiModel({
     this.userId,
-    required this.username,
+    this.username,
     required this.email,
     this.password,
     this.profilePicture,
+    this.confirmPassword,
   });
 
   //toJson
@@ -24,6 +27,7 @@ class AuthApiModel {
       "username": username,
       "email": email,
       "password": password,
+      "confirmPassword": confirmPassword,
       "profilePicture": profilePicture,
     };
   }

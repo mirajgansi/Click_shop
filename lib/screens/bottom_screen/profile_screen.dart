@@ -1,12 +1,19 @@
+import 'package:click_shop/app/routes/app_routes.dart';
+import 'package:click_shop/core/services/storage/user_session_service.dart';
+import 'package:click_shop/features/auth/data/datasources/local/auth_local_datasource.dart';
+import 'package:click_shop/features/auth/data/repositories/auth_repository.dart';
+import 'package:click_shop/features/auth/domain/usecases/logout_usecase.dart';
+import 'package:click_shop/features/auth/presentation/pages/login_screen.dart';
 import 'package:click_shop/features/auth/presentation/widgets/my_button_widgets.dart';
 import 'package:click_shop/core/widgets/my_menu_items_widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return LayoutBuilder(
       builder: (context, constraints) {
         final bool isTablet = constraints.maxWidth >= 600;
@@ -99,8 +106,15 @@ class ProfileScreen extends StatelessWidget {
                 height: 90,
                 child: MyButtonWidgets(
                   text: 'Log Out',
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/login');
+                  onPressed: () async {
+                    await ref.read(UserSessionServiceProvider).logout();
+
+                    if (!context.mounted) return;
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      '/login',
+                      (route) => false,
+                    );
                   },
                   height: 12,
                   borderRadius: 12,

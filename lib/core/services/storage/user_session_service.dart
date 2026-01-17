@@ -28,17 +28,23 @@ class UserSessionService {
   Future<void> saveUserSession({
     required String userId,
     required String email,
-    required String username,
+    String? username,
     String? profilePicture,
   }) async {
     await _prefs.setBool(_keyIsLoggedIn, true);
     await _prefs.setString(_keyUserId, userId);
     await _prefs.setString(_keyUserEmail, email);
-    await _prefs.setString(_keyUsername, username);
+    // await _prefs.setString(_keyUsername, username);
 
     if (profilePicture != null) {
       await _prefs.setString(_keyProfilePicture, profilePicture);
     }
+  }
+
+  Future<void> logout() async {
+    // safest: explicitly set false AND clear everything
+    await _prefs.setBool(_keyIsLoggedIn, false);
+    await clearUserSession();
   }
 
   //clear user session data

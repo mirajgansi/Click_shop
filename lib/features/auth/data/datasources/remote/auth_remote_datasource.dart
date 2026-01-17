@@ -30,7 +30,7 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
       ApiEndpoints.userRegister,
       data: user.toJson(),
     );
-    if (response.data['sucess'] == true) {
+    if (response.data['success'] == true) {
       final data = response.data['data'] as Map<String, dynamic>;
       final registeredUser = AuthApiModel.fromJson(data);
       return registeredUser;
@@ -64,13 +64,13 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
     );
 
     if (response.data['success'] == true) {
-      final data = response.data as Map<String, dynamic>;
+      final data = response.data['data'] as Map<String, dynamic>;
       final user = AuthApiModel.fromJson(data);
 
       await _userSessionService.saveUserSession(
         userId: user.userId!,
         email: user.email,
-        username: user.username,
+        // username: user.username,
       );
       return user;
     }

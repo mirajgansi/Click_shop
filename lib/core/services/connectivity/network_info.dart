@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -16,12 +17,10 @@ class NetworkInfo implements INetworkInfo {
 
   NetworkInfo(this._connnectivity);
   @override
-  // TODO: implement isConnected
   Future<bool> get isConnected async {
     //
     final result = await _connnectivity.checkConnectivity();
 
-    /// wifi / moble connected orr not
     if (result.contains(ConnectivityResult.none)) {
       return false;
     }
@@ -34,8 +33,11 @@ class NetworkInfo implements INetworkInfo {
     try {
       final result = await InternetAddress.lookup('google.com');
       return result.isNotEmpty && result[0].rawAddress.isNotEmpty;
-    } on SocketException catch (e) {
+    } on SocketException catch (_) {
       return false;
+    } catch (e) {
+      // For web or other platforms where lookup fails
+      return true; // Assume connected if connectivity check passed
     }
   }
 }
