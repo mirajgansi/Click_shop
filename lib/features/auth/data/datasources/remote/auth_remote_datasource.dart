@@ -64,17 +64,52 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
     );
 
     if (response.data['success'] == true) {
-      final data = response.data['data'] as Map<String, dynamic>;
+      final body = response.data as Map<String, dynamic>;
+
+      final data = body['data'] as Map<String, dynamic>;
+      final token = body['token']?.toString(); // ✅ token is here
+
       final user = AuthApiModel.fromJson(data);
+
+      if (user.userId == null || user.userId!.isEmpty) {
+        throw Exception("Missing userId. data=$data");
+      }
+      if (token == null || token.isEmpty) {
+        throw Exception("Missing token. body=$body");
+      }
 
       await _userSessionService.saveUserSession(
         userId: user.userId!,
         email: user.email,
-        // username: user.username,
+        username: user.username, // ✅ include this
+        token: token, // ✅ add token param in service
       );
+
       return user;
     }
 
     return null;
   }
+
+  //   @override
+  //   Future<AuthApiModel?> login(String email, String password) async {
+  //     final response = await _apiClient.post(
+  //       ApiEndpoints.userLogin,
+  //       data: {'email': email, 'password': password},
+  //     );
+
+  //     if (response.data['success'] == true) {
+  //       final data = response.data['data'] as Map<String, dynamic>;
+  //       final user = AuthApiModel.fromJson(data);
+
+  //       await _userSessionService.saveUserSession(
+  //         userId: user.userId!,
+  //         email: user.email,
+  //         // username: user.username,
+  //       );
+  //       return user;
+  //     }
+
+  //     return null;
+  //   }
 }

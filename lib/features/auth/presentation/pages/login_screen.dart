@@ -282,7 +282,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                   ),
                                   recognizer: TapGestureRecognizer()
                                     ..onTap = () {
-                                      Navigator.pushNamed(context, '/signup');
+                                      AppRoutes.pushReplacement(
+                                        context,
+                                        SignupScreen(),
+                                      );
                                     },
                                 ),
                               ],

@@ -24,7 +24,7 @@ class AuthViewModel extends Notifier<AuthState> {
     required String email,
     required String confirmPassword,
     required String password,
-    String? profileImage,
+    // String? profileImage,
   }) async {
     state = state.copyWith(status: AuthStatus.loading);
 
@@ -34,7 +34,7 @@ class AuthViewModel extends Notifier<AuthState> {
         email: email,
         password: password,
         confirmPassword: confirmPassword,
-        profileImage: profileImage,
+        // profileImage: profileImage,
       ),
     );
 

@@ -22,13 +22,13 @@ class AuthHiveModel extends HiveObject {
   @HiveField(4)
   final String? confirmPassword;
 
-  @HiveField(5)
-  final String? profileImage;
+  // @HiveField(5)
+  // final String? profileImage;
 
   AuthHiveModel({
     String? userId,
     required this.email,
-    this.profileImage,
+    // this.profileImage,
     required this.username,
     this.password,
     this.confirmPassword,
@@ -39,7 +39,7 @@ class AuthHiveModel extends HiveObject {
     return AuthHiveModel(
       userId: authEntity.userId,
       email: authEntity.email,
-      profileImage: authEntity.profileImage,
+      // profileImage: authEntity.profileImage,
       username: authEntity.username,
       password: authEntity.password,
       confirmPassword: authEntity.confirmPassword,
@@ -51,7 +51,7 @@ class AuthHiveModel extends HiveObject {
     return AuthEntity(
       userId: userId,
       email: email,
-      profileImage: profileImage,
+      // profileImage: profileImage,
       username: username,
       password: password,
       confirmPassword: confirmPassword,

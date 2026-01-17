@@ -142,31 +142,48 @@ class _AuthInterceptor extends Interceptor {
   final _storage = const FlutterSecureStorage();
   static const String _tokenKey = 'auth_token';
 
+  // @override
+  // void onRequest(
+  //   RequestOptions options,
+  //   RequestInterceptorHandler handler,
+  // ) async {
+  //   // Skip auth for public endpoints
+  //   final publicEndpoints = [
+  //     // ApiEndpoints.batches,
+  //     // ApiEndpoints.categories,
+  //     ApiEndpoints.userLogin,
+  //   ];
+
+  //   final isPublicGet =
+  //       options.method == 'GET' &&
+  //       publicEndpoints.any((endpoint) => options.path.startsWith(endpoint));
+
+  //   final isAuthEndpoint =
+  //       options.path == ApiEndpoints.userLogin ||
+  //       options.path == ApiEndpoints.users;
+
+  //   if (!isPublicGet && !isAuthEndpoint) {
+  //     final token = await _storage.read(key: _tokenKey);
+  //     if (token != null) {
+  //       options.headers['Authorization'] = 'Bearer $token';
+  //     }
+  //   }
+
+  //   handler.next(options);
+  // }
+
   @override
   void onRequest(
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
-    // Skip auth for public endpoints
-    final publicEndpoints = [
-      // ApiEndpoints.batches,
-      // ApiEndpoints.categories,
-      ApiEndpoints.userLogin,
-    ];
+    if (options.path.startsWith("auth")) {
+      return handler.next(options);
+    }
 
-    final isPublicGet =
-        options.method == 'GET' &&
-        publicEndpoints.any((endpoint) => options.path.startsWith(endpoint));
-
-    final isAuthEndpoint =
-        options.path == ApiEndpoints.userLogin ||
-        options.path == ApiEndpoints.users;
-
-    if (!isPublicGet && !isAuthEndpoint) {
-      final token = await _storage.read(key: _tokenKey);
-      if (token != null) {
-        options.headers['Authorization'] = 'Bearer $token';
-      }
+    final token = await _storage.read(key: _tokenKey);
+    if (token != null && token.isNotEmpty) {
+      options.headers['Authorization'] = 'Bearer $token';
     }
 
     handler.next(options);

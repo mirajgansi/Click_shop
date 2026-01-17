@@ -20,6 +20,7 @@ class UserSessionService {
   static const String _keyUserEmail = 'user_email';
   static const String _keyUsername = 'user_username';
   static const String _keyProfilePicture = 'user_profile_picture';
+  static const String _keyAuthToken = 'auth_token';
 
   UserSessionService({required SharedPreferences prefs}) : _prefs = prefs;
 
@@ -30,6 +31,7 @@ class UserSessionService {
     required String email,
     String? username,
     String? profilePicture,
+    String? token,
   }) async {
     await _prefs.setBool(_keyIsLoggedIn, true);
     await _prefs.setString(_keyUserId, userId);
