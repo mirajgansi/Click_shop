@@ -4,7 +4,6 @@ import 'package:click_shop/core/services/hive/hive_service.dart';
 import 'package:click_shop/core/services/storage/user_session_service.dart';
 import 'package:click_shop/features/auth/data/datasources/auth_datasources.dart';
 import 'package:click_shop/features/auth/data/models/auth_hive_model.dart';
-import 'package:click_shop/features/auth/domain/entities/auth_entity.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // Provider

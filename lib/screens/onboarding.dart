@@ -50,13 +50,16 @@ class _OnboardingState extends State<Onboarding> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                MyButtonWidgets(
-                  onPressed: () {
-                    Navigator.pushNamed(context, '/login');
-                  },
-                  text: 'Get Started',
-                  height: 50,
-                  borderRadius: 12,
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: MyButtonWidgets(
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/login');
+                    },
+                    text: 'Get Started',
+                    height: 50,
+                    borderRadius: 12,
+                  ),
                 ),
               ],
             ),
