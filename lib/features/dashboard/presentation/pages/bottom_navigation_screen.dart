@@ -22,7 +22,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     const ExploreScreen(),
     const CartScreen(),
     const FavouriteScreen(),
-    const ProfileScreen(),
+    ProfileScreen(),
     const AddProduct(),
   ];
 
