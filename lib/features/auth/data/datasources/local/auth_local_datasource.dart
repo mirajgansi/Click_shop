@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:click_shop/core/services/hive/hive_service.dart';
 import 'package:click_shop/core/services/storage/user_session_service.dart';
 import 'package:click_shop/features/auth/data/datasources/auth_datasources.dart';
+import 'package:click_shop/features/auth/data/models/auth_api_model.dart';
 import 'package:click_shop/features/auth/data/models/auth_hive_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -27,8 +28,16 @@ class AuthLocalDatasource implements IAuthLocalDataSource {
 
   @override
   Future<AuthHiveModel?> getCurrentUser() {
-    // TODO: implement getCurrentUser
-    throw UnimplementedError();
+    try {
+      final currentUserId = _userSessionService.getCurrentUserId();
+      if (currentUserId == null) {
+        return Future.value(null);
+      }
+      final user = _hiveService.getCurrentUser(currentUserId);
+      return Future.value(user);
+    } catch (e) {
+      return Future.value(null);
+    }
   }
 
   @override

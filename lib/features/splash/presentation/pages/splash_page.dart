@@ -4,7 +4,7 @@ import 'package:click_shop/screens/onboarding.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../screens/bottom_navigation_screen.dart';
+import '../../../dashboard/presentation/pages/bottom_navigation_screen.dart';
 
 class AppStartScreen extends ConsumerStatefulWidget {
   const AppStartScreen({super.key});

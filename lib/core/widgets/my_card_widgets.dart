@@ -1,4 +1,4 @@
-import 'package:click_shop/screens/bottom_screen/favourite_screen.dart';
+import 'package:click_shop/features/dashboard/presentation/pages/bottom_screen/favourite_screen.dart';
 import 'package:click_shop/screens/product_screen.dart';
 import 'package:click_shop/core/widgets/my_cart_button_widget.dart';
 import 'package:click_shop/core/widgets/my_favourite_button_widgets.dart';

@@ -36,7 +36,12 @@ class UserSessionService {
     await _prefs.setBool(_keyIsLoggedIn, true);
     await _prefs.setString(_keyUserId, userId);
     await _prefs.setString(_keyUserEmail, email);
-    // await _prefs.setString(_keyUsername, username);
+
+    await _prefs.setString(_keyUsername, username ?? "");
+
+    if (token != null) {
+      await _prefs.setString(_keyAuthToken, token);
+    }
 
     if (profilePicture != null) {
       await _prefs.setString(_keyProfilePicture, profilePicture);
@@ -57,6 +62,7 @@ class UserSessionService {
     await _prefs.remove(_keyUsername);
     // await _prefs.remove(_keyUserRole);
     await _prefs.remove(_keyProfilePicture);
+    await _prefs.remove(_keyAuthToken);
   }
 
   bool isLoggedIn() {
@@ -73,5 +79,13 @@ class UserSessionService {
 
   String? getUsername() {
     return _prefs.getString(_keyUsername);
+  }
+
+  String? getCurrentUserId() {
+    return getUserId();
+  }
+
+  String? getToken() {
+    return _prefs.getString(_keyAuthToken);
   }
 }

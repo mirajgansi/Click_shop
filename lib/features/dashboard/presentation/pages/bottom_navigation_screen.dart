@@ -1,9 +1,9 @@
 import 'package:click_shop/features/product/presentation/pages/add_product_screen.dart';
-import 'package:click_shop/screens/bottom_screen/explore_screen.dart';
-import 'package:click_shop/screens/bottom_screen/favourite_screen.dart';
-import 'package:click_shop/screens/bottom_screen/cart_sreen.dart';
-import 'package:click_shop/screens/bottom_screen/home_screen.dart';
-import 'package:click_shop/screens/bottom_screen/profile_screen.dart';
+import 'package:click_shop/features/dashboard/presentation/pages/bottom_screen/explore_screen.dart';
+import 'package:click_shop/features/dashboard/presentation/pages/bottom_screen/favourite_screen.dart';
+import 'package:click_shop/features/dashboard/presentation/pages/bottom_screen/cart_sreen.dart';
+import 'package:click_shop/features/dashboard/presentation/pages/bottom_screen/home_screen.dart';
+import 'package:click_shop/features/dashboard/presentation/pages/bottom_screen/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 

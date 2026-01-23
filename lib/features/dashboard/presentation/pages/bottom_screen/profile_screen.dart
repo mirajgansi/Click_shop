@@ -1,19 +1,29 @@
 import 'package:click_shop/app/routes/app_routes.dart';
+import 'package:click_shop/core/error/failures.dart';
 import 'package:click_shop/core/services/storage/user_session_service.dart';
 import 'package:click_shop/features/auth/data/datasources/local/auth_local_datasource.dart';
 import 'package:click_shop/features/auth/data/repositories/auth_repository.dart';
+import 'package:click_shop/features/auth/domain/entities/auth_entity.dart';
+import 'package:click_shop/features/auth/domain/usecases/get_currentuacase.dart';
 import 'package:click_shop/features/auth/domain/usecases/logout_usecase.dart';
-import 'package:click_shop/features/auth/presentation/pages/login_screen.dart';
+import 'package:click_shop/features/auth/presentation/pages/login_page.dart';
 import 'package:click_shop/features/auth/presentation/widgets/my_button_widgets.dart';
 import 'package:click_shop/core/widgets/my_menu_items_widgets.dart';
+import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+final currentUserProvider = FutureProvider<Either<Failure, AuthEntity>>((ref) {
+  final usecase = ref.read(getCurrentUserUsecaseProvider);
+  return usecase();
+});
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final currentUserAsync = ref.watch(currentUserProvider);
     return LayoutBuilder(
       builder: (context, constraints) {
         final bool isTablet = constraints.maxWidth >= 600;
@@ -41,37 +51,61 @@ class ProfileScreen extends ConsumerWidget {
                     ),
                   ),
                   SizedBox(width: spacingH),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            'John Doe',
-                            style: TextStyle(
-                              fontSize: fontName,
-                              fontWeight: FontWeight.bold,
+                  currentUserAsync.when(
+                    loading: () => const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                    error: (e, st) => const Text("Failed to load user"),
+                    data: (either) => either.fold(
+                      (failure) => Text("Failed: ${failure.toString()}"),
+                      (user) {
+                        final name = user.username ?? "No name";
+                        final email = user.email;
+
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  name,
+                                  style: TextStyle(
+                                    fontSize: fontName,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                SizedBox(width: spacingH / 2),
+                                Icon(
+                                  Icons.edit,
+                                  size: iconSize,
+                                  color: Colors.grey,
+                                ),
+                              ],
                             ),
-                          ),
-                          SizedBox(width: spacingH / 2),
-                          Icon(Icons.edit, size: iconSize, color: Colors.grey),
-                        ],
-                      ),
-                      SizedBox(height: 4),
-                      Row(
-                        children: [
-                          Icon(Icons.email, size: iconSize, color: Colors.grey),
-                          SizedBox(width: 4),
-                          Text(
-                            'JohnDoe@gmail.com',
-                            style: TextStyle(
-                              fontSize: fontEmail,
-                              color: Colors.grey,
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.email,
+                                  size: iconSize,
+                                  color: Colors.grey,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  email,
+                                  style: TextStyle(
+                                    fontSize: fontEmail,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
+                          ],
+                        );
+                      },
+                    ),
                   ),
                 ],
               ),
@@ -103,7 +137,7 @@ class ProfileScreen extends ConsumerWidget {
 
               SizedBox(
                 width: double.infinity,
-                height: 90,
+                height: 50,
                 child: MyButtonWidgets(
                   text: 'Log Out',
                   onPressed: () async {

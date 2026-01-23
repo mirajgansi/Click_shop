@@ -4,6 +4,7 @@ import 'package:click_shop/core/services/storage/user_session_service.dart';
 import 'package:click_shop/features/auth/data/datasources/auth_datasources.dart';
 import 'package:click_shop/features/auth/data/models/auth_api_model.dart';
 import 'package:click_shop/features/auth/data/models/auth_hive_model.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 //create Provider
@@ -51,12 +52,6 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
   }
 
   @override
-  Future<AuthApiModel> getUserById(String userId) {
-    // TODO: implement getUserById
-    throw UnimplementedError();
-  }
-
-  @override
   Future<AuthApiModel?> login(String email, String password) async {
     final response = await _apiClient.post(
       ApiEndpoints.userLogin,
@@ -67,7 +62,7 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
       final body = response.data as Map<String, dynamic>;
 
       final data = body['data'] as Map<String, dynamic>;
-      final token = body['token']?.toString(); // ✅ token is here
+      final token = body['token']?.toString();
 
       final user = AuthApiModel.fromJson(data);
 
@@ -81,8 +76,8 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
       await _userSessionService.saveUserSession(
         userId: user.userId!,
         email: user.email,
-        username: user.username, // ✅ include this
-        token: token, // ✅ add token param in service
+        username: user.username,
+        token: token,
       );
 
       return user;
@@ -91,25 +86,29 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
     return null;
   }
 
-  //   @override
-  //   Future<AuthApiModel?> login(String email, String password) async {
-  //     final response = await _apiClient.post(
-  //       ApiEndpoints.userLogin,
-  //       data: {'email': email, 'password': password},
-  //     );
+  @override
+  Future<AuthApiModel> WhoAmI() async {
+    final token = _userSessionService.getToken();
+    if (token == null || token.isEmpty) {
+      throw Exception("Token not found");
+    }
 
-  //     if (response.data['success'] == true) {
-  //       final data = response.data['data'] as Map<String, dynamic>;
-  //       final user = AuthApiModel.fromJson(data);
+    final response = await _apiClient.get(
+      ApiEndpoints.whoAmI,
+      options: Options(headers: {'Authorization': 'Bearer $token'}),
+    );
 
-  //       await _userSessionService.saveUserSession(
-  //         userId: user.userId!,
-  //         email: user.email,
-  //         // username: user.username,
-  //       );
-  //       return user;
-  //     }
+    if (response.data['success'] == true) {
+      final data = response.data['data'] as Map<String, dynamic>;
+      return AuthApiModel.fromJson(data);
+    }
 
-  //     return null;
-  //   }
+    throw Exception("Failed to fetch user info");
+  }
+
+  @override
+  Future<AuthApiModel> getUserById(String userId) {
+    // TODO: implement getUserById
+    throw UnimplementedError();
+  }
 }
