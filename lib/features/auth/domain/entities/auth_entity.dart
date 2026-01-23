@@ -6,12 +6,12 @@ class AuthEntity extends Equatable {
   final String email;
   final String? password;
   final String? confirmPassword;
-  final String? profileImage;
+  final String? imageUrl;
 
   const AuthEntity({
     this.userId,
     required this.email,
-    this.profileImage,
+    this.imageUrl,
     this.username,
     this.password,
     this.confirmPassword,
@@ -20,7 +20,7 @@ class AuthEntity extends Equatable {
   @override
   List<Object?> get props => [
     email,
-    profileImage,
+    imageUrl,
     username,
     password,
     confirmPassword,
