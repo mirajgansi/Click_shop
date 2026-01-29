@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:click_shop/features/auth/data/models/auth_api_model.dart';
 import 'package:click_shop/features/auth/data/models/auth_hive_model.dart';
 
@@ -27,6 +29,6 @@ abstract interface class IAuthRemoteDataSource {
   Future<AuthApiModel> WhoAmI();
   Future<AuthApiModel?> login(String email, String password);
   Future<AuthApiModel> getUserById(String userId);
-  Future<AuthApiModel> updateUser(AuthApiModel user);
+  Future<AuthApiModel> updateProfileImage(File image);
   Future<bool> deleteUser(String userId);
 }

@@ -15,20 +15,24 @@ class ApiEndpoints {
   static const bool isPhysicalDevice = false;
   static const String compIpAddress = '192.168.1.105';
 
-  static String getBaseUrl() {
+  static String getHostUrl() {
     if (isPhysicalDevice) {
-      return 'http://$compIpAddress:5050/api/';
+      return 'http://$compIpAddress:5050';
     }
 
     if (kIsWeb) {
-      return 'http://10.0.2.2:5050/api/';
+      return 'http://localhost:5050'; // web runs on same machine
     } else if (Platform.isAndroid) {
-      return 'http://10.0.2.2:5050/api/';
+      return 'http://10.0.2.2:5050'; // android emulator
     } else if (Platform.isIOS) {
-      return 'http://localhost:5000/api/';
+      return 'http://localhost:5050'; // iOS simulator
     } else {
-      return 'http://localhost:5000/api/';
+      return 'http://localhost:5050';
     }
+  }
+
+  static String getBaseUrl() {
+    return '${getHostUrl()}/api'; // ✅ API base (no trailing slash)
   }
 
   static const Duration connectionTimeout = Duration(seconds: 30);
@@ -45,7 +49,7 @@ class ApiEndpoints {
   static const String whoAmI = 'auth/whoamI';
 
   static String userById(String id) => '/auth/$id';
-  static String userPhoto(String id) => '/auth/$id/photo';
+  static String userPhoto(String id) => '/auth/update-profile';
 
   // ============ Item Endpoints ============
   // static const String items = '/items';

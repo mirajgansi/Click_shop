@@ -7,7 +7,7 @@ class AuthApiModel {
   final String? username;
   final String email;
   final String? password;
-  final String? imageUrl;
+  final String? image;
   final String? confirmPassword;
 
   // final String role;
@@ -19,7 +19,7 @@ class AuthApiModel {
     this.password,
     // this.profilePicture,
     this.confirmPassword,
-    this.imageUrl,
+    this.image,
   });
 
   //toJson
@@ -29,7 +29,7 @@ class AuthApiModel {
       "email": email,
       "password": password,
       "confirmPassword": confirmPassword,
-      // "profilePicture": profilePicture,
+      "image": image,
     };
   }
 
@@ -39,12 +39,17 @@ class AuthApiModel {
       userId: json['_id'] as String,
       username: json['username'] as String,
       email: json['email'] as String,
-      // profilePicture: json['profilePicture'] as String,
+      image: json['image'] as String?,
     );
   }
   //toEnitity
   AuthEntity toEntity() {
-    return AuthEntity(userId: userId, username: username, email: email);
+    return AuthEntity(
+      userId: userId,
+      username: username,
+      email: email,
+      image: image,
+    );
   }
 
   //from Enitity
@@ -55,7 +60,7 @@ class AuthApiModel {
       email: entity.email,
       password: entity.password,
       confirmPassword: entity.confirmPassword,
-      imageUrl: entity.imageUrl,
+      image: entity.image,
     );
   }
 

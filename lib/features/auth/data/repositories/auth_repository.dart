@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:click_shop/core/error/failures.dart';
 import 'package:click_shop/core/services/connectivity/network_info.dart';
 import 'package:click_shop/features/auth/data/datasources/local/auth_local_datasource.dart';
@@ -147,6 +149,35 @@ class AuthRepository implements IAuthRepository {
       } catch (e) {
         return Left(LocalDatabaseFailure(message: e.toString()));
       }
+    }
+  }
+
+  @override
+  Future<Either<Failure, String>> updateProfileImage(String? image) async {
+    //remote mma matra image upload hunu paryo locally hudaina
+    if (await _networkInfo.isConnected) {
+      try {
+        if (image == null) {
+          return const Left(ApiFailure(message: "Image path is required"));
+        }
+        final updatedModel = await _authRemoteDataSource.updateProfileImage(
+          File(image),
+        );
+        return Right(updatedModel.toEntity().toString());
+      } on DioException catch (e) {
+        return Left(
+          ApiFailure(
+            message: e.response?.data['message'] ?? 'Update Failed',
+            statusCode: e.response?.statusCode,
+          ),
+        );
+      } catch (e) {
+        return Left(ApiFailure(message: e.toString()));
+      }
+    } else {
+      return const Left(
+        ApiFailure(message: "No internet connection. Cannot update user."),
+      );
     }
   }
 }

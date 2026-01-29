@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:click_shop/features/auth/domain/usecases/get_currentuacase.dart';
 import 'package:click_shop/features/auth/domain/usecases/login_usecase.dart';
 import 'package:click_shop/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:click_shop/features/auth/domain/usecases/register_usecase.dart';
+import 'package:click_shop/features/auth/domain/usecases/updateProfile_usecase.dart';
 import 'package:click_shop/features/auth/presentation/state/auth_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,12 +18,13 @@ class AuthViewModel extends Notifier<AuthState> {
   late final LoginUsecase _loginUsecase;
   late final GetCurrentUserUsecase _getCurrentUserUsecase;
   late final LogoutUsecase _logoutUsecase;
-
+  late final UpdateProfileUsecase _updateProfileUsecase;
   @override
   AuthState build() {
     _registerUsecase = ref.read(registerUsecaseProvider);
     _loginUsecase = ref.read(loginUsecaseProvider);
     _getCurrentUserUsecase = ref.read(getCurrentUserUsecaseProvider);
+    _updateProfileUsecase = ref.read(updateProfileUsecaseProvider);
     _logoutUsecase = ref.read(logoutUsecaseProvider);
     return AuthState();
   }
@@ -115,5 +119,28 @@ class AuthViewModel extends Notifier<AuthState> {
 
   void clearError() {
     state = state.copyWith(errorMessage: null);
+  }
+
+  //update user
+  Future<void> updateProfile(File image) async {
+    state = state.copyWith(status: AuthStatus.loading);
+
+    final result = await _updateProfileUsecase(
+      UpdateProfileUsecaseParams(image: image.path),
+    );
+    result.fold(
+      (failure) {
+        state = state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: failure.message,
+        );
+      },
+      (imagePath) {
+        state = state.copyWith(
+          status: AuthStatus.loaded,
+          UploadPhotoName: imagePath,
+        );
+      },
+    );
   }
 }

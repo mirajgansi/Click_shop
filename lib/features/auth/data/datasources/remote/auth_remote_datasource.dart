@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:click_shop/core/config/api_client.dart';
 import 'package:click_shop/core/config/api_endpoints.dart';
+import 'package:click_shop/core/services/storage/token_service.dart';
 import 'package:click_shop/core/services/storage/user_session_service.dart';
 import 'package:click_shop/features/auth/data/datasources/auth_datasources.dart';
 import 'package:click_shop/features/auth/data/models/auth_api_model.dart';
@@ -12,17 +15,20 @@ final authRemoteDataSourceProvider = Provider<IAuthRemoteDataSource>((ref) {
   return AuthRemoteDatasource(
     apiClient: ref.read(apiClientProvider),
     userSessionService: ref.read(UserSessionServiceProvider),
+    tokenService: ref.read(tokenServiceProvider),
   );
 });
 
 class AuthRemoteDatasource implements IAuthRemoteDataSource {
   final ApiClient _apiClient;
   final UserSessionService _userSessionService;
-
+  final TokenService _tokenService;
   AuthRemoteDatasource({
     required ApiClient apiClient,
     required UserSessionService userSessionService,
+    required TokenService tokenService,
   }) : _apiClient = apiClient,
+       _tokenService = tokenService,
        _userSessionService = userSessionService;
 
   @override
@@ -40,10 +46,46 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
   }
 
   @override
-  Future<AuthApiModel> updateUser(AuthApiModel user) {
-    // TODO: implement updateUser
-    throw UnimplementedError();
+  Future<AuthApiModel> updateProfileImage(File image) async {
+    final fileName = image.path.split('/').last;
+
+    final formData = FormData.fromMap({
+      "image": await MultipartFile.fromFile(image.path, filename: fileName),
+    });
+
+    final token = _tokenService.getToken();
+
+    final response = await _apiClient.put(
+      ApiEndpoints.userPhoto(_userSessionService.getCurrentUserId()!),
+      data: formData,
+      options: Options(
+        headers: {"Authorization": "Bearer $token"},
+        contentType: "multipart/form-data",
+      ),
+    );
+
+    if (response.data["success"] == true) {
+      final data = response.data['data'] as Map<String, dynamic>;
+      return AuthApiModel.fromJson(data);
+    }
+    throw Exception("Failed to update profile image");
   }
+
+  // @override
+  // Future<AuthApiModel> video(AuthApiModel user, File image) async {
+  //   final fileName = video.path.split('/').last;
+  //   final formData = FormData.fromMap({
+  //     'itemVideo': MultipartFile.fromFile(video.path, filename: fileName),
+  //   });
+  //   //get token
+  //   final token = _tokenService.getToken();
+  //   final respone = await _apiClient.uploadFile(
+  //     ApiEndpoints.userBVideo(user.userId!), // j ni huna sakxa yeta backend anusart
+  //     formData: formData,
+  //     options: Options(headers: {'Authorization': 'Bearer  $token'}),
+  //   );
+  //   return respone.data['success'];
+  // }
 
   @override
   Future<bool> deleteUser(String userId) {
@@ -62,25 +104,22 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
       final body = response.data as Map<String, dynamic>;
 
       final data = body['data'] as Map<String, dynamic>;
-      final token = body['token']?.toString();
 
       final user = AuthApiModel.fromJson(data);
 
       if (user.userId == null || user.userId!.isEmpty) {
         throw Exception("Missing userId. data=$data");
       }
-      if (token == null || token.isEmpty) {
-        throw Exception("Missing token. body=$body");
-      }
 
       await _userSessionService.saveUserSession(
         userId: user.userId!,
         email: user.email,
         username: user.username,
-
-        token: token,
       );
+      //save token
 
+      final token = response.data['token'] as String?;
+      await _tokenService.saveToken(token!);
       return user;
     }
 
@@ -89,14 +128,11 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
 
   @override
   Future<AuthApiModel> WhoAmI() async {
-    final token = _userSessionService.getToken();
-    if (token == null || token.isEmpty) {
-      throw Exception("Token not found");
-    }
-
     final response = await _apiClient.get(
       ApiEndpoints.whoAmI,
-      options: Options(headers: {'Authorization': 'Bearer $token'}),
+      options: Options(
+        headers: {'Authorization': 'Bearer ${_tokenService.getToken()}'},
+      ),
     );
 
     if (response.data['success'] == true) {

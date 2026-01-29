@@ -1,11 +1,14 @@
 import 'dart:io';
 
 import 'package:click_shop/app/theme/theme_extensions.dart';
+import 'package:click_shop/core/config/api_endpoints.dart';
 import 'package:click_shop/core/error/failures.dart';
 import 'package:click_shop/core/services/storage/user_session_service.dart';
 import 'package:click_shop/core/utils/snackbar_utils.dart';
 import 'package:click_shop/features/auth/domain/entities/auth_entity.dart';
 import 'package:click_shop/features/auth/domain/usecases/get_currentuacase.dart';
+import 'package:click_shop/features/auth/presentation/state/auth_state.dart';
+import 'package:click_shop/features/auth/presentation/view_model/auth_view_model.dart';
 import 'package:click_shop/features/auth/presentation/widgets/my_button_widgets.dart';
 import 'package:click_shop/features/dashboard/presentation/widgets/my_menu_items_widgets.dart';
 import 'package:dartz/dartz.dart';
@@ -15,19 +18,33 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:riverpod/src/framework.dart';
 
-final currentUserProvider = FutureProvider<Either<Failure, AuthEntity>>((ref) {
-  final usecase = ref.read(getCurrentUserUsecaseProvider);
-  return usecase();
-});
+final currentUserViewModelProvider = NotifierProvider<AuthViewModel, AuthState>(
+  AuthViewModel.new,
+);
 
-class ProfileScreen extends ConsumerWidget {
-  ProfileScreen({super.key});
+class ProfileScreen extends ConsumerStatefulWidget {
+  const ProfileScreen({super.key});
 
+  @override
+  ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   //camera permission
   final List<XFile> _selectedMedia =
       []; //images video all not suitable for this page
   final ImagePicker _picker = ImagePicker();
+
+  @override
+  void initState() {
+    super.initState();
+
+    Future.microtask(() {
+      ref.read(currentUserViewModelProvider.notifier).getCurrentUser();
+    });
+  }
 
   Future<bool> _userSagaPermissionMagana(
     BuildContext context,
@@ -51,12 +68,23 @@ class ProfileScreen extends ConsumerWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text("Give Permission"),
-        content: Text(
-          "Yo feature haru use garna lai permission settings ma janu hola",
+        content: const Text(
+          "Permission permanently denied. Please enable it from App Settings.",
         ),
         actions: [
-          TextButton(onPressed: () {}, child: const Text("cancel")),
-          TextButton(onPressed: () {}, child: const Text("Open Settings")),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // close dialog
+            },
+            child: const Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.of(context).pop(); // close dialog
+              await openAppSettings(); // open app settings
+            },
+            child: const Text("Open Settings"),
+          ),
         ],
       ),
     );
@@ -70,15 +98,20 @@ class ProfileScreen extends ConsumerWidget {
     );
     if (!hasPermission) return;
 
-    final XFile? photo = await _picker.pickImage(
+    final XFile? image = await _picker.pickImage(
       source: ImageSource.camera,
       imageQuality: 80, //size ghatxa but quality ramro hunxa
     );
-    if (photo != null) {
-      setState() {
+    if (image != null) {
+      setState(() {
         _selectedMedia.clear();
-        _selectedMedia.add(photo);
-      }
+        _selectedMedia.add(image);
+      });
+
+      //upload imge from server
+      await ref
+          .read(currentUserViewModelProvider.notifier)
+          .updateProfile(File(image.path));
     }
   }
 
@@ -102,10 +135,10 @@ class ProfileScreen extends ConsumerWidget {
       maxDuration: const Duration(seconds: 60),
     );
     if (video != null) {
-      setState() {
+      setState(() {
         _selectedMedia.clear();
         _selectedMedia.add(video);
-      }
+      });
     }
   }
 
@@ -125,10 +158,15 @@ class ProfileScreen extends ConsumerWidget {
       imageQuality: 80,
     );
     if (image != null) {
-      setState() {
+      setState(() {
+        debugPrint("Picked: ${image.path}");
+
         _selectedMedia.clear();
         _selectedMedia.add(image);
-      }
+      });
+      await ref
+          .read(currentUserViewModelProvider.notifier)
+          .updateProfile(File(image.path));
     }
   }
 
@@ -154,10 +192,10 @@ class ProfileScreen extends ConsumerWidget {
   //         imageQuality: 80,
   //       );
   //       if (image != null) {
-  //         setState() {
+  //         setState?(() {
   //           _selectedMedia.clear();
   //           _selectedMedia.add(image);
-  //         }
+  //         });
   //       }
   //     }
   //   } catch (e) {
@@ -193,14 +231,14 @@ class ProfileScreen extends ConsumerWidget {
                   _pickCamera(context);
                 },
               ),
-              ListTile(
-                leading: Icon(Icons.video_library),
-                title: Text("Record Video"),
-                onTap: () {
-                  Navigator.pop(context);
-                  _pickVideo(context);
-                },
-              ),
+              // ListTile(
+              //   leading: Icon(Icons.video_library),
+              //   title: Text("Record Video"),
+              //   onTap: () {
+              //     Navigator.pop(context);
+              //     _pickVideo(context);
+              //   },
+              // ),
               ListTile(
                 leading: Icon(Icons.photo_library),
                 title: Text("Choose from Gallery"),
@@ -209,13 +247,13 @@ class ProfileScreen extends ConsumerWidget {
                   _pickGallery(context);
                 },
               ),
-              ListTile(
-                leading: Icon(Icons.settings),
-                title: Text("Settings"),
-                onTap: () {
-                  Navigator.pop(context);
-                },
-              ),
+              // ListTile(
+              //   leading: Icon(Icons.settings),
+              //   title: Text("Settings"),
+              //   onTap: () {
+              //     Navigator.pop(context);
+              //   },
+              // ),
             ],
           ),
         ),
@@ -224,9 +262,31 @@ class ProfileScreen extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final currentUserAsync = ref.watch(currentUserProvider);
+  Widget build(BuildContext context) {
+    final authState = ref.watch(currentUserViewModelProvider);
 
+    if (authState.status == AuthStatus.loading) {
+      return const CircularProgressIndicator();
+    }
+
+    if (authState.status == AuthStatus.error) {
+      return Center(
+        child: Text(authState.errorMessage ?? 'An unexpected error occurred'),
+      );
+    }
+    final user = authState.user;
+    if (user == null) {
+      return const Text("User not available yet");
+    }
+
+    final name = user.username ?? "No name";
+    final email = user.email;
+    final imagePath = user.image; // "/uploads/....jpg"
+    final imageUrl = (imagePath != null && imagePath.isNotEmpty)
+        ? "${ApiEndpoints.getHostUrl()}$imagePath"
+        : null;
+
+    debugPrint("FINAL IMAGE URL: $imageUrl");
     return LayoutBuilder(
       builder: (context, constraints) {
         final bool isTablet = constraints.maxWidth >= 600;
@@ -260,79 +320,99 @@ class ProfileScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   GestureDetector(
-                    onTap: () {
-                      _pickMediaDailog(context);
-                    },
+                    onTap: () => _pickMediaDailog(context),
                     child: CircleAvatar(
                       radius: avatarRadius,
-                      backgroundImage: const AssetImage(
-                        'assets/images/Group.jpg',
-                      ),
+                      backgroundImage: _selectedMedia.isNotEmpty
+                          ? FileImage(File(_selectedMedia.first.path))
+                          : (imageUrl != null
+                                ? NetworkImage(imageUrl)
+                                : const AssetImage('assets/images/Group.jpg')
+                                      as ImageProvider),
                     ),
                   ),
 
                   SizedBox(width: spacingH),
-                  currentUserAsync.when(
-                    loading: () => const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    ),
-                    error: (e, st) => const Text("Failed to load user"),
-                    data: (either) => either.fold(
-                      (failure) => Text("Failed: ${failure.toString()}"),
-                      (user) {
-                        final name = user.username ?? "No name";
-                        final email = user.email;
-
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
                           children: [
-                            Row(
-                              children: [
-                                Text(
-                                  name,
-                                  style: TextStyle(
-                                    fontSize: fontName,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                SizedBox(width: spacingH / 2),
-                                Icon(
-                                  Icons.edit,
-                                  size: iconSize,
-                                  color: Colors.grey,
-                                ),
-                              ],
+                            Text(
+                              name!,
+                              style: TextStyle(
+                                fontSize: fontName,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-
-                            const SizedBox(height: 4),
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.email,
-                                  size: iconSize,
-                                  color: Colors.grey,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  email,
-                                  style: TextStyle(
-                                    fontSize: fontEmail,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                              ],
+                            SizedBox(width: spacingH / 2),
+                            Icon(
+                              Icons.edit,
+                              size: iconSize,
+                              color: Colors.grey,
                             ),
                           ],
-                        );
-                      },
+                        ),
+
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.email,
+                              size: iconSize,
+                              color: Colors.grey,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              email,
+                              style: TextStyle(
+                                fontSize: fontEmail,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
 
               Divider(thickness: dividerThickness, height: 32),
+              SizedBox(height: 24),
+              // if (_selectedMedia.isNotEmpty) ...[
+              //   Stack(
+              //     children: [
+              //       Container(
+              //         width: 200,
+              //         height: 200,
+              //         decoration: BoxDecoration(
+              //           borderRadius: BorderRadius.circular(12),
+              //           image: DecorationImage(
+              //             image: FileImage(File(_selectedMedia[0].path)),
+              //           ),
+              //         ),
+              //       ),
+              //     ],
+              //   ),
+              //   Positioned(
+              //     top: 4,
+              //     right: 4,
+              //     child: GestureDetector(
+              //       onTap: () {
+              //         setState() {
+              //           _selectedMedia.clear();
+              //         }
+              //       },
+              //       child: CircleAvatar(
+              //         radius: 16,
+              //         backgroundColor: Colors.red,
+              //         child: Icon(Icons.close, color: Colors.white, size: 18),
+              //       ),
+              //     ),
+              //   ),
+              // ],
 
               // const MyMenuItemsWidgets(
               //   icon: Icons.shopping_bag_outlined,
@@ -404,46 +484,7 @@ class ProfileScreen extends ConsumerWidget {
               ),
 
               SizedBox(height: 25),
-              SizedBox(height: 24),
-              if (_selectedMedia.isNotEmpty) ...[
-                Stack(
-                  children: [
-                    Container(
-                      width: 200,
-                      height: 200,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        image: DecorationImage(
-                          image: FileImage(File(_selectedMedia[0].path)),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                Positioned(
-                  top: 4,
-                  right: 4,
-                  child: GestureDetector(
-                    onTap: () {
-                      setState() {
-                        _selectedMedia.clear();
-                      }
-                    },
-                    child: CircleAvatar(
-                      radius: 16,
-                      backgroundColor: Colors.red,
-                      child: Icon(Icons.close, color: Colors.white, size: 18),
-                    ),
-                  ),
-                ),
-              ],
-              Text(
-                'Item name',
-                style: TextStyle(
-                  fontSize: fontName,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+
               SizedBox(
                 width: double.infinity,
                 height: 50,
