@@ -1,7 +1,7 @@
 import 'package:click_shop/features/dashboard/presentation/pages/bottom_screen/favourite_screen.dart';
-import 'package:click_shop/screens/product_screen.dart';
 import 'package:click_shop/core/widgets/my_cart_button_widget.dart';
 import 'package:click_shop/core/widgets/my_favourite_button_widgets.dart';
+import 'package:click_shop/features/item/presentation/pages/product_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
