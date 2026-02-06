@@ -1,19 +1,70 @@
 import 'package:click_shop/core/widgets/my_favourite_button_widgets.dart';
 import 'package:click_shop/core/widgets/my_review_button_widgets.dart';
+import 'package:click_shop/features/product/presentation/view_model/product_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ProductDetailScreen extends StatefulWidget {
-  const ProductDetailScreen({super.key, required String productId});
+class ProductDetailScreen extends ConsumerStatefulWidget {
+  final String productId;
+
+  const ProductDetailScreen({super.key, required this.productId});
 
   @override
-  State<ProductDetailScreen> createState() => _ProductDetailScreenState();
+  ConsumerState<ProductDetailScreen> createState() =>
+      _ProductDetailScreenState();
 }
 
-class _ProductDetailScreenState extends State<ProductDetailScreen> {
+class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
   int quantity = 1;
   int rating = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      ref
+          .read(productViewModelProvider.notifier)
+          .getProductById(widget.productId);
+    });
+  }
+
+  void _toast(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(msg),
+        duration: const Duration(seconds: 2),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  // If your backend returns "/uploads/..", make it absolute:
+  String _buildImageUrl(String path) {
+    if (path.startsWith("http")) return path;
+    // change port/base if needed
+    return "http://10.0.2.2:5050${path.startsWith("/") ? "" : "/"}$path";
+  }
+
   @override
   Widget build(BuildContext context) {
+    final state = ref.watch(productViewModelProvider);
+
+    if (state.isLoading) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    if (state.error != null) {
+      return Scaffold(
+        appBar: AppBar(),
+        body: Center(child: Text(state.error!)),
+      );
+    }
+
+    final product = state.selectedProduct;
+    if (product == null) {
+      return const Scaffold(body: Center(child: Text("Product not found")));
+    }
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -26,7 +77,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.share_outlined, color: Colors.black),
-            onPressed: () {},
+            onPressed: () {
+              _toast("Share coming soon");
+            },
           ),
         ],
       ),
@@ -42,7 +95,9 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 borderRadius: BorderRadius.circular(14),
               ),
             ),
-            onPressed: () {},
+            onPressed: () {
+              _toast("Added to basket (coming soon)");
+            },
             child: const Text(
               "Add To Basket",
               style: TextStyle(
@@ -67,10 +122,19 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 color: Colors.grey.shade100,
               ),
               child: Center(
-                child: Image.asset(
-                  "assets/images/Group.jpg",
-                  fit: BoxFit.contain,
-                ),
+                child: product.image.isEmpty
+                    ? Image.asset(
+                        "assets/images/Group.jpg",
+                        fit: BoxFit.contain,
+                      )
+                    : Image.network(
+                        _buildImageUrl(product.image),
+                        fit: BoxFit.contain,
+                        errorBuilder: (_, __, ___) => Image.asset(
+                          "assets/images/Group.jpg",
+                          fit: BoxFit.contain,
+                        ),
+                      ),
               ),
             ),
 
@@ -83,20 +147,31 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: const [
-                      Text(
-                        "Wai Wai",
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          product.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
-                      MyFavouriteButtonWidgets(),
+                      GestureDetector(
+                        onTap: () =>
+                            _toast("Added to favourites (coming soon)"),
+                        child: const MyFavouriteButtonWidgets(),
+                      ),
                     ],
                   ),
 
                   const SizedBox(height: 4),
-                  Text("1 box, Price", style: TextStyle(color: Colors.grey)),
+                  Text(
+                    "In stock: ${product.inStock}",
+                    style: const TextStyle(color: Colors.grey),
+                  ),
 
                   const SizedBox(height: 16),
 
@@ -113,9 +188,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             IconButton(
                               icon: const Icon(Icons.remove),
                               onPressed: () {
-                                if (quantity > 1) {
-                                  setState(() => quantity--);
-                                }
+                                if (quantity > 1) setState(() => quantity--);
                               },
                             ),
                             Text(
@@ -127,17 +200,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             ),
                             IconButton(
                               icon: const Icon(Icons.add, color: Colors.green),
-                              onPressed: () {
-                                setState(() => quantity++);
-                              },
+                              onPressed: () => setState(() => quantity++),
                             ),
                           ],
                         ),
                       ),
 
-                      const Text(
-                        "Rs. 120",
-                        style: TextStyle(
+                      Text(
+                        "Rs. ${product.price}",
+                        style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
@@ -151,14 +222,16 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   sectionTitle("Product Detail"),
                   const SizedBox(height: 8),
                   Text(
-                    "Wai Wai is a popular instant noodle brand loved for its unique taste and quick preparation. It can be eaten straight from the packet, boiled, or fried.",
+                    product.description,
                     style: TextStyle(color: Colors.grey.shade700, height: 1.5),
                   ),
-                  TextButton(onPressed: () {}, child: const Text("See More")),
 
                   const Divider(),
 
-                  listTile(title: "Nutritions", trailing: "100g"),
+                  listTile(
+                    title: "Nutritions",
+                    trailing: product.nutritionalInfo,
+                  ),
 
                   const Divider(),
 
@@ -171,9 +244,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                         (index) => MyReviewButtonWidgets(
                           isRated: index < rating,
                           onTap: () {
-                            setState(() {
-                              rating = index + 1;
-                            });
+                            setState(() => rating = index + 1);
+                            _toast("Rated ${index + 1} star(s)");
                           },
                         ),
                       ),

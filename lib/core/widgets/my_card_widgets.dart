@@ -27,7 +27,6 @@ class CardWidget extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  // ✅ pass productId (or whole product) to details
                   builder: (context) => ProductDetailScreen(
                     productId: product.id!, // if nullable handle null
                   ),

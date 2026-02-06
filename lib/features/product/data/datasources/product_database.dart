@@ -1,26 +1,28 @@
 import 'dart:core';
 
+import 'package:click_shop/features/product/data/model/product_api_model.dart';
+import 'package:click_shop/features/product/data/model/product_hive_model.dart';
 import 'package:click_shop/features/product/domain/entities/product_entity.dart';
 
 abstract interface class IProductLocalDatabase {
-  Future<List<ProductEntity>> getAllproduct();
-  Future<ProductEntity> getProductbyId(String productId);
+  Future<List<ProductHiveModel>> getAllproduct();
+  Future<ProductHiveModel?> getProductbyId(String productId);
   // Future<bool> deleteProduct(String productId);
-  // Future<bool> updateProduct(ProductEntity productEntity);
-  Future<List<ProductEntity>> getProductsByCategory(String categoryId);
-  // Future<List<ProductEntity>> searchProducts(String query);
+  // Future<bool> updateProduct(ProductApiModel ProductApiModel);
+  Future<List<ProductHiveModel>> getProductsByCategory(String categoryId);
+  // Future<List<ProductApiModel>> searchProducts(String query);
   Future<bool> createCartProduct(String productId);
-  Future<List<ProductEntity>> getCartProducts();
+  Future<List<ProductHiveModel>> getCartProducts();
 }
 
 abstract interface class IProductRemoteDatabase {
-  // Future<bool> createProduct(ProductEntity productEntity);
-  Future<List<ProductEntity>> getAllproduct();
-  Future<ProductEntity> getProductbyId(String productId);
+  // Future<bool> createProduct(ProductApiModel ProductApiModel);
+  Future<List<ProductApiModel>> getAllproduct();
+  Future<ProductApiModel?> getProductbyId(String productId);
   // Future<bool> deleteProduct(String productId);
-  // Future<bool> updateProduct(ProductEntity productEntity);
-  Future<List<ProductEntity>> getProductsByCategory(String categoryId);
-  // Future<List<ProductEntity>> searchProducts(String query);
+  // Future<bool> updateProduct(ProductApiModel ProductApiModel);
+  Future<List<ProductApiModel>> getProductsByCategory(String categoryId);
+  // Future<List<ProductApiModel>> searchProducts(String query);
   Future<bool> createCartProduct(String productId);
-  Future<List<ProductEntity>> getCartProducts();
+  Future<List<ProductApiModel>> getCartProducts();
 }

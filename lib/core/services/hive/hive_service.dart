@@ -25,7 +25,6 @@ class HiveService {
       Hive.registerAdapter(AuthHiveModelAdapter());
     }
 
-    // ✅ Product adapter
     if (!Hive.isAdapterRegistered(HiveTableConstants.productTypeId)) {
       Hive.registerAdapter(ProductHiveModelAdapter());
     }
@@ -34,7 +33,6 @@ class HiveService {
   Future<void> openBoxed() async {
     await Hive.openBox<AuthHiveModel>(HiveTableConstants.authTable);
 
-    // ✅ open product box
     await Hive.openBox<ProductHiveModel>(HiveTableConstants.productTable);
 
     await Hive.openBox<String>(HiveTableConstants.cartTable);
@@ -154,5 +152,12 @@ class HiveService {
 
   Future<void> clearCart() async {
     await _cartBox.clear();
+  }
+
+  Future<void> cacheAllProdcuts(List<ProductHiveModel> products) async {
+    await _productBox.clear();
+    for (var product in products) {
+      await _productBox.put(product.id, product);
+    }
   }
 }

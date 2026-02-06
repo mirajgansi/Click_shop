@@ -3,6 +3,8 @@ import 'package:click_shop/core/services/connectivity/network_info.dart';
 import 'package:click_shop/features/product/data/datasources/local/product_local_database.dart';
 import 'package:click_shop/features/product/data/datasources/product_database.dart';
 import 'package:click_shop/features/product/data/datasources/remote/product_remote_database.dart';
+import 'package:click_shop/features/product/data/model/product_api_model.dart';
+import 'package:click_shop/features/product/data/model/product_hive_model.dart';
 import 'package:click_shop/features/product/domain/entities/product_entity.dart';
 import 'package:click_shop/features/product/domain/repositories/product_repository.dart';
 import 'package:dartz/dartz.dart';
@@ -35,12 +37,11 @@ class ProductRepository implements IProductRepository {
 
   // -------------------- PRODUCTS --------------------
 
-  /// ✅ GET ALL PRODUCTS (Remote -> cache -> return, fallback local)
-
-  Future<Either<Failure, List<ProductEntity>>> _getCachedProducts() async {
+  Future<Either<Failure, List<ProductEntity>>> _getCachedItems() async {
     try {
-      final products = await _localDataSource.getAllproduct();
-      return Right(products);
+      final models = await _localDataSource.getAllproduct();
+      final entities = ProductHiveModel.toEntityList(models);
+      return Right(entities);
     } catch (e) {
       return Left(LocalDatabaseFailure(message: e.toString()));
     }
@@ -53,15 +54,18 @@ class ProductRepository implements IProductRepository {
   ) async {
     if (await _networkInfo.isConnected) {
       try {
-        final product = await _remoteDataSource.getProductbyId(productId);
-        return Right(product);
+        final model = await _remoteDataSource.getProductbyId(productId);
+        return Right(model!.toEntity());
       } catch (e) {
         return Left(ApiFailure(message: e.toString()));
       }
     } else {
       try {
-        final product = await _localDataSource.getProductbyId(productId);
-        return Right(product);
+        final model = await _localDataSource.getProductbyId(productId);
+        if (model != null) {
+          return Right(model.toEntity());
+        }
+        return const Left(LocalDatabaseFailure(message: 'Item not found'));
       } catch (e) {
         return Left(LocalDatabaseFailure(message: e.toString()));
       }
@@ -69,30 +73,30 @@ class ProductRepository implements IProductRepository {
   }
 
   /// ✅ GET PRODUCTS BY CATEGORY
-  @override
-  Future<Either<Failure, List<ProductEntity>>> getProductsByCategory(
-    String categoryId,
-  ) async {
-    if (await _networkInfo.isConnected) {
-      try {
-        final products = await _remoteDataSource.getProductsByCategory(
-          categoryId,
-        );
-        return Right(products);
-      } catch (e) {
-        return Left(ApiFailure(message: e.toString()));
-      }
-    } else {
-      try {
-        final products = await _localDataSource.getProductsByCategory(
-          categoryId,
-        );
-        return Right(products);
-      } catch (e) {
-        return Left(LocalDatabaseFailure(message: e.toString()));
-      }
-    }
-  }
+  // @override
+  // Future<Either<Failure, List<ProductEntity>>> getProductsByCategory(
+  //   String categoryId,
+  // ) async {
+  //   if (await _networkInfo.isConnected) {
+  //     try {
+  //       final products = await _remoteDataSource.getProductsByCategory(
+  //         categoryId,
+  //       );
+  //       return Right(products);
+  //     } catch (e) {
+  //       return Left(ApiFailure(message: e.toString()));
+  //     }
+  //   } else {
+  //     try {
+  //       final products = await _localDataSource.getProductsByCategory(
+  //         categoryId,
+  //       );
+  //       return Right(products);
+  //     } catch (e) {
+  //       return Left(LocalDatabaseFailure(message: e.toString()));
+  //     }
+  //   }
+  // }
 
   /// ✅ SEARCH (local filtering)
   // @override
@@ -136,31 +140,31 @@ class ProductRepository implements IProductRepository {
     }
   }
 
-  /// ✅ GET CART PRODUCTS
-  @override
-  Future<Either<Failure, List<ProductEntity>>> getCartProducts() async {
-    if (await _networkInfo.isConnected) {
-      try {
-        final products = await _remoteDataSource.getCartProducts();
-        return Right(products);
-      } catch (e) {
-        // fallback local cart
-        try {
-          final products = await _localDataSource.getCartProducts();
-          return Right(products);
-        } catch (err) {
-          return Left(LocalDatabaseFailure(message: err.toString()));
-        }
-      }
-    } else {
-      try {
-        final products = await _localDataSource.getCartProducts();
-        return Right(products);
-      } catch (e) {
-        return Left(LocalDatabaseFailure(message: e.toString()));
-      }
-    }
-  }
+  // /// ✅ GET CART PRODUCTS
+  // @override
+  // Future<Either<Failure, List<ProductEntity>>> getCartProducts() async {
+  //   if (await _networkInfo.isConnected) {
+  //     try {
+  //       final products = await _remoteDataSource.getCartProducts();
+  //       return Right(products);
+  //     } catch (e) {
+  //       // fallback local cart
+  //       try {
+  //         final products = await _localDataSource.getCartProducts();
+  //         return Right(products);
+  //       } catch (err) {
+  //         return Left(LocalDatabaseFailure(message: err.toString()));
+  //       }
+  //     }
+  //   } else {
+  //     try {
+  //       final products = await _localDataSource.getCartProducts();
+  //       return Right(products);
+  //     } catch (e) {
+  //       return Left(LocalDatabaseFailure(message: e.toString()));
+  //     }
+  //   }
+  // }
 
   @override
   Future<Either<Failure, bool>> createProduct(ProductEntity productEntity) {
@@ -188,18 +192,37 @@ class ProductRepository implements IProductRepository {
 
   @override
   Future<Either<Failure, List<ProductEntity>>> getAllproduct() async {
-    try {
-      final products = await _localDataSource
-          .getAllproduct(); // List<ProductEntity>
-      if (products.isEmpty) {
-        return const Left(LocalDatabaseFailure(message: "No products found"));
+    if (await _networkInfo.isConnected) {
+      try {
+        final models = await _remoteDataSource.getAllproduct();
+        // Cache the data locally for offline access
+        final hiveModels = ProductHiveModel.fromApiModelList(models);
+        await _localDataSource.cacheAllProducts(hiveModels);
+        final entities = ProductApiModel.toEntityList(models);
+        return Right(entities);
+      } catch (e) {
+        // API failed, try to return cached data
+        return _getCachedItems();
       }
-      return Right(products);
-    } catch (e) {
-      return Left(LocalDatabaseFailure(message: e.toString()));
+    } else {
+      return _getCachedItems();
     }
   }
 
+  @override
+  Future<Either<Failure, List<ProductEntity>>> getCartProducts() {
+    // TODO: implement getCartProducts
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Either<Failure, List<ProductEntity>>> getProductsByCategory(
+    String categoryId,
+  ) {
+    // TODO: implement getProductsByCategory
+    throw UnimplementedError();
+  }
+}
   // -------------------- ADMIN METHODS (skip / keep as not implemented) --------------------
   // If your IProductRepository still contains these, either remove them or keep as stubs.
 
@@ -237,4 +260,3 @@ class ProductRepository implements IProductRepository {
   //     return Left(LocalDatabaseFailure(message: e.toString()));
   //   }
   // }
-}

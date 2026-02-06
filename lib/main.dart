@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContextcontext) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       initialRoute: '/',

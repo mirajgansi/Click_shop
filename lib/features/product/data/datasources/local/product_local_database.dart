@@ -1,5 +1,6 @@
 import 'package:click_shop/core/services/hive/hive_service.dart';
 import 'package:click_shop/features/product/data/datasources/product_database.dart';
+import 'package:click_shop/features/product/data/model/product_api_model.dart';
 import 'package:click_shop/features/product/data/model/product_hive_model.dart';
 import 'package:click_shop/features/product/domain/entities/product_entity.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,24 +16,18 @@ class ProdcutLocalDatabase implements IProductLocalDatabase {
     : _hiveService = hiveService;
 
   @override
-  Future<List<ProductEntity>> getAllproduct() async {
-    final products = await _hiveService.getAllProducts();
-    return products.map((p) => p.toEntity()).toList();
-  }
-
-  @override
-  Future<ProductEntity> getProductbyId(String productId) async {
-    final ProductHiveModel? model = await _hiveService.getProductById(
-      productId,
-    );
-    if (model == null) {
-      throw Exception("Product not found in local database");
+  Future<List<ProductHiveModel>> getAllproduct() async {
+    try {
+      return _hiveService.getAllProducts();
+    } catch (e) {
+      return [];
     }
-    return model.toEntity();
   }
 
   @override
-  Future<List<ProductEntity>> getProductsByCategory(String categoryId) async {
+  Future<List<ProductHiveModel>> getProductsByCategory(
+    String categoryId,
+  ) async {
     try {
       final all = await getAllproduct();
       final cat = categoryId.trim().toLowerCase();
@@ -55,7 +50,7 @@ class ProdcutLocalDatabase implements IProductLocalDatabase {
   }
 
   @override
-  Future<List<ProductEntity>> getCartProducts() async {
+  Future<List<ProductHiveModel>> getCartProducts() async {
     try {
       final cartIds = await _hiveService.getCartProductIds(); // ✅ await here
       if (cartIds.isEmpty) return [];
@@ -67,18 +62,27 @@ class ProdcutLocalDatabase implements IProductLocalDatabase {
           if (m.id != null) m.id!: m,
       };
 
-      final result = <ProductEntity>[];
-      for (final id in cartIds) {
-        final model = mapById[id];
-        if (model != null) result.add(model.toEntity());
-      }
+      final result = <ProductHiveModel>[];
+      // for (final id in cartIds) {
+      //   final model = mapById[id];
+      //   if (model != null) result.add(model.toEntity());
+      // }
       return result;
     } catch (_) {
       return [];
     }
   }
 
-  // Future<void> cacheAllItems(List<ProductHiveModel> items) async {
-  //   await _hiveService.cacheAllItems(items);
-  // }
+  Future<void> cacheAllProducts(List<ProductHiveModel> items) async {
+    await _hiveService.cacheAllProdcuts(items);
+  }
+
+  @override
+  Future<ProductHiveModel?> getProductbyId(String productId) async {
+    try {
+      return _hiveService.getProductById(productId);
+    } catch (e) {
+      return null;
+    }
+  }
 }

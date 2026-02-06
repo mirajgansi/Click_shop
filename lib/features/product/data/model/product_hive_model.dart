@@ -1,4 +1,6 @@
 import 'package:click_shop/core/constants/hive_table_constants.dart';
+import 'package:click_shop/features/product/data/model/product_api_model.dart';
+import 'package:click_shop/features/product/data/model/product_hive_model.dart';
 import 'package:click_shop/features/product/domain/entities/product_entity.dart';
 import 'package:hive/hive.dart';
 
@@ -69,28 +71,28 @@ class ProductHiveModel extends HiveObject {
   });
 
   /// JSON -> HiveModel (API response)
-  factory ProductHiveModel.fromJson(Map<String, dynamic> json) {
-    return ProductHiveModel(
-      id: (json['_id'] ?? json['id'])?.toString(),
-      name: (json['name'] ?? '').toString(),
-      nutritionalInfo: (json['nutritionalInfo'] ?? '').toString(),
-      category: (json['category'] ?? '').toString(),
-      description: (json['description'] ?? '').toString(),
-      price: (json['price'] is num)
-          ? (json['price'] as num).toDouble()
-          : double.tryParse(json['price']?.toString() ?? '0') ?? 0,
-      inStock: (json['inStock'] is num)
-          ? (json['inStock'] as num).toInt()
-          : int.tryParse(json['inStock']?.toString() ?? '0') ?? 0,
-      image: (json['image'] ?? '').toString(),
-      images: (json['images'] is List)
-          ? (json['images'] as List).map((e) => e.toString()).toList()
-          : const [],
-      manufacturer: json['manufacturer']?.toString(),
-      manufactureDateIso: json['manufactureDate']?.toString(),
-      expireDateIso: json['expireDate']?.toString(),
-    );
-  }
+  // factory ProductHiveModel.fromJson(Map<String, dynamic> json) {
+  //   return ProductHiveModel(
+  //     id: (json['_id'] ?? json['id'])?.toString(),
+  //     name: (json['name'] ?? '').toString(),
+  //     nutritionalInfo: (json['nutritionalInfo'] ?? '').toString(),
+  //     category: (json['category'] ?? '').toString(),
+  //     description: (json['description'] ?? '').toString(),
+  //     price: (json['price'] is num)
+  //         ? (json['price'] as num).toDouble()
+  //         : double.tryParse(json['price']?.toString() ?? '0') ?? 0,
+  //     inStock: (json['inStock'] is num)
+  //         ? (json['inStock'] as num).toInt()
+  //         : int.tryParse(json['inStock']?.toString() ?? '0') ?? 0,
+  //     image: (json['image'] ?? '').toString(),
+  //     images: (json['images'] is List)
+  //         ? (json['images'] as List).map((e) => e.toString()).toList()
+  //         : const [],
+  //     manufacturer: json['manufacturer']?.toString(),
+  //     manufactureDateIso: json['manufactureDate']?.toString(),
+  //     expireDateIso: json['expireDate']?.toString(),
+  //   );
+  // }
 
   /// HiveModel -> Entity
   ProductEntity toEntity() {
@@ -115,25 +117,50 @@ class ProductHiveModel extends HiveObject {
   }
 
   /// Entity -> HiveModel
-  factory ProductHiveModel.fromEntity(ProductEntity e) {
+  factory ProductHiveModel.fromEntity(ProductEntity entity) {
     return ProductHiveModel(
-      id: e.id,
-      name: e.name,
-      nutritionalInfo: e.nutritionalInfo,
-      category: e.category,
-      description: e.description,
-      price: e.price,
-      image: e.image,
-      inStock: e.inStock,
-      images: e.images,
-      manufacturer: e.manufacturer,
-      manufactureDateIso: e.manufactureDate?.toIso8601String(),
-      expireDateIso: e.expireDate?.toIso8601String(),
+      id: entity.id,
+      name: entity.name,
+      nutritionalInfo: entity.nutritionalInfo,
+      category: entity.category,
+      description: entity.description,
+      price: entity.price,
+      image: entity.image,
+      inStock: entity.inStock,
+      images: entity.images,
+      manufacturer: entity.manufacturer,
+      manufactureDateIso: entity.manufactureDate?.toIso8601String(),
+      expireDateIso: entity.expireDate?.toIso8601String(),
     );
   }
-
   // To entity list
   static List<ProductEntity> toEntityList(List<ProductHiveModel> hiveModels) {
     return hiveModels.map((model) => model.toEntity()).toList();
+  }
+
+  /// Entity -> HiveModel
+  factory ProductHiveModel.fromApiModel(ProductApiModel apiModel) {
+    return ProductHiveModel(
+      id: apiModel.id,
+      name: apiModel.name,
+      nutritionalInfo: apiModel.nutritionalInfo,
+      category: apiModel.category,
+      description: apiModel.description,
+      price: apiModel.price,
+      image: apiModel.image,
+      inStock: apiModel.inStock,
+      images: apiModel.images,
+      manufacturer: apiModel.manufacturer,
+      manufactureDateIso: apiModel.manufactureDate?.toIso8601String(),
+      expireDateIso: apiModel.expireDate?.toIso8601String(),
+    );
+  }
+
+  static List<ProductHiveModel> fromApiModelList(
+    List<ProductApiModel> apiModels,
+  ) {
+    return apiModels
+        .map((model) => ProductHiveModel.fromApiModel(model))
+        .toList();
   }
 }
