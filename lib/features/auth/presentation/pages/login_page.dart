@@ -1,6 +1,5 @@
 import 'package:click_shop/app/app_color.dart';
 import 'package:click_shop/app/routes/app_routes.dart';
-import 'package:click_shop/core/utils/my_snack_bar.dart';
 import 'package:click_shop/core/utils/snackbar_utils.dart';
 import 'package:click_shop/features/auth/presentation/widgets/my_button_widgets.dart';
 import 'package:click_shop/features/auth/presentation/widgets/my_text_field_widgets.dart';

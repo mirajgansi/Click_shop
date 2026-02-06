@@ -23,8 +23,8 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
-  bool _obscurePassword = true;
-  bool _obscureConfirmPassword = true;
+  final bool _obscurePassword = true;
+  final bool _obscureConfirmPassword = true;
   bool _agreedToTerms = false;
 
   @override

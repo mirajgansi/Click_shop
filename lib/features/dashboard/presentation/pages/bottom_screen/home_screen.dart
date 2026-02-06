@@ -1,16 +1,30 @@
 import 'package:click_shop/core/widgets/my_card_widgets.dart';
+import 'package:click_shop/features/product/presentation/view_model/product_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(productViewModelProvider);
 
-class _HomeScreenState extends State<HomeScreen> {
-  @override
-  Widget build(BuildContext context) {
+    // 🔄 Loading
+    if (state.isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (state.error != null) {
+      return Center(child: Text(state.error!));
+    }
+
+    final products = state.products;
+
+    if (products.isEmpty) {
+      return const Center(child: Text("No products found"));
+    }
+
     return LayoutBuilder(
       builder: (context, constraints) {
         int crossAxisCount = 2;
@@ -29,9 +43,11 @@ class _HomeScreenState extends State<HomeScreen> {
             crossAxisSpacing: 10,
             mainAxisSpacing: 10,
           ),
-          itemCount: 10,
+          itemCount: products.length,
           itemBuilder: (context, index) {
-            return CardWidget();
+            return CardWidget(
+              product: products[index], // ✅ real data
+            );
           },
         );
       },

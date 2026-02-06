@@ -10,7 +10,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class LoginUsecaseParams extends Equatable {
   final String email;
   final String password;
-  LoginUsecaseParams({required this.email, required this.password});
+  const LoginUsecaseParams({required this.email, required this.password});
 
   @override
   List<Object?> get props => [email, password];

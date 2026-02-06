@@ -14,7 +14,7 @@ class RegisterUsecaseParams extends Equatable {
   final String confirmPassword;
   // final String? profileImage;
 
-  RegisterUsecaseParams({
+  const RegisterUsecaseParams({
     required this.username,
     required this.email,
     required this.password,

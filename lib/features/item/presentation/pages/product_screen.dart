@@ -3,7 +3,7 @@ import 'package:click_shop/core/widgets/my_review_button_widgets.dart';
 import 'package:flutter/material.dart';
 
 class ProductDetailScreen extends StatefulWidget {
-  const ProductDetailScreen({super.key});
+  const ProductDetailScreen({super.key, required String productId});
 
   @override
   State<ProductDetailScreen> createState() => _ProductDetailScreenState();

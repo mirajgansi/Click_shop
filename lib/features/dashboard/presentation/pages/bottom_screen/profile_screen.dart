@@ -143,10 +143,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   // code for gallery for single image
-  Future<void> _pickGallery(
-    BuildContext context, {
-    bool allowMultiple = false,
-  }) async {
+  Future<void> _pickGallery(BuildContext context) async {
     final hasPermission = await _userSagaPermissionMagana(
       context,
       Permission.photos,
@@ -299,17 +296,17 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         final double dividerThickness = isTablet ? 1 : 1.5;
 
         //Menu items controllers and variables
-        final _usernameController = TextEditingController();
-        final _emailController = TextEditingController();
-        final _passwordController = TextEditingController();
-        final _confirmPasswordController = TextEditingController();
-        final _locationController = TextEditingController();
+        final usernameController = TextEditingController();
+        final emailController = TextEditingController();
+        final passwordController = TextEditingController();
+        final confirmPasswordController = TextEditingController();
+        final locationController = TextEditingController();
 
         bool notificationsEnabled = true;
 
-        bool _obscurePassword = true;
-        bool _obscureConfirmPassword = true;
-        bool _agreedToTerms = false;
+        bool obscurePassword = true;
+        bool obscureConfirmPassword = true;
+        bool agreedToTerms = false;
 
         return SingleChildScrollView(
           padding: const EdgeInsets.all(16),
@@ -340,7 +337,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         Row(
                           children: [
                             Text(
-                              name!,
+                              name,
                               style: TextStyle(
                                 fontSize: fontName,
                                 fontWeight: FontWeight.bold,
@@ -423,20 +420,20 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 title: "My Details",
                 children: [
                   TextField(
-                    controller: _usernameController,
+                    controller: usernameController,
                     decoration: const InputDecoration(labelText: "Full Name"),
                   ),
                   const SizedBox(height: 12),
                   TextField(
-                    controller: _emailController,
+                    controller: emailController,
                     decoration: const InputDecoration(labelText: "Email"),
                   ),
                   TextField(
-                    controller: _passwordController,
+                    controller: passwordController,
                     decoration: const InputDecoration(labelText: "Password"),
                   ),
                   TextField(
-                    controller: _confirmPasswordController,
+                    controller: confirmPasswordController,
                     decoration: const InputDecoration(
                       labelText: "Confirm Password",
                     ),
@@ -457,7 +454,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 title: 'Delivery address',
                 children: [
                   TextField(
-                    controller: _locationController,
+                    controller: locationController,
                     decoration: const InputDecoration(labelText: "Location"),
                   ),
                 ],

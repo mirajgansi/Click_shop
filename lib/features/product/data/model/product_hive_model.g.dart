@@ -17,34 +17,49 @@ class ProductHiveModelAdapter extends TypeAdapter<ProductHiveModel> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return ProductHiveModel(
-      productId: fields[0] as String?,
-      productName: fields[1] as String,
-      productNutrition: fields[2] as String,
-      productCategory: fields[3] as String,
-      productDetails: fields[4] as String,
-      productPrice: fields[5] as String,
-      productImage: fields[6] as String,
+      id: fields[0] as String?,
+      name: fields[1] as String,
+      nutritionalInfo: fields[2] as String,
+      category: fields[3] as String,
+      description: fields[4] as String,
+      price: fields[5] as double,
+      image: fields[6] as String,
+      inStock: fields[7] as int,
+      images: (fields[8] as List).cast<String>(),
+      manufacturer: fields[9] as String?,
+      manufactureDateIso: fields[10] as String?,
+      expireDateIso: fields[11] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, ProductHiveModel obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(12)
       ..writeByte(0)
-      ..write(obj.productId)
+      ..write(obj.id)
       ..writeByte(1)
-      ..write(obj.productName)
+      ..write(obj.name)
       ..writeByte(2)
-      ..write(obj.productNutrition)
+      ..write(obj.nutritionalInfo)
       ..writeByte(3)
-      ..write(obj.productCategory)
+      ..write(obj.category)
       ..writeByte(4)
-      ..write(obj.productDetails)
+      ..write(obj.description)
       ..writeByte(5)
-      ..write(obj.productPrice)
+      ..write(obj.price)
       ..writeByte(6)
-      ..write(obj.productImage);
+      ..write(obj.image)
+      ..writeByte(7)
+      ..write(obj.inStock)
+      ..writeByte(8)
+      ..write(obj.images)
+      ..writeByte(9)
+      ..write(obj.manufacturer)
+      ..writeByte(10)
+      ..write(obj.manufactureDateIso)
+      ..writeByte(11)
+      ..write(obj.expireDateIso);
   }
 
   @override

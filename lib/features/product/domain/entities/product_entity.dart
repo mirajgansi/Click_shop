@@ -1,32 +1,47 @@
 import 'package:equatable/equatable.dart';
 
 class ProductEntity extends Equatable {
-  final String? productId;
-  final String productName;
-  final String productNutrition;
-  final String productCategory;
-  final String productDetails;
-  final String productPrice;
-  final String productImage;
+  final String? id;
+  final String name;
+  final String description;
+  final double price;
+  final int inStock;
+  final String category;
+  final String nutritionalInfo;
+  final String image; // main image
+  final List<String> images; // extra images (optional)
+  final String? manufacturer;
+  final DateTime? manufactureDate;
+  final DateTime? expireDate;
 
-  ProductEntity({
-    required this.productId,
-    required this.productName,
-    required this.productNutrition,
-    required this.productCategory,
-    required this.productDetails,
-    required this.productPrice,
-    required this.productImage,
+  const ProductEntity({
+    this.id,
+    required this.name,
+    required this.description,
+    required this.price,
+    required this.inStock,
+    required this.category,
+    required this.nutritionalInfo,
+    required this.image,
+    this.images = const [],
+    this.manufacturer,
+    this.manufactureDate,
+    this.expireDate,
   });
 
   @override
   List<Object?> get props => [
-    productId,
-    productName,
-    productNutrition,
-    productCategory,
-    productDetails,
-    productPrice,
-    productImage,
+    id,
+    name,
+    description,
+    price,
+    inStock,
+    category,
+    nutritionalInfo,
+    image,
+    images,
+    manufacturer,
+    manufactureDate,
+    expireDate,
   ];
 }

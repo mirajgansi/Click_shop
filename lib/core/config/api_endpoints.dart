@@ -32,7 +32,7 @@ class ApiEndpoints {
   }
 
   static String getBaseUrl() {
-    return '${getHostUrl()}/api'; // ✅ API base (no trailing slash)
+    return '${getHostUrl()}/api/';
   }
 
   static const Duration connectionTimeout = Duration(seconds: 30);
@@ -46,16 +46,26 @@ class ApiEndpoints {
   static const String users = 'auth';
   static const String userLogin = 'auth/login';
   static const String userRegister = 'auth/register/';
-  static const String whoAmI = 'auth/whoamI';
+  static const String whoAmI = 'auth/whoamI/';
 
   static String userById(String id) => '/auth/$id';
   static String userPhoto(String id) => '/auth/update-profile';
 
   // ============ Item Endpoints ============
-  // static const String items = '/items';
-  // static String itemById(String id) => '/items/$id';
-  // static String itemClaim(String id) => '/items/$id/claim';
+  static const String products = "products";
 
+  static String getAllProducts() => "/"; // GET
+  static String getProductById(String id) => "products/$id"; // GET
+  static String getByCategory(String category) =>
+      "products/category/$category"; // GET
+
+  static String recent() => "$products/recent";
+  static String trending() => "$products/trending"; // GET
+  static String popular() => "$products/popular"; // GET
+  static String topRated() => "$products/top-rated"; // GET
+
+  static const String CartAdd = "/api/cart";
+  static const String CartGet = "/api/cart/item";
   // ============ Comment Endpoints ============
   // static const String comments = '/comments';
   // static String commentById(String id) => '/comments/$id';

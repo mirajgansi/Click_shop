@@ -1,6 +1,4 @@
-import 'package:click_shop/features/product/presentation/pages/add_product_screen.dart';
 import 'package:click_shop/features/dashboard/presentation/pages/bottom_screen/explore_screen.dart';
-import 'package:click_shop/features/dashboard/presentation/pages/bottom_screen/favourite_screen.dart';
 import 'package:click_shop/features/dashboard/presentation/pages/bottom_screen/cart_sreen.dart';
 import 'package:click_shop/features/dashboard/presentation/pages/bottom_screen/home_screen.dart';
 import 'package:click_shop/features/dashboard/presentation/pages/bottom_screen/profile_screen.dart';
@@ -21,9 +19,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     const HomeScreen(),
     const ExploreScreen(),
     const CartScreen(),
-    const FavouriteScreen(),
-    ProfileScreen(),
-    const AddProduct(),
+    const ProfileScreen(),
   ];
 
   BottomNavigationBarItem _svgNavItem({
@@ -75,19 +71,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
           _svgNavItem(asset: 'assets/icons/cart.svg', label: 'Cart', index: 2),
           _svgNavItem(
             asset: 'assets/icons/favriout.svg',
-            label: 'Faviout',
+            label: 'Account',
             index: 3,
           ),
-          _svgNavItem(
-            asset: 'assets/icons/profile.svg',
-            label: 'Account',
-            index: 4,
-          ),
-          _svgNavItem(
-            asset: 'assets/icons/profile.svg',
-            label: 'admin',
-            index: 5,
-          ),
+          // _svgNavItem(
+          //   asset: 'assets/icons/profile.svg',
+          //   label: 'Account',
+          //   index: 4,
+          // ),
         ],
       ),
     );

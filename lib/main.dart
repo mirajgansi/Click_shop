@@ -3,7 +3,6 @@ import 'package:click_shop/core/services/storage/user_session_service.dart';
 import 'package:click_shop/features/splash/presentation/pages/splash_page.dart';
 import 'package:click_shop/features/dashboard/presentation/pages/bottom_navigation_screen.dart';
 import 'package:click_shop/features/auth/presentation/pages/frogotpassword_page.dart';
-import 'package:click_shop/screens/onboarding.dart';
 import 'package:click_shop/features/auth/presentation/pages/login_page.dart';
 import 'package:click_shop/features/auth/presentation/pages/signup_page.dart';
 import 'package:flutter/material.dart';

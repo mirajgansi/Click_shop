@@ -3,7 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:motion_toast/motion_toast.dart';
 
 class MyCartButtonWidget extends StatefulWidget {
-  const MyCartButtonWidget({super.key});
+  const MyCartButtonWidget({super.key, required String productId});
 
   @override
   State<MyCartButtonWidget> createState() => _MyCartButtonWidgetState();
