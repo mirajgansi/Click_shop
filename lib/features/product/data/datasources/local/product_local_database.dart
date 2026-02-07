@@ -37,42 +37,6 @@ class ProdcutLocalDatabase implements IProductLocalDatabase {
     }
   }
 
-  // ---------------- CART ----------------
-
-  @override
-  Future<bool> createCartProduct(String productId) async {
-    try {
-      await _hiveService.addToCart(productId);
-      return true;
-    } catch (_) {
-      return false;
-    }
-  }
-
-  @override
-  Future<List<ProductHiveModel>> getCartProducts() async {
-    try {
-      final cartIds = await _hiveService.getCartProductIds(); // ✅ await here
-      if (cartIds.isEmpty) return [];
-
-      // Fetch all products once (faster than get by id in a loop)
-      final allModels = await _hiveService.getAllProducts();
-      final mapById = {
-        for (final m in allModels)
-          if (m.id != null) m.id!: m,
-      };
-
-      final result = <ProductHiveModel>[];
-      // for (final id in cartIds) {
-      //   final model = mapById[id];
-      //   if (model != null) result.add(model.toEntity());
-      // }
-      return result;
-    } catch (_) {
-      return [];
-    }
-  }
-
   Future<void> cacheAllProducts(List<ProductHiveModel> items) async {
     await _hiveService.cacheAllProdcuts(items);
   }

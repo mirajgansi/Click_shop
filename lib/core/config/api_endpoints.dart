@@ -54,7 +54,7 @@ class ApiEndpoints {
   // ============ Item Endpoints ============
   static const String products = "products";
 
-  static String getAllProducts() => "/"; // GET
+  static String getAllProducts() => "products"; // GET
   static String getProductById(String id) => "products/$id"; // GET
   static String getByCategory(String category) =>
       "products/category/$category"; // GET
@@ -64,11 +64,25 @@ class ApiEndpoints {
   static String popular() => "$products/popular"; // GET
   static String topRated() => "$products/top-rated"; // GET
 
-  static const String CartAdd = "/api/cart";
-  static const String CartGet = "/api/cart/item";
-  // ============ Comment Endpoints ============
-  // static const String comments = '/comments';
-  // static String commentById(String id) => '/comments/$id';
-  // static String commentsByItem(String itemId) => '/comments/item/$itemId';
-  // static String commentLike(String id) => '/comments/$id/like';
+  static String cartAdd() => "cart"; // POST /api/cart
+  static String cartGet() => "cart/item"; // GET  /api/cart/item
+  static String deleteCart(String id) =>
+      "cart/item/$id"; // DELETE /api/cart/item/:id
+  static String deleteAllCart() => "cart";
+
+  static const String base = "/api/orders";
+
+  // user
+  static const String createOrder = base;
+  static const String myOrders = "$base/me";
+  static String orderById(String id) => "$base/$id";
+  static String cancelOrder(String id) => "$base/orders/$id/cancel";
+
+  // driver
+  static const String driverOrders = "$base/driver/my-orders";
+
+  // admin (optional)
+  static const String allOrders = base;
+  static String updateStatus(String id) => "$base/$id/status";
+  static String assignDriver(String id) => "$base/$id/assign-driver";
 }

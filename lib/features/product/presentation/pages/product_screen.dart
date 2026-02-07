@@ -1,5 +1,6 @@
 import 'package:click_shop/core/widgets/my_favourite_button_widgets.dart';
 import 'package:click_shop/core/widgets/my_review_button_widgets.dart';
+import 'package:click_shop/features/cart/domain/usecases/add_cart_product_usecase.dart';
 import 'package:click_shop/features/product/presentation/view_model/product_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -95,8 +96,22 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                 borderRadius: BorderRadius.circular(14),
               ),
             ),
-            onPressed: () {
-              _toast("Added to basket (coming soon)");
+            onPressed: () async {
+              final result = await ref
+                  .read(addToCartUsecaseProvider)
+                  .call(
+                    AddToCartParams(
+                      productId:
+                          product.id ??
+                          widget.productId, // use whichever you have
+                      quantity: quantity,
+                    ),
+                  );
+
+              result.fold(
+                (failure) => _toast(failure.message),
+                (_) => _toast("Added to basket "),
+              );
             },
             child: const Text(
               "Add To Basket",

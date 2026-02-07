@@ -11,8 +11,6 @@ abstract interface class IProductLocalDatabase {
   // Future<bool> updateProduct(ProductApiModel ProductApiModel);
   Future<List<ProductHiveModel>> getProductsByCategory(String categoryId);
   // Future<List<ProductApiModel>> searchProducts(String query);
-  Future<bool> createCartProduct(String productId);
-  Future<List<ProductHiveModel>> getCartProducts();
 }
 
 abstract interface class IProductRemoteDatabase {
@@ -23,6 +21,4 @@ abstract interface class IProductRemoteDatabase {
   // Future<bool> updateProduct(ProductApiModel ProductApiModel);
   Future<List<ProductApiModel>> getProductsByCategory(String categoryId);
   // Future<List<ProductApiModel>> searchProducts(String query);
-  Future<bool> createCartProduct(String productId);
-  Future<List<ProductApiModel>> getCartProducts();
 }

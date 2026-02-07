@@ -42,22 +42,17 @@ class AuthRepository implements IAuthRepository {
 
   @override
   Future<Either<Failure, AuthEntity>> getCurrentUser() async {
-    try {
-      if (await _networkInfo.isConnected) {
+    if (await _networkInfo.isConnected) {
+      try {
         final apiModel = await _authRemoteDataSource.WhoAmI();
-        if (apiModel != true) {
-          return Right(apiModel.toEntity());
-        }
-      }
+        final entity = apiModel.toEntity();
 
-      final model = await _authDatasource.getCurrentUser();
-      if (model != null) {
-        return Right(model.toEntity());
+        return Right(entity);
+      } catch (e) {
+        return _getCachedUser();
       }
-
-      return Left(LocalDatabaseFailure(message: "User not found"));
-    } catch (e) {
-      return Left(ApiFailure(message: e.toString()));
+    } else {
+      return _getCachedUser();
     }
   }
 
@@ -94,6 +89,18 @@ class AuthRepository implements IAuthRepository {
       } catch (e) {
         return Left(LocalDatabaseFailure(message: e.toString()));
       }
+    }
+  }
+
+  Future<Either<Failure, AuthEntity>> _getCachedUser() async {
+    try {
+      final model = await _authDatasource.getCurrentUser();
+      if (model == null) {
+        return const Left(LocalDatabaseFailure(message: "No user found"));
+      }
+      return Right(model.toEntity());
+    } catch (e) {
+      return Left(LocalDatabaseFailure(message: e.toString()));
     }
   }
 

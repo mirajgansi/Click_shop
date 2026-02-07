@@ -74,14 +74,14 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.of(context).pop(); // close dialog
+              Navigator.of(context).pop();
             },
             child: const Text("Cancel"),
           ),
           TextButton(
             onPressed: () async {
-              Navigator.of(context).pop(); // close dialog
-              await openAppSettings(); // open app settings
+              Navigator.of(context).pop();
+              await openAppSettings();
             },
             child: const Text("Open Settings"),
           ),

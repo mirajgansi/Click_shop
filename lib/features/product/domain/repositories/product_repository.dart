@@ -12,6 +12,4 @@ abstract interface class IProductRepository {
     String categoryId,
   );
   Future<Either<Failure, List<ProductEntity>>> searchProducts(String query);
-  Future<Either<Failure, bool>> createCartProduct(String productId);
-  Future<Either<Failure, List<ProductEntity>>> getCartProducts();
 }

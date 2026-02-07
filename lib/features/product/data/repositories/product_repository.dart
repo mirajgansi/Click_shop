@@ -98,7 +98,6 @@ class ProductRepository implements IProductRepository {
   //   }
   // }
 
-  /// ✅ SEARCH (local filtering)
   // @override
   // Future<Either<Failure, List<ProductEntity>>> searchProducts(
   //   String query,
@@ -113,34 +112,7 @@ class ProductRepository implements IProductRepository {
 
   // -------------------- CART --------------------
 
-  /// ✅ ADD TO CART
-  @override
-  Future<Either<Failure, bool>> createCartProduct(String productId) async {
-    // If your backend has cart API, use remote when online, else local
-    if (await _networkInfo.isConnected) {
-      try {
-        final ok = await _remoteDataSource.createCartProduct(productId);
-        return Right(ok);
-      } catch (e) {
-        // if remote fails, fallback to local cart
-        try {
-          final ok = await _localDataSource.createCartProduct(productId);
-          return Right(ok);
-        } catch (err) {
-          return Left(LocalDatabaseFailure(message: err.toString()));
-        }
-      }
-    } else {
-      try {
-        final ok = await _localDataSource.createCartProduct(productId);
-        return Right(ok);
-      } catch (e) {
-        return Left(LocalDatabaseFailure(message: e.toString()));
-      }
-    }
-  }
-
-  // /// ✅ GET CART PRODUCTS
+  //  GET CART PRODUCTS
   // @override
   // Future<Either<Failure, List<ProductEntity>>> getCartProducts() async {
   //   if (await _networkInfo.isConnected) {
@@ -207,12 +179,6 @@ class ProductRepository implements IProductRepository {
     } else {
       return _getCachedItems();
     }
-  }
-
-  @override
-  Future<Either<Failure, List<ProductEntity>>> getCartProducts() {
-    // TODO: implement getCartProducts
-    throw UnimplementedError();
   }
 
   @override

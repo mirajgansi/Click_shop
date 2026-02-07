@@ -1,5 +1,6 @@
 import 'package:click_shop/core/constants/hive_table_constants.dart';
 import 'package:click_shop/features/auth/data/models/auth_hive_model.dart';
+import 'package:click_shop/features/cart/data/model/cart_hive_model.dart';
 import 'package:click_shop/features/product/data/model/product_hive_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
@@ -27,6 +28,9 @@ class HiveService {
 
     if (!Hive.isAdapterRegistered(HiveTableConstants.productTypeId)) {
       Hive.registerAdapter(ProductHiveModelAdapter());
+    }
+    if (!Hive.isAdapterRegistered(HiveTableConstants.cartTypeId)) {
+      Hive.registerAdapter(CartHiveModelAdapter());
     }
   }
 
@@ -63,6 +67,13 @@ class HiveService {
 
   AuthHiveModel? getCurrentUser(String userId) {
     return _authBox.get(userId);
+  }
+
+  Future<void> cacheUser(List<AuthHiveModel> userId) async {
+    await _authBox.clear();
+    for (var auth in userId) {
+      await _authBox.put(auth.userId, auth);
+    }
   }
 
   bool isEmailExists(String email) {
@@ -112,12 +123,63 @@ class HiveService {
     return true;
   }
 
-  Box<String> get _cartBox => Hive.box<String>(HiveTableConstants.cartTable);
+  // ==================== CART ====================
+  Box<CartHiveModel> get _cartBox =>
+      Hive.box<CartHiveModel>(HiveTableConstants.cartTable);
 
-  Future<bool> addToCart(String productId) async {
+  Future<bool> addToCart({
+    required String productId,
+    int quantity = 1,
+    required,
+  }) async {
     try {
       if (productId.isEmpty) return false;
-      await _cartBox.put(productId, productId); // key/value both productId
+      if (quantity <= 0) quantity = 1;
+
+      // ✅ Use productId as the KEY so updates are easy
+      final existing = _cartBox.get(productId);
+
+      if (existing != null) {
+        final updated = CartHiveModel(
+          cartItemId: existing.cartItemId,
+          productId: existing.productId,
+          quantity: existing.quantity + quantity,
+        );
+        await _cartBox.put(productId, updated);
+      } else {
+        final item = CartHiveModel(
+          productId: productId,
+          quantity: quantity,
+          cartItemId: "",
+        );
+        await _cartBox.put(productId, item);
+      }
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<bool> updateCartQuantity({
+    required String productId,
+    required int quantity,
+  }) async {
+    try {
+      final existing = _cartBox.get(productId);
+      if (existing == null) return false;
+
+      if (quantity <= 0) {
+        await _cartBox.delete(productId); // remove item if qty <= 0
+        return true;
+      }
+
+      final updated = CartHiveModel(
+        cartItemId: existing.cartItemId,
+        productId: existing.productId,
+        quantity: quantity,
+      );
+
+      await _cartBox.put(productId, updated);
       return true;
     } catch (_) {
       return false;
@@ -142,9 +204,17 @@ class HiveService {
     }
   }
 
+  Future<List<CartHiveModel>> getAllCart() async {
+    try {
+      return _cartBox.values.toList();
+    } catch (_) {
+      return [];
+    }
+  }
+
   Future<List<String>> getCartProductIds() async {
     try {
-      return _cartBox.keys.map((e) => e.toString()).toList();
+      return _cartBox.values.map((e) => e.productId).toList();
     } catch (_) {
       return [];
     }

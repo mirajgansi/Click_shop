@@ -62,60 +62,6 @@ class ProductRemoteDatabase implements IProductRemoteDatabase {
   //   return ProductApiModel.fromJson(response.data['data']);
   // }
 
-  // ---------------- CART ----------------
-
-  @override
-  Future<bool> createCartProduct(String productId) async {
-    try {
-      final token = _tokenService.getToken();
-
-      // Update endpoint to match your backend:
-      // example: POST /api/cart/:productId  or POST /api/cart {productId}
-      await _apiClient.post(
-        ApiEndpoints.CartAdd, // <-- create this
-        data: {'productId': productId},
-        options: Options(headers: {'Authorization': 'Bearer $token'}),
-      );
-
-      return true;
-    } catch (_) {
-      return false;
-    }
-  }
-
-  // @override
-  // Future<List<ProductApiModel>> getCartProducts() async {
-  //   try {
-  //     final token = _tokenService.getToken();
-
-  //     // Update endpoint to match your backend:
-  //     // example: GET /api/cart
-  //     final res = await _apiClient.get(
-  //       ApiEndpoints.CartGet, // <-- create this
-  //       options: Options(headers: {'Authorization': 'Bearer $token'}),
-  //     );
-
-  //     final data = res.data['data'];
-  //     if (data is! List) return [];
-
-  //     // If backend returns cart items with nested product: { product: {...} }
-  //     // adjust this mapping accordingly.
-  //     final models = data
-  //         .map((json) => ProductApiModel.fromJson(json as Map<String, dynamic>))
-  //         .toList();
-
-  //     return models.map((m) => m.toEntity()).toList();
-  //   } catch (_) {
-  //     return [];
-  //   }
-  // }
-
-  @override
-  Future<List<ProductApiModel>> getCartProducts() {
-    // TODO: implement getCartProducts
-    throw UnimplementedError();
-  }
-
   @override
   Future<List<ProductApiModel>> getProductsByCategory(String categoryId) {
     // TODO: implement getProductsByCategory
