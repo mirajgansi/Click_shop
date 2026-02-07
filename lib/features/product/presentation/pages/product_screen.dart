@@ -1,3 +1,4 @@
+import 'package:click_shop/core/config/api_endpoints.dart';
 import 'package:click_shop/core/widgets/my_favourite_button_widgets.dart';
 import 'package:click_shop/core/widgets/my_review_button_widgets.dart';
 import 'package:click_shop/features/cart/domain/usecases/add_cart_product_usecase.dart';
@@ -39,11 +40,11 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
     );
   }
 
-  // If your backend returns "/uploads/..", make it absolute:
   String _buildImageUrl(String path) {
+    if (path.isEmpty) return "";
     if (path.startsWith("http")) return path;
-    // change port/base if needed
-    return "http://10.0.2.2:5050${path.startsWith("/") ? "" : "/"}$path";
+
+    return "${ApiEndpoints.getHostUrl()}${path.startsWith("/") ? "" : "/"}$path";
   }
 
   @override
@@ -142,17 +143,9 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                         "assets/images/Group.jpg",
                         fit: BoxFit.contain,
                       )
-                    : Image.network(
-                        _buildImageUrl(product.image),
-                        fit: BoxFit.contain,
-                        errorBuilder: (_, __, ___) => Image.asset(
-                          "assets/images/Group.jpg",
-                          fit: BoxFit.contain,
-                        ),
-                      ),
+                    : Image.network(ApiEndpoints.buildFileUrl(product.image)),
               ),
             ),
-
             const SizedBox(height: 20),
 
             Padding(
@@ -160,78 +153,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          product.name,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () =>
-                            _toast("Added to favourites (coming soon)"),
-                        child: const MyFavouriteButtonWidgets(),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 4),
-                  Text(
-                    "In stock: ${product.inStock}",
-                    style: const TextStyle(color: Colors.grey),
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.grey.shade300),
-                        ),
-                        child: Row(
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.remove),
-                              onPressed: () {
-                                if (quantity > 1) setState(() => quantity--);
-                              },
-                            ),
-                            Text(
-                              quantity.toString(),
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.add, color: Colors.green),
-                              onPressed: () => setState(() => quantity++),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      Text(
-                        "Rs. ${product.price}",
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 24),
+                  // ... (keep your UI)
                   const Divider(),
 
                   sectionTitle("Product Detail"),
@@ -243,10 +165,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
 
                   const Divider(),
 
-                  listTile(
-                    title: "Nutritions",
-                    trailing: product.nutritionalInfo,
-                  ),
+                  listTile(title: "Nutritions", value: product.nutritionalInfo),
 
                   const Divider(),
 
@@ -286,18 +205,21 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
 
   Widget listTile({
     required String title,
-    String? trailing,
+    String? value,
     Widget? trailingWidget,
   }) {
     return ListTile(
       contentPadding: EdgeInsets.zero,
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
-      trailing:
-          trailingWidget ??
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [Text(trailing ?? ""), const Icon(Icons.chevron_right)],
-          ),
+      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
+      subtitle: value != null
+          ? Text(
+              value,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(color: Colors.grey),
+            )
+          : null,
+      trailing: trailingWidget,
     );
   }
 }

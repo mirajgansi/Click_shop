@@ -35,6 +35,13 @@ class ApiEndpoints {
     return '${getHostUrl()}/api/';
   }
 
+  static String buildFileUrl(String path) {
+    if (path.isEmpty) return "";
+    if (path.startsWith("http")) return path;
+
+    return "${getHostUrl()}${path.startsWith("/") ? "" : "/"}$path";
+  }
+
   static const Duration connectionTimeout = Duration(seconds: 30);
   static const Duration receiveTimeout = Duration(seconds: 30);
 
@@ -64,11 +71,14 @@ class ApiEndpoints {
   static String popular() => "$products/popular"; // GET
   static String topRated() => "$products/top-rated"; // GET
 
-  static String cartAdd() => "cart"; // POST /api/cart
-  static String cartGet() => "cart/item"; // GET  /api/cart/item
-  static String deleteCart(String id) =>
-      "cart/item/$id"; // DELETE /api/cart/item/:id
-  static String deleteAllCart() => "cart";
+  // cart
+  static String cartGet() => "cart"; // GET /api/cart
+  static String cartAdd() => "cart/items"; // POST /api/cart/items
+  static String updateCartQty(String productId) =>
+      "cart/items/$productId"; // PATCH
+  static String deleteCartItem(String productId) =>
+      "cart/items/$productId"; // DELETE
+  static String clearCart() => "cart"; // DELETE /api/cart
 
   static const String base = "/api/orders";
 

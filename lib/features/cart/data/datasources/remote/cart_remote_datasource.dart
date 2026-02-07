@@ -60,47 +60,42 @@ class CartRemoteDatasource implements ICartRemoteDatabase {
   Future<List<ProductApiModel>> getCartProducts() async {
     try {
       final res = await _apiClient.get(
-        ApiEndpoints.cartGet(), // "cart/item"
+        ApiEndpoints.cartGet(), // "cart"
         options: await _authOptions(),
       );
 
-      // ✅ Handle common response shapes:
-      // 1) {data: [...]}
-      // 2) {data: {items:[...]}}
       final body = res.data;
 
-      dynamic list = body;
-      if (body is Map && body["data"] != null) list = body["data"];
-      if (list is Map && list["items"] != null) list = list["items"];
+      // ✅ data is a MAP, items is a LIST
+      final items =
+          (body is Map && body["data"] is Map && body["data"]["items"] is List)
+          ? body["data"]["items"] as List
+          : <dynamic>[];
 
-      if (list is! List) return [];
-
-      return list.map<ProductApiModel>((item) {
-        final map = item as Map<String, dynamic>;
-        final productJson = map["product"] is Map ? map["product"] : map;
-        return ProductApiModel.fromJson(Map<String, dynamic>.from(productJson));
+      // ✅ each item has productId: {...product...}
+      return items.map<ProductApiModel>((item) {
+        final map = Map<String, dynamic>.from(item as Map);
+        final productJson = Map<String, dynamic>.from(map["productId"] as Map);
+        return ProductApiModel.fromJson(productJson);
       }).toList();
     } catch (e) {
-      // ignore: avoid_print
       print("getCartProducts error: $e");
       return [];
     }
   }
 
   @override
-  Future<bool> deleteCartItem(String cartItemId) async {
+  Future<bool> deleteCartItem(String productId) async {
     try {
       final res = await _apiClient.delete(
-        ApiEndpoints.deleteCart(cartItemId), // "cart/item/:id"
+        ApiEndpoints.deleteCartItem(productId),
         options: await _authOptions(),
       );
 
       final data = res.data;
       if (data is Map && data["success"] == false) return false;
-
       return true;
     } catch (e) {
-      // ignore: avoid_print
       print("deleteCartItem error: $e");
       return false;
     }
@@ -110,16 +105,14 @@ class CartRemoteDatasource implements ICartRemoteDatabase {
   Future<bool> clearCart() async {
     try {
       final res = await _apiClient.delete(
-        ApiEndpoints.deleteAllCart(), // "cart"
+        ApiEndpoints.clearCart(),
         options: await _authOptions(),
       );
 
       final data = res.data;
       if (data is Map && data["success"] == false) return false;
-
       return true;
     } catch (e) {
-      // ignore: avoid_print
       print("clearCart error: $e");
       return false;
     }

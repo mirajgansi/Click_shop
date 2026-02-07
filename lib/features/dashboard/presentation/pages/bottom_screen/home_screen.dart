@@ -10,7 +10,6 @@ class HomeScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(productViewModelProvider);
 
-    // 🔄 Loading
     if (state.isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
