@@ -7,6 +7,7 @@ import 'package:click_shop/core/services/storage/user_session_service.dart';
 import 'package:click_shop/features/auth/data/datasources/auth_datasources.dart';
 import 'package:click_shop/features/auth/data/models/auth_api_model.dart';
 import 'package:click_shop/features/auth/data/models/auth_hive_model.dart';
+import 'package:click_shop/features/auth/domain/entities/auth_entity.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -85,13 +86,6 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
   //     options: Options(headers: {'Authorization': 'Bearer  $token'}),
   //   );
   //   return respone.data['success'];
-  // }
-
-  @override
-  Future<bool> deleteMe(String userId) {
-    // TODO: implement deleteUser
-    throw UnimplementedError();
-  }
 
   @override
   Future<AuthApiModel?> login(String email, String password) async {
@@ -127,7 +121,7 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
   }
 
   @override
-  Future<AuthApiModel> WhoAmI() async {
+  Future<AuthApiModel> whoAmI() async {
     final response = await _apiClient.get(
       ApiEndpoints.whoAmI,
       options: Options(
@@ -150,8 +144,75 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
   }
 
   @override
-  Future<AuthHiveModel?> updateUser(String user) {
-    // TODO: implement updateUser
-    throw UnimplementedError();
+  Future<AuthApiModel> updateUser(AuthEntity user) async {
+    final apiModel = AuthApiModel.formEnitity(user);
+    final data = apiModel.toProfileUpdateJson(); // removes password/nulls
+
+    final response = await _apiClient.put(
+      ApiEndpoints.updateProfile,
+      data: data,
+      options: Options(
+        headers: {'Authorization': 'Bearer ${_tokenService.getToken()}'},
+      ),
+    );
+
+    if (response.data['success'] == true) {
+      return AuthApiModel.fromJson(response.data['data']);
+    }
+
+    throw Exception(response.data['message'] ?? "Update failed");
+  }
+
+  @override
+  Future<bool> requestPasswordReset(String email) async {
+    final response = await _apiClient.post(
+      ApiEndpoints.requestPasswordReset, // auth/request-password-reset
+      data: {"email": email},
+    );
+
+    if (response.data['success'] == true) {
+      return true;
+    }
+
+    throw Exception(
+      response.data['message'] ?? "Failed to request password reset",
+    );
+  }
+
+  @override
+  Future<bool> resetPassword({
+    required String token,
+    required String newPassword,
+  }) async {
+    final response = await _apiClient.post(
+      ApiEndpoints.resetPassword(token), // auth/reset-password/:token
+      data: {
+        "password": newPassword,
+      }, // change key if backend expects "newPassword"
+    );
+
+    if (response.data['success'] == true) {
+      return true;
+    }
+
+    throw Exception(response.data['message'] ?? "Failed to reset password");
+  }
+
+  @override
+  Future<bool> deleteMe(String password) async {
+    final response = await _apiClient.delete(
+      ApiEndpoints.deleteMe, // auth/me
+      data: {"password": password},
+
+      options: Options(
+        headers: {'Authorization': 'Bearer ${_tokenService.getToken()}'},
+      ),
+    );
+
+    if (response.data['success'] == true) {
+      return true;
+    }
+
+    throw Exception(response.data['message'] ?? "Failed to delete user");
   }
 }

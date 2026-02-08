@@ -88,6 +88,38 @@ class HiveService {
     return users.isNotEmpty;
   }
 
+  Future<AuthHiveModel?> updateUser(AuthHiveModel model) async {
+    final key = model.userId;
+    if (key == null || key.isEmpty) return null;
+
+    final exists = _authBox.containsKey(key);
+    if (!exists) return null;
+
+    await _authBox.put(key, model);
+    return model;
+  }
+
+  Future<bool> deleteUser(String userId) async {
+    final exists = _authBox.containsKey(userId);
+    if (!exists) return false;
+
+    await _authBox.delete(userId);
+    return true;
+  }
+
+  // clear all users (optional)
+  Future<void> clearUsers() async {
+    await _authBox.clear();
+  }
+
+  Future<void> saveUser(AuthHiveModel user) async {
+    final key = user.userId;
+    if (key == null || key.isEmpty) {
+      throw Exception("UserId is required to save user locally");
+    }
+    await _authBox.put(key, user);
+  }
+
   // ==================== PRODUCTS ====================
   Box<ProductHiveModel> get _productBox =>
       Hive.box<ProductHiveModel>(HiveTableConstants.productTable);
@@ -132,11 +164,7 @@ class HiveService {
   Box<CartHiveModel> get _cartBox =>
       Hive.box<CartHiveModel>(HiveTableConstants.cartTable);
 
-  Future<bool> addToCart({
-    required String productId,
-    int quantity = 1,
-    required,
-  }) async {
+  Future<bool> addToCart({required String productId, int quantity = 1}) async {
     try {
       if (productId.isEmpty) return false;
       if (quantity <= 0) quantity = 1;

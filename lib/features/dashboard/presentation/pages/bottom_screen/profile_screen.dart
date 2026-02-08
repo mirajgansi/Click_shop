@@ -10,6 +10,8 @@ import 'package:click_shop/features/auth/domain/usecases/get_currentuacase.dart'
 import 'package:click_shop/features/auth/presentation/state/auth_state.dart';
 import 'package:click_shop/features/auth/presentation/view_model/auth_view_model.dart';
 import 'package:click_shop/features/auth/presentation/widgets/my_button_widgets.dart';
+import 'package:click_shop/features/dashboard/presentation/pages/my_account_delete_page.dart';
+import 'package:click_shop/features/dashboard/presentation/pages/my_detail_page.dart';
 import 'package:click_shop/features/dashboard/presentation/widgets/my_menu_items_widgets.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
@@ -377,110 +379,61 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ),
 
               Divider(thickness: dividerThickness, height: 32),
-              SizedBox(height: 24),
-              // if (_selectedMedia.isNotEmpty) ...[
-              //   Stack(
-              //     children: [
-              //       Container(
-              //         width: 200,
-              //         height: 200,
-              //         decoration: BoxDecoration(
-              //           borderRadius: BorderRadius.circular(12),
-              //           image: DecorationImage(
-              //             image: FileImage(File(_selectedMedia[0].path)),
-              //           ),
-              //         ),
-              //       ),
-              //     ],
-              //   ),
-              //   Positioned(
-              //     top: 4,
-              //     right: 4,
-              //     child: GestureDetector(
-              //       onTap: () {
-              //         setState() {
-              //           _selectedMedia.clear();
-              //         }
-              //       },
-              //       child: CircleAvatar(
-              //         radius: 16,
-              //         backgroundColor: Colors.red,
-              //         child: Icon(Icons.close, color: Colors.white, size: 18),
-              //       ),
-              //     ),
-              //   ),
-              // ],
 
-              // const MyMenuItemsWidgets(
-              //   icon: Icons.shopping_bag_outlined,
-              //   title: 'Order',
-              // ),
-              MyMenuItemsWidgets(
-                icon: Icons.person,
-                title: "My Details",
+              Column(
                 children: [
-                  TextField(
-                    controller: usernameController,
-                    decoration: const InputDecoration(labelText: "Full Name"),
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: emailController,
-                    decoration: const InputDecoration(labelText: "Email"),
-                  ),
-                  TextField(
-                    controller: passwordController,
-                    decoration: const InputDecoration(labelText: "Password"),
-                  ),
-                  TextField(
-                    controller: confirmPasswordController,
-                    decoration: const InputDecoration(
-                      labelText: "Confirm Password",
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      // call your update API here
-                      // nameController.text, emailController.text
-                    },
-                    child: const Text("Update"),
-                  ),
-                ],
-              ),
-
-              MyMenuItemsWidgets(
-                icon: Icons.location_on_outlined,
-                title: 'Delivery address',
-                children: [
-                  TextField(
-                    controller: locationController,
-                    decoration: const InputDecoration(labelText: "Location"),
-                  ),
-                ],
-              ),
-              MyMenuItemsWidgets(
-                icon: Icons.notifications,
-                title: "Notifications",
-                children: [
-                  SwitchListTile(
-                    contentPadding: EdgeInsets.zero,
-                    title: const Text("Enable Notifications"),
-                    value: notificationsEnabled,
-                    onChanged: (val) {
-                      // setState(() => notificationsEnabled = val);
-                      // Save to backend/sharedPreferences if needed
+                  MyMenuItemWidget(
+                    icon: Icons.person,
+                    title: "My Details",
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const MyDetailsScreen(),
+                        ),
+                      );
                     },
                   ),
+
+                  // MyMenuItemWidget(
+                  //   icon: Icons.location_on_outlined,
+                  //   title: "Delivery address",
+                  //   onTap: () {
+                  //     Navigator.push(
+                  //       context,
+                  //       MaterialPageRoute(
+                  //         builder: (_) => const DeliveryAddressScreen(),
+                  //       ),
+                  //     );
+                  //   },
+                  // ),
+                  MyMenuItemWidget(
+                    icon: Icons.notifications,
+                    title: "Delete My Account",
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const DeleteAccountScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                  MyMenuItemWidget(
+                    icon: Icons.help_outline,
+                    title: "Help",
+                    onTap: () => Navigator.pushNamed(context, "/help"),
+                  ),
+
+                  MyMenuItemWidget(
+                    icon: Icons.info_outline,
+                    title: "About",
+                    onTap: () => Navigator.pushNamed(context, "/about"),
+                  ),
                 ],
               ),
-              const MyMenuItemsWidgets(icon: Icons.help_outline, title: 'Help'),
-              const MyMenuItemsWidgets(
-                icon: Icons.info_outline,
-                title: 'About',
-              ),
 
-              SizedBox(height: 25),
+              SizedBox(height: 200),
 
               SizedBox(
                 width: double.infinity,

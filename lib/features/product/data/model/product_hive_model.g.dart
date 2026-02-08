@@ -29,7 +29,7 @@ class ProductHiveModelAdapter extends TypeAdapter<ProductHiveModel> {
       manufacturer: fields[9] as String?,
       manufactureDateIso: fields[10] as String?,
       expireDateIso: fields[11] as String?,
-      quantity: fields[12] as int,
+      quantity: fields[12] as int?,
     );
   }
 

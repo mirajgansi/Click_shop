@@ -36,7 +36,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => const AppStartScreen(),
         '/login': (context) => const LoginPage(),
-        '/forgotpassword': (context) => const FrogotpasswordScreen(),
+        '/forgotpassword': (context) => const ForgotPasswordScreen(),
         '/signup': (context) => const SignupScreen(),
         '/dashboard': (context) => const DashboardScreen(),
       },

@@ -61,6 +61,10 @@ class ApiEndpoints {
 
   static const String requestPasswordReset = '$auth/request-password-reset';
   static String resetPassword(String token) => '$auth/reset-password/$token';
+
+  static String userById(String id) => '/auth/$id';
+  static String userPhoto(String id) => '/auth/update-profile';
+
   // ============ Item Endpoints ============
   static const String products = "products";
 

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:click_shop/core/error/failures.dart';
 import 'package:click_shop/core/services/connectivity/network_info.dart';
+import 'package:click_shop/core/services/storage/token_service.dart';
 import 'package:click_shop/features/auth/data/datasources/local/auth_local_datasource.dart';
 import 'package:click_shop/features/auth/data/datasources/auth_datasources.dart';
 import 'package:click_shop/features/auth/data/datasources/remote/auth_remote_datasource.dart';
@@ -19,32 +20,37 @@ final authRepositoryProvider = Provider<IAuthRepository>((ref) {
   final authDatasource = ref.watch(AuthLocalDatasourceProvider);
   final authRemoteDatasource = ref.read(authRemoteDataSourceProvider);
   final networkInfo = ref.read(NetworkInfoProvider);
+  final tokenService = ref.read(tokenServiceProvider);
 
   return AuthRepository(
     authDatasource: authDatasource,
     authRemoteDataSource: authRemoteDatasource,
     networkInfo: networkInfo,
+    tokenService: tokenService,
   );
 });
 
 class AuthRepository implements IAuthRepository {
   final IAuthLocalDataSource _authDatasource;
   final IAuthRemoteDataSource _authRemoteDataSource;
+  final TokenService _tokenService;
   final NetworkInfo _networkInfo;
 
   AuthRepository({
     required IAuthLocalDataSource authDatasource,
     required IAuthRemoteDataSource authRemoteDataSource,
     required NetworkInfo networkInfo,
+    required TokenService tokenService,
   }) : _authDatasource = authDatasource,
        _authRemoteDataSource = authRemoteDataSource,
-       _networkInfo = networkInfo;
+       _networkInfo = networkInfo,
+       _tokenService = tokenService;
 
   @override
   Future<Either<Failure, AuthEntity>> getCurrentUser() async {
     if (await _networkInfo.isConnected) {
       try {
-        final apiModel = await _authRemoteDataSource.WhoAmI();
+        final apiModel = await _authRemoteDataSource.whoAmI();
         final entity = apiModel.toEntity();
 
         return Right(entity);
@@ -185,6 +191,140 @@ class AuthRepository implements IAuthRepository {
       return const Left(
         ApiFailure(message: "No internet connection. Cannot update user."),
       );
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> deleteMe(String password) async {
+    if (await _networkInfo.isConnected) {
+      try {
+        final ok = await _authRemoteDataSource.deleteMe(password);
+
+        if (ok) {
+          await _authDatasource.clearUser();
+          await _tokenService.removeToken();
+          ;
+        }
+
+        return Right(ok);
+      } on DioException catch (e) {
+        return Left(
+          ApiFailure(
+            message: e.response?.data['message'] ?? 'Delete Failed',
+            statusCode: e.response?.statusCode,
+          ),
+        );
+      } catch (e) {
+        return Left(ApiFailure(message: e.toString()));
+      }
+    } else {
+      return const Left(
+        LocalDatabaseFailure(message: "No internet connection"),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> requestPasswordReset(String email) async {
+    if (await _networkInfo.isConnected) {
+      try {
+        final ok = await _authRemoteDataSource.requestPasswordReset(email);
+        return Right(ok);
+      } on DioException catch (e) {
+        return Left(
+          ApiFailure(
+            message: e.response?.data['message'] ?? 'Request failed',
+            statusCode: e.response?.statusCode,
+          ),
+        );
+      } catch (e) {
+        return Left(ApiFailure(message: e.toString()));
+      }
+    } else {
+      return const Left(
+        LocalDatabaseFailure(message: "No internet connection"),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> resetPassword({
+    required String token,
+    required String newPassword,
+  }) async {
+    if (await _networkInfo.isConnected) {
+      try {
+        final ok = await _authRemoteDataSource.resetPassword(
+          token: token,
+          newPassword: newPassword,
+        );
+        return Right(ok);
+      } on DioException catch (e) {
+        return Left(
+          ApiFailure(
+            message: e.response?.data['message'] ?? 'Reset failed',
+            statusCode: e.response?.statusCode,
+          ),
+        );
+      } catch (e) {
+        return Left(ApiFailure(message: e.toString()));
+      }
+    } else {
+      return const Left(
+        LocalDatabaseFailure(message: "No internet connection"),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, AuthEntity>> updateUser(AuthEntity user) async {
+    if (await _networkInfo.isConnected) {
+      try {
+        // ✅ send AuthEntity (not Map)
+        final updatedApi = await _authRemoteDataSource.updateUser(user);
+
+        // cache/update locally
+        final hive = updatedApi.toHiveModel();
+        await _authDatasource.updateUser(hive);
+
+        return Right(updatedApi.toEntity());
+      } on DioException catch (e) {
+        return Left(
+          ApiFailure(
+            message: e.response?.data['message'] ?? 'Update Failed',
+            statusCode: e.response?.statusCode,
+          ),
+        );
+      } catch (e) {
+        return Left(ApiFailure(message: e.toString()));
+      }
+    } else {
+      try {
+        final current = await _authDatasource.getCurrentUser();
+        if (current == null || current.userId == null) {
+          return const Left(LocalDatabaseFailure(message: "No logged in user"));
+        }
+
+        final updatedLocal = current.copyWith(
+          username: user.username,
+          email: user.email,
+          phoneNumber: user.phoneNumber,
+          location: user.location,
+          gender: user.gender,
+          dob: user.dob,
+          image: user.image,
+          role: user.role,
+        );
+
+        final saved = await _authDatasource.updateUser(updatedLocal);
+        if (saved == null) {
+          return const Left(LocalDatabaseFailure(message: "Update failed"));
+        }
+
+        return Right(saved.toEntity());
+      } catch (e) {
+        return Left(LocalDatabaseFailure(message: e.toString()));
+      }
     }
   }
 }

@@ -114,7 +114,7 @@ class AuthLocalDatasource implements IAuthLocalDataSource {
 
   @override
   Future<void> clearUser() async {
-    await _hiveService.clearUser(); // implement if needed
+    await _hiveService.clearUsers(); // implement if needed
     await _userSessionService.clearUserSession();
   }
 
@@ -131,8 +131,22 @@ class AuthLocalDatasource implements IAuthLocalDataSource {
   }
 
   @override
-  Future<AuthHiveModel?> updateUser(String user) {
-    // TODO: implement updateUser
-    throw UnimplementedError();
+  Future<AuthHiveModel?> updateUser(AuthHiveModel user) async {
+    try {
+      final updatedUser = await _hiveService.updateUser(user);
+
+      // Optional: keep session in sync if this is the logged-in user
+      final currentUserId = _userSessionService.getCurrentUserId();
+      if (updatedUser != null && updatedUser.userId == currentUserId) {
+        await _userSessionService.saveUserSession(
+          userId: updatedUser.userId!,
+          email: updatedUser.email,
+        );
+      }
+
+      return updatedUser;
+    } catch (_) {
+      return null;
+    }
   }
 }
