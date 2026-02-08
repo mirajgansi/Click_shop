@@ -60,22 +60,28 @@ class CartRemoteDatasource implements ICartRemoteDatabase {
   Future<List<ProductApiModel>> getCartProducts() async {
     try {
       final res = await _apiClient.get(
-        ApiEndpoints.cartGet(), // "cart"
+        ApiEndpoints.cartGet(),
         options: await _authOptions(),
       );
 
       final body = res.data;
 
-      // ✅ data is a MAP, items is a LIST
       final items =
           (body is Map && body["data"] is Map && body["data"]["items"] is List)
           ? body["data"]["items"] as List
           : <dynamic>[];
 
-      // ✅ each item has productId: {...product...}
       return items.map<ProductApiModel>((item) {
-        final map = Map<String, dynamic>.from(item as Map);
-        final productJson = Map<String, dynamic>.from(map["productId"] as Map);
+        final itemMap = Map<String, dynamic>.from(item as Map);
+
+        // product details
+        final productJson = Map<String, dynamic>.from(
+          itemMap["productId"] as Map,
+        );
+
+        // ✅ IMPORTANT: attach quantity
+        productJson["quantity"] = itemMap["quantity"];
+
         return ProductApiModel.fromJson(productJson);
       }).toList();
     } catch (e) {
@@ -116,5 +122,18 @@ class CartRemoteDatasource implements ICartRemoteDatabase {
       print("clearCart error: $e");
       return false;
     }
+  }
+
+  @override
+  Future<bool> updateCartQty({
+    required String productId,
+    required int quantity,
+  }) async {
+    final res = await _apiClient.put(
+      ApiEndpoints.updateCartQty(productId),
+      data: {"quantity": quantity},
+      options: await _authOptions(),
+    );
+    return res.statusCode == 200;
   }
 }

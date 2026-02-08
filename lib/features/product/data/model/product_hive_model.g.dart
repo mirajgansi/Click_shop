@@ -29,13 +29,14 @@ class ProductHiveModelAdapter extends TypeAdapter<ProductHiveModel> {
       manufacturer: fields[9] as String?,
       manufactureDateIso: fields[10] as String?,
       expireDateIso: fields[11] as String?,
+      quantity: fields[12] as int,
     );
   }
 
   @override
   void write(BinaryWriter writer, ProductHiveModel obj) {
     writer
-      ..writeByte(12)
+      ..writeByte(13)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -59,7 +60,9 @@ class ProductHiveModelAdapter extends TypeAdapter<ProductHiveModel> {
       ..writeByte(10)
       ..write(obj.manufactureDateIso)
       ..writeByte(11)
-      ..write(obj.expireDateIso);
+      ..write(obj.expireDateIso)
+      ..writeByte(12)
+      ..write(obj.quantity);
   }
 
   @override

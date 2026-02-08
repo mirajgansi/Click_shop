@@ -10,6 +10,10 @@ abstract interface class ICartLocalDatabase {
   Future<List<CartHiveModel>> getCartProducts();
   Future<bool> deleteCartItem(String cartItemId);
   Future<bool> clearCart();
+  Future<bool> updateCartQty({
+    required String productId,
+    required int quantity,
+  });
 }
 
 abstract interface class ICartRemoteDatabase {
@@ -17,9 +21,8 @@ abstract interface class ICartRemoteDatabase {
   Future<List<ProductApiModel>> getCartProducts();
   Future<bool> deleteCartItem(String cartItemId);
   Future<bool> clearCart();
+  Future<bool> updateCartQty({
+    required String productId,
+    required int quantity,
+  });
 }
-//  Future<Either<Failure, bool>> createCartProduct(
-//     String productId,
-//     int quantity,
-//   );
-//   Future<Either<Failure, List<ProductEntity>>> getCartProducts();

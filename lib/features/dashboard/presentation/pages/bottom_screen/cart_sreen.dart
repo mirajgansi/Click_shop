@@ -40,19 +40,19 @@ class _CartScreenState extends ConsumerState<CartScreen> {
               itemCount: state.cartProducts.length,
               separatorBuilder: (_, __) => const SizedBox(height: 12),
               itemBuilder: (context, index) {
-                final item = state.cartProducts[index]; // ✅
-                final qty = 1; // (until you implement quantity)
+                final item = state.cartProducts[index];
+                final qty = item.quantity ?? 1;
 
                 return _CartItemTile(
                   imageUrl: item.image,
                   title: item.name,
-                  inStock: (item.inStock ?? 0) > 0,
+                  inStock: item.inStock > 0,
                   qty: qty,
-                  price: item.price ?? 0,
+                  price: item.price,
                   onRemove: () async {
                     await ref
                         .read(cartViewModelProvider.notifier)
-                        .deleteFromCart(item.id ?? ""); // ✅ correct method
+                        .deleteFromCart(item.id ?? "");
                   },
                   onPlus: () {
                     ref
@@ -60,7 +60,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                         .changeQty(itemId: item.id ?? "", newQty: qty + 1);
                   },
                   onMinus: () {
-                    if (qty <= 1) return; // stop at 1
+                    if (qty <= 1) return;
                     ref
                         .read(cartViewModelProvider.notifier)
                         .changeQty(itemId: item.id ?? "", newQty: qty - 1);
@@ -77,37 +77,6 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                 child: _CheckoutBar(
                   total: ref.read(cartViewModelProvider.notifier).totalPrice,
-                  // onCheckout: () async {
-                  //   // call order viewmodel
-                  //   await ref
-                  //       .read(orderViewModelProvider.notifier)
-                  //       .createOrderFromCart();
-
-                  //   final orderState = ref.read(orderViewModelProvider);
-
-                  //   if (!context.mounted) return;
-
-                  //   if (orderState.errorMessage != null) {
-                  //     ScaffoldMessenger.of(context).showSnackBar(
-                  //       SnackBar(content: Text(orderState.errorMessage!)),
-                  //     );
-                  //     return;
-                  //   }
-
-                  //   if (orderState.actionSuccess) {
-                  //     // optional: refresh cart after ordering
-                  //     await ref.read(cartViewModelProvider.notifier).getCart();
-
-                  //     // optional: reset action flag so snackbar doesn't repeat
-                  //     ref
-                  //         .read(orderViewModelProvider.notifier)
-                  //         .clearActionSuccess();
-
-                  //     ScaffoldMessenger.of(context).showSnackBar(
-                  //       const SnackBar(content: Text("Order created ")),
-                  //     );
-                  //   }
-                  // },
                   onCheckout: () {
                     showCheckoutSheet(
                       context: context,
@@ -228,7 +197,6 @@ class _CartItemTile extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
 
-                // Qty control + price
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [

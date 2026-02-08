@@ -7,10 +7,10 @@ part of 'cart_api_model.dart';
 // **************************************************************************
 
 CartApiModel _$CartApiModelFromJson(Map<String, dynamic> json) => CartApiModel(
-  cartItemId: json['_id'] as String?,
-  productId: _extractProductId(json['product']),
-  quantity: (json['quantity'] as num).toInt(),
-);
+      cartItemId: json['_id'] as String?,
+      productId: _extractProductId(json['product']),
+      quantity: (json['quantity'] as num).toInt(),
+    );
 
 Map<String, dynamic> _$CartApiModelToJson(CartApiModel instance) =>
     <String, dynamic>{

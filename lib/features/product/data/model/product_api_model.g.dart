@@ -27,6 +27,7 @@ ProductApiModel _$ProductApiModelFromJson(Map<String, dynamic> json) =>
       expireDate: json['expireDate'] == null
           ? null
           : DateTime.parse(json['expireDate'] as String),
+      quantity: (json['quantity'] as num?)?.toInt() ?? 1,
     );
 
 Map<String, dynamic> _$ProductApiModelToJson(ProductApiModel instance) =>
@@ -43,4 +44,5 @@ Map<String, dynamic> _$ProductApiModelToJson(ProductApiModel instance) =>
       'manufacturer': instance.manufacturer,
       'manufactureDate': instance.manufactureDate?.toIso8601String(),
       'expireDate': instance.expireDate?.toIso8601String(),
+      'quantity': instance.quantity,
     };

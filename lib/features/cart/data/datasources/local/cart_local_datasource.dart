@@ -52,4 +52,20 @@ class CartLocalDatasource implements ICartLocalDatabase {
       return false;
     }
   }
+
+  @override
+  Future<bool> updateCartQty({
+    required String productId,
+    required int quantity,
+  }) async {
+    try {
+      await _hiveService.updateCartQty(
+        productId: productId,
+        quantity: quantity,
+      );
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
 }

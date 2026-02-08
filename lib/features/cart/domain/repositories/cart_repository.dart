@@ -14,7 +14,7 @@ abstract interface class ICartRepository {
   Future<Either<Failure, bool>> createOrderFromCart();
   Future<Either<Failure, bool>> cancelMyOrder(String orderId);
   Future<Either<Failure, void>> updateCartQty({
-    required String cartItemId,
+    required String productId,
     required int quantity,
   });
 }

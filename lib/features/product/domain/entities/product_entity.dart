@@ -31,6 +31,38 @@ class ProductEntity extends Equatable {
     this.quantity,
   });
 
+  ProductEntity copyWith({
+    String? id,
+    String? name,
+    String? description,
+    double? price,
+    int? inStock,
+    String? category,
+    String? nutritionalInfo,
+    String? image,
+    List<String>? images,
+    String? manufacturer,
+    DateTime? manufactureDate,
+    DateTime? expireDate,
+    int? quantity,
+  }) {
+    return ProductEntity(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      price: price ?? this.price,
+      inStock: inStock ?? this.inStock,
+      category: category ?? this.category,
+      nutritionalInfo: nutritionalInfo ?? this.nutritionalInfo,
+      image: image ?? this.image,
+      images: images ?? this.images,
+      manufacturer: manufacturer ?? this.manufacturer,
+      manufactureDate: manufactureDate ?? this.manufactureDate,
+      expireDate: expireDate ?? this.expireDate,
+      quantity: quantity ?? this.quantity,
+    );
+  }
+
   @override
   List<Object?> get props => [
     id,
@@ -45,5 +77,6 @@ class ProductEntity extends Equatable {
     manufacturer,
     manufactureDate,
     expireDate,
+    quantity,
   ];
 }

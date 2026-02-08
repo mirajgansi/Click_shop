@@ -2,7 +2,7 @@ import 'package:click_shop/features/cart/domain/usecases/add_cart_product_usecas
 import 'package:click_shop/features/cart/domain/usecases/clear_cart_prodcut_usecase.dart';
 import 'package:click_shop/features/cart/domain/usecases/create_order_cart_usecase.dart';
 import 'package:click_shop/features/cart/domain/usecases/delete_cart_product_usecase.dart';
-import 'package:click_shop/features/cart/domain/usecases/get_cart_products_usecase..dart';
+import 'package:click_shop/features/cart/domain/usecases/get_cart_products_usecase.dart';
 import 'package:click_shop/features/cart/domain/usecases/update_cart_usecase.dart';
 import 'package:click_shop/features/cart/presentation/state/cart_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -25,8 +25,7 @@ class CartViewModel extends Notifier<CartState> {
     _addToCartUsecase = ref.read(addToCartUsecaseProvider);
     _deleteCartItemUsecase = ref.read(deleteCartItemUsecaseProvider);
     _updateCartQtyUsecase = ref.read(updateCartQtyUsecaseProvider);
-
-    // _clearCartUsecase = ref.read(clearCartUsecaseProvider);
+    _clearCartUsecase = ref.read(clearCartUsecaseProvider);
     // _createOrderFromCartUsecase = ref.read(createOrderFromCartUsecaseProvider);
 
     // auto load cart once
@@ -38,7 +37,7 @@ class CartViewModel extends Notifier<CartState> {
   num get totalPrice {
     num total = 0;
     for (final p in state.cartProducts) {
-      total += (p.price ?? 0); // ⚠️ qty not included yet
+      total += p.price * (p.quantity ?? 1);
     }
     return total;
   }
@@ -137,20 +136,23 @@ class CartViewModel extends Notifier<CartState> {
   }
 
   Future<void> changeQty({required String itemId, required int newQty}) async {
+    if (newQty < 1) return;
+
     // optimistic UI update
     state = state.copyWith(
       cartProducts: [
         for (final item in state.cartProducts)
           if (item.id == itemId) item.copyWith(quantity: newQty) else item,
       ],
+      error: null,
     );
 
     final result = await _updateCartQtyUsecase(
-      UpdateCartQtyParams(cartItemId: itemId, quantity: newQty),
+      UpdateCartQtyParams(productId: itemId, quantity: newQty),
     );
 
     result.fold((failure) async {
-      // rollback
+      // rollback to server state if failed
       await getCart();
       state = state.copyWith(error: failure.message);
     }, (_) {});

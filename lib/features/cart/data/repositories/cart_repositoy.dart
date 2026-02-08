@@ -196,6 +196,52 @@ class ItemRepository implements ICartRepository {
     throw UnimplementedError();
   }
 
+  @override
+  Future<Either<Failure, void>> updateCartQty({
+    required String productId,
+    required int quantity,
+  }) async {
+    // basic guard
+    if (quantity < 1) {
+      return Left(LocalDatabaseFailure(message: "Quantity must be at least 1"));
+    }
+
+    if (await _networkInfo.isConnected) {
+      try {
+        final ok = await _remoteDataSource.updateCartQty(
+          productId: productId,
+          quantity: quantity,
+        );
+
+        if (ok == false) {
+          return Left(
+            LocalDatabaseFailure(message: "Failed to update quantity"),
+          );
+        }
+
+        return const Right(null);
+      } catch (e) {
+        return Left(LocalDatabaseFailure(message: e.toString()));
+      }
+    }
+    try {
+      final ok = await _localDataSource.updateCartQty(
+        productId: productId,
+        quantity: quantity,
+      );
+
+      if (!ok) {
+        return Left(
+          LocalDatabaseFailure(message: "Local quantity update failed"),
+        );
+      }
+
+      return const Right(null);
+    } catch (e) {
+      return Left(LocalDatabaseFailure(message: e.toString()));
+    }
+  }
+
   // @override
   // Future<Either<Failure, bool>> createOrderFromCart() async {
   //   // ordering should be online

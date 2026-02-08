@@ -37,9 +37,14 @@ class HiveService {
   Future<void> openBoxed() async {
     await Hive.openBox<AuthHiveModel>(HiveTableConstants.authTable);
 
-    await Hive.openBox<ProductHiveModel>(HiveTableConstants.productTable);
+    try {
+      await Hive.openBox<ProductHiveModel>(HiveTableConstants.productTable);
+    } catch (e) {
+      await Hive.deleteBoxFromDisk(HiveTableConstants.productTable);
+      await Hive.openBox<ProductHiveModel>(HiveTableConstants.productTable);
+    }
 
-    await Hive.openBox<String>(HiveTableConstants.cartTable);
+    await Hive.openBox<CartHiveModel>(HiveTableConstants.cartTable);
   }
 
   Future<void> close() async {
@@ -229,5 +234,25 @@ class HiveService {
     for (var product in products) {
       await _productBox.put(product.id, product);
     }
+  }
+
+  Future<void> updateCartQty({
+    required String productId,
+    required int quantity,
+  }) async {
+    final box = await Hive.openBox<CartHiveModel>(HiveTableConstants.cartTable);
+
+    final item = box.values.firstWhere(
+      (e) => e.productId == productId,
+      orElse: () => throw Exception("Cart item not found"),
+    );
+
+    final updated = CartHiveModel(
+      productId: item.productId,
+      quantity: quantity,
+      cartItemId: item.cartItemId,
+    );
+
+    await box.put(item.key, updated);
   }
 }
