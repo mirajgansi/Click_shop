@@ -89,9 +89,33 @@ class AuthLocalDatasource implements IAuthLocalDataSource {
   }
 
   @override
-  Future<AuthHiveModel?> deleteUser(String userId) {
-    // TODO: implement deleteUser
-    throw UnimplementedError();
+  Future<bool> deleteMe(String userId) async {
+    try {
+      final ok = await _hiveService.deleteUser(
+        userId,
+      ); // implement in HiveService
+      if (ok == true) {
+        await _userSessionService.clearUserSession();
+      }
+      return ok == true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  // ----------------------------
+  // New interface methods
+  // ----------------------------
+  @override
+  Future<void> saveUser(AuthHiveModel user) async {
+    // if you already store user inside register/login, this can be optional
+    await _hiveService.saveUser(user); // implement if needed
+  }
+
+  @override
+  Future<void> clearUser() async {
+    await _hiveService.clearUser(); // implement if needed
+    await _userSessionService.clearUserSession();
   }
 
   @override
@@ -111,14 +135,4 @@ class AuthLocalDatasource implements IAuthLocalDataSource {
     // TODO: implement updateUser
     throw UnimplementedError();
   }
-
-  // @override
-  // Future<bool> register(AuthHiveModel user) async {
-  //   try {
-  //     await _hiveService.registerUser(user);
-  //     return Future.value(true);
-  //   } catch (e) {
-  //     return Future.value(false);
-  //   }
-  // }
 }

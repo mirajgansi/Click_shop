@@ -6,6 +6,7 @@ import 'package:click_shop/core/services/storage/token_service.dart';
 import 'package:click_shop/core/services/storage/user_session_service.dart';
 import 'package:click_shop/features/auth/data/datasources/auth_datasources.dart';
 import 'package:click_shop/features/auth/data/models/auth_api_model.dart';
+import 'package:click_shop/features/auth/data/models/auth_hive_model.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -87,7 +88,7 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
   // }
 
   @override
-  Future<bool> deleteUser(String userId) {
+  Future<bool> deleteMe(String userId) {
     // TODO: implement deleteUser
     throw UnimplementedError();
   }
@@ -145,6 +146,12 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
   @override
   Future<AuthApiModel> getUserById(String userId) {
     // TODO: implement getUserById
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<AuthHiveModel?> updateUser(String user) {
+    // TODO: implement updateUser
     throw UnimplementedError();
   }
 }

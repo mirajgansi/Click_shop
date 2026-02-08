@@ -20,7 +20,8 @@ abstract interface class IAuthLocalDataSource {
   Future<AuthHiveModel?> getUserbyId(String userId);
   Future<AuthHiveModel?> getUserbyEmail(String email);
   Future<AuthHiveModel?> updateUser(String user);
-  Future<AuthHiveModel?> deleteUser(String userId);
+  Future<void> clearUser();
+  Future<void> saveUser(AuthHiveModel user);
   Future<bool> isEmailExists(String email);
 }
 
@@ -30,5 +31,15 @@ abstract interface class IAuthRemoteDataSource {
   Future<AuthApiModel?> login(String email, String password);
   Future<AuthApiModel> getUserById(String userId);
   Future<AuthApiModel> updateProfileImage(File image);
-  Future<bool> deleteUser(String userId);
+  Future<AuthHiveModel?> updateUser(String user);
+  Future<bool> deleteMe();
+
+  /// POST /auth/request-password-reset
+  Future<bool> requestPasswordReset(String email);
+
+  /// POST /auth/reset-password/:token
+  Future<bool> resetPassword({
+    required String token,
+    required String newPassword,
+  });
 }
