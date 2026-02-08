@@ -1,4 +1,5 @@
 import 'package:click_shop/core/config/api_endpoints.dart';
+import 'package:click_shop/features/order/presentation/view_model/order_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -81,19 +82,35 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                 child: _CheckoutBar(
                   total: ref.read(cartViewModelProvider.notifier).totalPrice,
                   onCheckout: () async {
-                    final ok = await ref
-                        .read(cartViewModelProvider.notifier)
-                        .orderFromCart();
+                    // call order viewmodel
+                    await ref
+                        .read(orderViewModelProvider.notifier)
+                        .createOrderFromCart();
+
+                    final orderState = ref.read(orderViewModelProvider);
 
                     if (!context.mounted) return;
 
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          ok ? "Order created ✅" : "Order failed ❌",
-                        ),
-                      ),
-                    );
+                    if (orderState.errorMessage != null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(orderState.errorMessage!)),
+                      );
+                      return;
+                    }
+
+                    if (orderState.actionSuccess) {
+                      // optional: refresh cart after ordering
+                      await ref.read(cartViewModelProvider.notifier).getCart();
+
+                      // optional: reset action flag so snackbar doesn't repeat
+                      ref
+                          .read(orderViewModelProvider.notifier)
+                          .clearActionSuccess();
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Order created ✅")),
+                      );
+                    }
                   },
                 ),
               ),

@@ -83,16 +83,17 @@ class ApiEndpoints {
   static const String base = "/api/orders";
 
   // user
-  static const String createOrder = base;
-  static const String myOrders = "$base/me";
-  static String orderById(String id) => "$base/$id";
-  static String cancelOrder(String id) => "$base/orders/$id/cancel";
+  // orders
+  static const String orders = "orders";
 
-  // driver
-  static const String driverOrders = "$base/driver/my-orders";
+  static const String createOrder = orders; // POST /api/orders
+  static const String myOrders = "$orders/me"; // GET  /api/orders/me
+  static String orderById(String id) => "$orders/$id"; // GET /api/orders/:id
+  static String cancelOrder(String id) => "$orders/$id/cancel"; // PUT/PATCH
 
-  // admin (optional)
-  static const String allOrders = base;
-  static String updateStatus(String id) => "$base/$id/status";
-  static String assignDriver(String id) => "$base/$id/assign-driver";
+  static const String driverOrders = "$orders/driver/my-orders";
+
+  static const String allOrders = orders;
+  static String updateStatus(String id) => "$orders/$id/status";
+  static String assignDriver(String id) => "$orders/$id/assign-driver";
 }
