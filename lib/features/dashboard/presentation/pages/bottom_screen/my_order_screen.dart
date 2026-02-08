@@ -1,43 +1,77 @@
-import 'package:click_shop/core/widgets/my_card_widgets.dart';
-import 'package:click_shop/features/product/presentation/view_model/product_view_model.dart';
+import 'package:click_shop/features/order/presentation/pages/prder_detail_page.dart';
+import 'package:click_shop/features/order/presentation/widgets/order_card_widget.dart';
+import 'package:click_shop/features/order/presentation/widgets/status_badge_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:click_shop/features/order/presentation/view_model/order_view_model.dart';
+import 'package:click_shop/features/order/domain/entities/order_entities.dart';
 
-class ProductScreen extends ConsumerWidget {
-  const ProductScreen({super.key});
+class MyOrdersPage extends ConsumerStatefulWidget {
+  const MyOrdersPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(productViewModelProvider);
+  ConsumerState<MyOrdersPage> createState() => _MyOrdersPageState();
+}
 
-    if (state.isLoading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
-    }
+class _MyOrdersPageState extends ConsumerState<MyOrdersPage> {
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(
+      () => ref.read(orderViewModelProvider.notifier).loadMyOrders(),
+    );
+  }
 
-    if (state.error != null) {
-      return Scaffold(body: Center(child: Text(state.error!)));
-    }
-
-    final products = state.products;
-
-    if (products.isEmpty) {
-      return const Scaffold(body: Center(child: Text("No products found")));
-    }
+  @override
+  Widget build(BuildContext context) {
+    final state = ref.watch(orderViewModelProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Products")),
-      body: GridView.builder(
-        padding: const EdgeInsets.all(10),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          childAspectRatio: 0.7,
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10,
-        ),
-        itemCount: products.length,
-        itemBuilder: (context, index) {
-          return CardWidget(product: products[index]);
-        },
+      backgroundColor: Colors.white,
+
+      body: RefreshIndicator(
+        onRefresh: () =>
+            ref.read(orderViewModelProvider.notifier).loadMyOrders(),
+        child: state.isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : state.errorMessage != null
+            ? ListView(
+                children: [
+                  const SizedBox(height: 140),
+                  Center(
+                    child: Text(
+                      state.errorMessage!,
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  ),
+                ],
+              )
+            : state.orders.isEmpty
+            ? ListView(
+                children: const [
+                  SizedBox(height: 140),
+                  Center(child: Text("No orders yet")),
+                ],
+              )
+            : ListView.separated(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+                itemCount: state.orders.length,
+                separatorBuilder: (_, __) => const SizedBox(height: 12),
+                itemBuilder: (context, index) {
+                  final order = state.orders[index];
+                  return OrderCard(
+                    order: order,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => OrderDetailPage(orderId: order.id),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
       ),
     );
   }

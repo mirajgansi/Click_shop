@@ -1,7 +1,7 @@
 import 'package:click_shop/core/config/api_client.dart';
 import 'package:click_shop/core/config/api_endpoints.dart';
 import 'package:click_shop/core/services/storage/token_service.dart';
-import 'package:click_shop/features/order/data/daatasources/order_datasource.dart';
+import 'package:click_shop/features/order/data/datasources/order_datasource.dart';
 import 'package:click_shop/features/order/data/model/order_api_model.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -83,7 +83,7 @@ class OrderRemoteDatasource implements IOrderRemoteDatasource {
   Future<bool> cancelMyOrder(String orderId) async {
     try {
       final res = await _apiClient.put(
-        ApiEndpoints.cancelOrder(orderId), // e.g. PUT /orders/:id/cancel
+        ApiEndpoints.cancelOrder(orderId),
         options: await _authOptions(),
       );
 
@@ -98,16 +98,16 @@ class OrderRemoteDatasource implements IOrderRemoteDatasource {
   }
 
   @override
-  Future<bool> createOrderFromCart() async {
+  Future<bool> createOrderFromCart(Map<String, dynamic> shippingJson) async {
     try {
       final res = await _apiClient.post(
-        ApiEndpoints.createOrder, // ✅ NO ()
+        ApiEndpoints.createOrder, // see endpoint note below
+        data: {"shippingAddress": shippingJson},
         options: await _authOptions(),
       );
 
       final data = res.data;
       if (data is Map && data["success"] == false) return false;
-
       return true;
     } catch (e) {
       print("createOrderFromCart error: $e");

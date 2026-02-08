@@ -1,3 +1,4 @@
+import 'package:click_shop/features/auth/domain/entities/auth_entity.dart';
 import 'package:click_shop/features/order/domain/entities/order_entities.dart';
 import 'package:equatable/equatable.dart';
 
@@ -7,6 +8,7 @@ class OrderState extends Equatable {
   final OrderEntity? selectedOrder;
   final String? errorMessage;
   final bool actionSuccess;
+  final AuthEntity? currentUser;
 
   const OrderState({
     this.isLoading = false,
@@ -14,6 +16,7 @@ class OrderState extends Equatable {
     this.selectedOrder,
     this.errorMessage,
     this.actionSuccess = false,
+    this.currentUser,
   });
 
   OrderState copyWith({
@@ -22,6 +25,7 @@ class OrderState extends Equatable {
     OrderEntity? selectedOrder,
     String? errorMessage,
     bool? actionSuccess,
+    AuthEntity? currentUser,
   }) {
     return OrderState(
       isLoading: isLoading ?? this.isLoading,
@@ -29,6 +33,7 @@ class OrderState extends Equatable {
       selectedOrder: selectedOrder ?? this.selectedOrder,
       errorMessage: errorMessage,
       actionSuccess: actionSuccess ?? this.actionSuccess,
+      currentUser: currentUser ?? this.currentUser,
     );
   }
 

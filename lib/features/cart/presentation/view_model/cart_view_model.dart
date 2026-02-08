@@ -3,6 +3,7 @@ import 'package:click_shop/features/cart/domain/usecases/clear_cart_prodcut_usec
 import 'package:click_shop/features/cart/domain/usecases/create_order_cart_usecase.dart';
 import 'package:click_shop/features/cart/domain/usecases/delete_cart_product_usecase.dart';
 import 'package:click_shop/features/cart/domain/usecases/get_cart_products_usecase..dart';
+import 'package:click_shop/features/cart/domain/usecases/update_cart_usecase.dart';
 import 'package:click_shop/features/cart/presentation/state/cart_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -16,12 +17,15 @@ class CartViewModel extends Notifier<CartState> {
   late final DeleteCartItemUsecase _deleteCartItemUsecase;
   late final ClearCartUsecase _clearCartUsecase;
   late final CreateOrderFromCartUsecase _createOrderFromCartUsecase;
+  late final UpdateCartQtyUsecase _updateCartQtyUsecase;
 
   @override
   CartState build() {
     _getCartProductsUsecase = ref.read(getCartProductsUsecaseProvider);
     _addToCartUsecase = ref.read(addToCartUsecaseProvider);
     _deleteCartItemUsecase = ref.read(deleteCartItemUsecaseProvider);
+    _updateCartQtyUsecase = ref.read(updateCartQtyUsecaseProvider);
+
     // _clearCartUsecase = ref.read(clearCartUsecaseProvider);
     // _createOrderFromCartUsecase = ref.read(createOrderFromCartUsecaseProvider);
 
@@ -81,7 +85,6 @@ class CartViewModel extends Notifier<CartState> {
   Future<bool> deleteFromCart(String productId) async {
     state = state.copyWith(isLoading: true, error: null);
 
-    // ⚠️ Your backend delete uses productId: DELETE /api/cart/items/:productId
     final result = await _deleteCartItemUsecase(
       DeleteCartItemParams(cartItemId: productId),
     );
@@ -131,5 +134,25 @@ class CartViewModel extends Notifier<CartState> {
         return true;
       },
     );
+  }
+
+  Future<void> changeQty({required String itemId, required int newQty}) async {
+    // optimistic UI update
+    state = state.copyWith(
+      cartProducts: [
+        for (final item in state.cartProducts)
+          if (item.id == itemId) item.copyWith(quantity: newQty) else item,
+      ],
+    );
+
+    final result = await _updateCartQtyUsecase(
+      UpdateCartQtyParams(cartItemId: itemId, quantity: newQty),
+    );
+
+    result.fold((failure) async {
+      // rollback
+      await getCart();
+      state = state.copyWith(error: failure.message);
+    }, (_) {});
   }
 }

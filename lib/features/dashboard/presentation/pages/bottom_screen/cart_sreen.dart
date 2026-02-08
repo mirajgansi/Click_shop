@@ -1,5 +1,6 @@
 import 'package:click_shop/core/config/api_endpoints.dart';
 import 'package:click_shop/features/order/presentation/view_model/order_view_model.dart';
+import 'package:click_shop/features/order/presentation/widgets/order_form.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -27,16 +28,6 @@ class _CartScreenState extends ConsumerState<CartScreen> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        centerTitle: true,
-        title: const Text(
-          "My Cart",
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.w700),
-        ),
-        iconTheme: const IconThemeData(color: Colors.black),
-      ),
 
       body: state.isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -46,7 +37,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
           ? const Center(child: Text("Your cart is empty"))
           : ListView.separated(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 110),
-              itemCount: state.cartProducts.length, // ✅
+              itemCount: state.cartProducts.length,
               separatorBuilder: (_, __) => const SizedBox(height: 12),
               itemBuilder: (context, index) {
                 final item = state.cartProducts[index]; // ✅
@@ -64,10 +55,15 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                         .deleteFromCart(item.id ?? ""); // ✅ correct method
                   },
                   onPlus: () {
-                    // optional: implement update quantity later
+                    ref
+                        .read(cartViewModelProvider.notifier)
+                        .changeQty(itemId: item.id ?? "", newQty: qty + 1);
                   },
                   onMinus: () {
-                    // optional: implement update quantity later
+                    if (qty <= 1) return; // stop at 1
+                    ref
+                        .read(cartViewModelProvider.notifier)
+                        .changeQty(itemId: item.id ?? "", newQty: qty - 1);
                   },
                 );
               },
@@ -81,36 +77,45 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                 child: _CheckoutBar(
                   total: ref.read(cartViewModelProvider.notifier).totalPrice,
-                  onCheckout: () async {
-                    // call order viewmodel
-                    await ref
-                        .read(orderViewModelProvider.notifier)
-                        .createOrderFromCart();
+                  // onCheckout: () async {
+                  //   // call order viewmodel
+                  //   await ref
+                  //       .read(orderViewModelProvider.notifier)
+                  //       .createOrderFromCart();
 
-                    final orderState = ref.read(orderViewModelProvider);
+                  //   final orderState = ref.read(orderViewModelProvider);
 
-                    if (!context.mounted) return;
+                  //   if (!context.mounted) return;
 
-                    if (orderState.errorMessage != null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(orderState.errorMessage!)),
-                      );
-                      return;
-                    }
+                  //   if (orderState.errorMessage != null) {
+                  //     ScaffoldMessenger.of(context).showSnackBar(
+                  //       SnackBar(content: Text(orderState.errorMessage!)),
+                  //     );
+                  //     return;
+                  //   }
 
-                    if (orderState.actionSuccess) {
-                      // optional: refresh cart after ordering
-                      await ref.read(cartViewModelProvider.notifier).getCart();
+                  //   if (orderState.actionSuccess) {
+                  //     // optional: refresh cart after ordering
+                  //     await ref.read(cartViewModelProvider.notifier).getCart();
 
-                      // optional: reset action flag so snackbar doesn't repeat
-                      ref
-                          .read(orderViewModelProvider.notifier)
-                          .clearActionSuccess();
+                  //     // optional: reset action flag so snackbar doesn't repeat
+                  //     ref
+                  //         .read(orderViewModelProvider.notifier)
+                  //         .clearActionSuccess();
 
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Order created ✅")),
-                      );
-                    }
+                  //     ScaffoldMessenger.of(context).showSnackBar(
+                  //       const SnackBar(content: Text("Order created ")),
+                  //     );
+                  //   }
+                  // },
+                  onCheckout: () {
+                    showCheckoutSheet(
+                      context: context,
+                      ref: ref,
+                      total: ref
+                          .read(cartViewModelProvider.notifier)
+                          .totalPrice,
+                    );
                   },
                 ),
               ),

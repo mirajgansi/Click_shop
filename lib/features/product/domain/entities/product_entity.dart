@@ -13,6 +13,7 @@ class ProductEntity extends Equatable {
   final String? manufacturer;
   final DateTime? manufactureDate;
   final DateTime? expireDate;
+  final int? quantity;
 
   const ProductEntity({
     this.id,
@@ -27,6 +28,7 @@ class ProductEntity extends Equatable {
     this.manufacturer,
     this.manufactureDate,
     this.expireDate,
+    this.quantity,
   });
 
   @override

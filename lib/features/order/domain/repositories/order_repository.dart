@@ -4,7 +4,9 @@ import 'package:dartz/dartz.dart';
 
 abstract interface class IOrderRepository {
   // user
-  Future<Either<Failure, bool>> createOrderFromCart();
+  Future<Either<Failure, bool>> createOrderFromCart(
+    Map<String, dynamic> shippingJson,
+  );
   Future<Either<Failure, List<OrderEntity>>> getMyOrders();
   Future<Either<Failure, OrderEntity>> getOrderById(String orderId);
   Future<Either<Failure, bool>> cancelMyOrder(String orderId);

@@ -1,7 +1,7 @@
 import 'package:click_shop/core/error/failures.dart';
 import 'package:click_shop/core/services/connectivity/network_info.dart';
-import 'package:click_shop/features/order/data/daatasources/order_datasource.dart';
-import 'package:click_shop/features/order/data/daatasources/remote/order_remote_datasource.dart';
+import 'package:click_shop/features/order/data/datasources/order_datasource.dart';
+import 'package:click_shop/features/order/data/datasources/remote/order_remote_datasource.dart';
 import 'package:click_shop/features/order/data/model/order_api_model.dart';
 import 'package:click_shop/features/order/domain/entities/order_entities.dart';
 import 'package:click_shop/features/order/domain/repositories/order_repository.dart';
@@ -30,17 +30,18 @@ class OrderRepositoryImpl implements IOrderRepository {
 
   Failure _noInternet() =>
       LocalDatabaseFailure(message: "No internet connection");
-
   @override
-  Future<Either<Failure, bool>> createOrderFromCart() async {
+  Future<Either<Failure, bool>> createOrderFromCart(
+    Map<String, dynamic> shippingJson,
+  ) async {
     if (!await _networkInfo.isConnected) {
       return Left(LocalDatabaseFailure(message: "No internet connection"));
     }
 
     try {
-      final ok = await _remote.createOrderFromCart();
+      final ok = await _remote.createOrderFromCart(shippingJson);
 
-      if (ok) {
+      if (!ok) {
         return Left(LocalDatabaseFailure(message: "Failed to create order"));
       }
 

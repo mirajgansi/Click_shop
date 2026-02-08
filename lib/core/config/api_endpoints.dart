@@ -89,7 +89,7 @@ class ApiEndpoints {
   static const String createOrder = orders; // POST /api/orders
   static const String myOrders = "$orders/me"; // GET  /api/orders/me
   static String orderById(String id) => "$orders/$id"; // GET /api/orders/:id
-  static String cancelOrder(String id) => "$orders/$id/cancel"; // PUT/PATCH
+  static String cancelOrder(String id) => "$orders/orders/$id/cancel";
 
   static const String driverOrders = "$orders/driver/my-orders";
 

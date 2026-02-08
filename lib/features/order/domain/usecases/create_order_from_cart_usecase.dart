@@ -12,14 +12,19 @@ final createOrderFromCartUsecaseProvider = Provider<CreateOrderFromCartUsecase>(
   },
 );
 
-class CreateOrderFromCartUsecase implements UsecaseWithoutParams<bool> {
-  final IOrderRepository _repo;
+class CreateOrderParams {
+  final Map<String, dynamic> shippingJson;
+  const CreateOrderParams(this.shippingJson);
+}
 
+class CreateOrderFromCartUsecase
+    implements UsecaseWithParams<bool, CreateOrderParams> {
+  final IOrderRepository _repo;
   CreateOrderFromCartUsecase({required IOrderRepository orderRepository})
     : _repo = orderRepository;
 
   @override
-  Future<Either<Failure, bool>> call() {
-    return _repo.createOrderFromCart();
+  Future<Either<Failure, bool>> call(CreateOrderParams params) {
+    return _repo.createOrderFromCart(params.shippingJson);
   }
 }
