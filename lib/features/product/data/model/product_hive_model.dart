@@ -54,6 +54,8 @@ class ProductHiveModel extends HiveObject {
 
   @HiveField(11)
   final String? expireDateIso;
+  @HiveField(12)
+  final int quantity;
 
   ProductHiveModel({
     this.id,
@@ -68,6 +70,7 @@ class ProductHiveModel extends HiveObject {
     this.manufacturer,
     this.manufactureDateIso,
     this.expireDateIso,
+    required this.quantity,
   });
 
   /// JSON -> HiveModel (API response)
@@ -113,6 +116,7 @@ class ProductHiveModel extends HiveObject {
       expireDate: expireDateIso == null
           ? null
           : DateTime.tryParse(expireDateIso!),
+      quantity: quantity,
     );
   }
 
@@ -131,6 +135,7 @@ class ProductHiveModel extends HiveObject {
       manufacturer: entity.manufacturer,
       manufactureDateIso: entity.manufactureDate?.toIso8601String(),
       expireDateIso: entity.expireDate?.toIso8601String(),
+      quantity: entity.quantity ?? 1,
     );
   }
   // To entity list
@@ -153,6 +158,7 @@ class ProductHiveModel extends HiveObject {
       manufacturer: apiModel.manufacturer,
       manufactureDateIso: apiModel.manufactureDate?.toIso8601String(),
       expireDateIso: apiModel.expireDate?.toIso8601String(),
+      quantity: apiModel.quantity ?? 1,
     );
   }
 

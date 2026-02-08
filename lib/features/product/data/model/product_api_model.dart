@@ -46,6 +46,9 @@ class ProductApiModel {
   @JsonKey()
   final DateTime? expireDate;
 
+  @JsonKey(defaultValue: 1)
+  final int quantity;
+
   ProductApiModel({
     this.id,
     required this.name,
@@ -59,6 +62,7 @@ class ProductApiModel {
     this.manufacturer,
     this.manufactureDate,
     this.expireDate,
+    this.quantity = 1,
   });
 
   factory ProductApiModel.fromJson(Map<String, dynamic> json) =>
@@ -82,6 +86,7 @@ class ProductApiModel {
       manufacturer: manufacturer,
       manufactureDate: manufactureDate,
       expireDate: expireDate,
+      quantity: quantity ?? 1,
     );
   }
 
@@ -99,6 +104,7 @@ class ProductApiModel {
       manufacturer: entity.manufacturer,
       manufactureDate: entity.manufactureDate,
       expireDate: entity.expireDate,
+      quantity: entity.quantity ?? 1,
     );
   }
 
