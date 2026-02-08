@@ -1,6 +1,7 @@
 import 'package:click_shop/core/config/api_endpoints.dart';
 import 'package:click_shop/core/widgets/my_cart_button_widget.dart';
 import 'package:click_shop/core/widgets/my_favourite_button_widgets.dart';
+import 'package:click_shop/features/dashboard/presentation/widgets/my_stock_badge_widget.dart';
 import 'package:click_shop/features/product/presentation/pages/product_screen.dart';
 import 'package:click_shop/features/product/domain/entities/product_entity.dart';
 import 'package:flutter/material.dart';
@@ -72,6 +73,7 @@ class CardWidget extends StatelessWidget {
                         fontSize: fontSizeTitle,
                       ),
                     ),
+                    StockPillBadge(stock: product.inStock),
 
                     // PRICE + CART BUTTON
                     Row(

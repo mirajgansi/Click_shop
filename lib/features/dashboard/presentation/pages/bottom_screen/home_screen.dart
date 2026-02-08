@@ -1,4 +1,4 @@
-import 'package:click_shop/core/widgets/my_card_widgets.dart';
+import 'package:click_shop/features/dashboard/presentation/widgets/my_card_widgets.dart';
 import 'package:click_shop/features/product/presentation/view_model/product_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

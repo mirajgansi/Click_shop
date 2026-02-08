@@ -298,17 +298,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         final double dividerThickness = isTablet ? 1 : 1.5;
 
         //Menu items controllers and variables
-        final usernameController = TextEditingController();
-        final emailController = TextEditingController();
-        final passwordController = TextEditingController();
-        final confirmPasswordController = TextEditingController();
-        final locationController = TextEditingController();
 
         bool notificationsEnabled = true;
-
-        bool obscurePassword = true;
-        bool obscureConfirmPassword = true;
-        bool agreedToTerms = false;
 
         return SingleChildScrollView(
           padding: const EdgeInsets.all(16),
