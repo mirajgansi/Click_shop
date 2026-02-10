@@ -1,34 +1,24 @@
-import 'package:click_shop/features/dashboard/presentation/pages/bottom_screen/explore_screen.dart';
-import 'package:click_shop/features/dashboard/presentation/pages/bottom_screen/cart_sreen.dart';
-import 'package:click_shop/features/dashboard/presentation/pages/bottom_screen/home_screen.dart';
-import 'package:click_shop/features/dashboard/presentation/pages/bottom_screen/my_order_screen.dart';
 import 'package:click_shop/features/dashboard/presentation/pages/bottom_screen/profile_screen.dart';
+import 'package:click_shop/features/driver/presentation/pages/bottom_screen/assigned_page.dart';
+import 'package:click_shop/features/driver/presentation/pages/bottom_screen/delivered_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key});
+class DriverHomePage extends StatefulWidget {
+  const DriverHomePage({super.key});
 
   @override
-  State<DashboardScreen> createState() => _DashboardScreenState();
+  State<DriverHomePage> createState() => _DriverHomePageState();
 }
 
-class _DashboardScreenState extends State<DashboardScreen> {
+class _DriverHomePageState extends State<DriverHomePage> {
   int _selectedIndex = 0;
 
-  final List<String> _titles = [
-    "Home",
-    "Explore",
-    "My Cart",
-    "My Orders",
-    "Account",
-  ];
+  final List<String> _titles = ["Assigned Orders", "Deliverd Orders", ""];
 
   final List<Widget> lstBottomScreen = [
-    const HomeScreen(),
-    const ExploreScreen(),
-    const CartScreen(),
-    const MyOrdersPage(),
+    const AssignedPage(),
+    const DeliveredPage(),
     const ProfileScreen(),
   ];
 
@@ -91,22 +81,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
           });
         },
         items: [
-          _svgNavItem(asset: 'assets/icons/home.svg', label: 'Home', index: 0),
           _svgNavItem(
-            asset: 'assets/icons/explore.svg',
-            label: 'Explore',
-            index: 1,
+            asset: 'assets/icons/home.svg',
+            label: 'Assinged',
+            index: 0,
           ),
-          _svgNavItem(asset: 'assets/icons/cart.svg', label: 'Cart', index: 2),
+
           _svgNavItem(
             asset: 'assets/icons/delivery.svg',
-            label: 'Order',
-            index: 3,
+            label: 'Deliverd',
+            index: 1,
           ),
           _svgNavItem(
             asset: 'assets/icons/account.svg',
             label: 'Account',
-            index: 4,
+            index: 2,
           ),
         ],
       ),

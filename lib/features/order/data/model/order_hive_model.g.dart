@@ -25,7 +25,7 @@ class OrderHiveModelAdapter extends TypeAdapter<OrderHiveModel> {
       total: fields[5] as double,
       status: fields[6] as String,
       paymentStatus: fields[7] as String,
-      shippingAddress: fields[8] as ShippingAddressHiveModel,
+      shippingAddress: fields[8] as ShippingAddressHiveModel?,
       notes: fields[9] as String?,
       driverId: fields[10] as String?,
       driverName: fields[11] as String?,

@@ -1,10 +1,6 @@
-import 'package:click_shop/app/routes/app_routes.dart';
-import 'package:click_shop/core/services/storage/user_session_service.dart';
-import 'package:click_shop/screens/onboarding.dart';
+import 'package:click_shop/features/auth/presentation/view_model/auth_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../../../dashboard/presentation/pages/bottom_navigation_screen.dart';
 
 class AppStartScreen extends ConsumerStatefulWidget {
   const AppStartScreen({super.key});
@@ -14,18 +10,34 @@ class AppStartScreen extends ConsumerStatefulWidget {
 }
 
 class _AppStartScreenState extends ConsumerState<AppStartScreen> {
+  bool _ran = false;
+
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_ran) return;
+    _ran = true;
 
-    Future.microtask(() {
-      final session = ref.read(UserSessionServiceProvider);
-      final isLoggedIn = session.isLoggedIn(); // ✅ rename method properly
+    Future.microtask(() async {
+      // ✅ loads from API (whoAmI) or local cache
+      await ref.read(AuthViewModelProvider.notifier).getCurrentUser();
 
-      if (isLoggedIn) {
-        AppRoutes.pushReplacement(context, const DashboardScreen());
+      final authState = ref.read(AuthViewModelProvider);
+      final user = authState.user;
+
+      if (!mounted) return;
+
+      if (user == null) {
+        Navigator.pushReplacementNamed(context, "/login");
+        return;
+      }
+
+      final role = (user.role ?? "").toLowerCase();
+
+      if (role == "driver") {
+        Navigator.pushReplacementNamed(context, "/driver");
       } else {
-        AppRoutes.pushReplacement(context, const Onboarding());
+        Navigator.pushReplacementNamed(context, "/dashboard");
       }
     });
   }
