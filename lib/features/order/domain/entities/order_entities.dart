@@ -58,4 +58,32 @@ class OrderEntity extends Equatable {
     createdAt,
     updatedAt,
   ];
+
+  factory OrderEntity.fromJson(Map<String, dynamic> json) {
+    return OrderEntity(
+      id: json['_id'] ?? json['id'] ?? '',
+      userId: json['userId'] ?? '',
+
+      items: (json['items'] as List<dynamic>? ?? [])
+          .map((e) => OrderItemEntity.fromJson(e as Map<String, dynamic>))
+          .toList(),
+
+      subtotal: (json['subtotal'] ?? 0).toDouble(),
+      shippingFee: (json['shippingFee'] ?? 0).toDouble(),
+      total: (json['total'] ?? 0).toDouble(),
+
+      status: OrderStatusX.fromString(json['status']),
+      paymentStatus: PaymentStatusX.fromString(json['paymentStatus']),
+
+      driverId: json['driverId'],
+      driverName: json['driverName'],
+
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'])
+          : null,
+      updatedAt: json['updatedAt'] != null
+          ? DateTime.parse(json['updatedAt'])
+          : null,
+    );
+  }
 }

@@ -82,7 +82,11 @@ class AuthViewModel extends Notifier<AuthState> {
     );
   }
 
-  Future<void> login({required String email, required String password}) async {
+  Future<void> login({
+    required String email,
+    required String password,
+    required void Function(String route) onNavigate,
+  }) async {
     state = state.copyWith(status: AuthStatus.loading);
 
     final result = await _loginUsecase(
@@ -94,8 +98,19 @@ class AuthViewModel extends Notifier<AuthState> {
         status: AuthStatus.error,
         errorMessage: failure.message,
       ),
-      (user) =>
-          state = state.copyWith(status: AuthStatus.authenticated, user: user),
+      (user) {
+        state = state.copyWith(status: AuthStatus.authenticated, user: user);
+
+        final role = (user.role ?? "").toLowerCase();
+
+        if (role == "driver") {
+          onNavigate("/driver");
+        } else if (role == "admin") {
+          onNavigate("/admin");
+        } else {
+          onNavigate("/user");
+        }
+      },
     );
   }
 

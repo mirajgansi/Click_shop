@@ -145,7 +145,7 @@ class AuthLocalDatasource implements IAuthLocalDataSource {
       }
 
       return updatedUser;
-    } catch (_) {
+    } catch (e) {
       return null;
     }
   }

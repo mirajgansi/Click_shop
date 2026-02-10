@@ -16,6 +16,16 @@ class OrderItemEntity extends Equatable {
     required this.quantity,
     required this.lineTotal,
   });
+  factory OrderItemEntity.fromJson(Map<String, dynamic> json) {
+    return OrderItemEntity(
+      productId: json['product'] ?? json['productId'],
+      name: json['name'] ?? '',
+      price: (json['price'] ?? 0).toDouble(),
+      image: json['image'],
+      quantity: (json['quantity'] ?? 0) as int,
+      lineTotal: (json['lineTotal'] ?? 0).toDouble(),
+    );
+  }
 
   @override
   List<Object?> get props => [

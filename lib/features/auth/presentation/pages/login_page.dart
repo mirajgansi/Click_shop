@@ -40,6 +40,13 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           .login(
             email: _emailController.text.trim(),
             password: _passwordController.text.trim(),
+            onNavigate: (route) {
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                route,
+                (context) => false,
+              );
+            },
           );
     }
   }

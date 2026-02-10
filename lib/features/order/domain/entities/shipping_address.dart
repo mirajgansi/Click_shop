@@ -17,6 +17,17 @@ class ShippingAddressEntity extends Equatable {
     this.zip,
   });
 
+  factory ShippingAddressEntity.fromJson(Map<String, dynamic> json) {
+    return ShippingAddressEntity(
+      userName: json['userName'] ?? json['name'],
+      phone: json['phone'],
+      address1: json['address1'] ?? json['address'],
+      address2: json['address2'],
+      city: json['city'],
+      zip: json['zip'],
+    );
+  }
+
   @override
   List<Object?> get props => [userName, phone, address1, address2, city, zip];
 }

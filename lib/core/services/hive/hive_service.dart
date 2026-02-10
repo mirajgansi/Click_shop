@@ -1,6 +1,10 @@
 import 'package:click_shop/core/constants/hive_table_constants.dart';
 import 'package:click_shop/features/auth/data/models/auth_hive_model.dart';
 import 'package:click_shop/features/cart/data/model/cart_hive_model.dart';
+import 'package:click_shop/features/order/data/model/order_hive_model.dart';
+import 'package:click_shop/features/order/data/model/order_item_hive_model.dart';
+import 'package:click_shop/features/order/data/model/shipping_address_hive_model.dart';
+import 'package:click_shop/features/order/domain/entities/order_entities.dart';
 import 'package:click_shop/features/product/data/model/product_hive_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
@@ -32,6 +36,15 @@ class HiveService {
     if (!Hive.isAdapterRegistered(HiveTableConstants.cartTypeId)) {
       Hive.registerAdapter(CartHiveModelAdapter());
     }
+    if (!Hive.isAdapterRegistered(HiveTableConstants.orderItemTypeId)) {
+      Hive.registerAdapter(OrderItemHiveModelAdapter());
+    }
+    if (!Hive.isAdapterRegistered(HiveTableConstants.shippingAddressTypeId)) {
+      Hive.registerAdapter(ShippingAddressHiveModelAdapter());
+    }
+    if (!Hive.isAdapterRegistered(HiveTableConstants.orderTypeId)) {
+      Hive.registerAdapter(OrderHiveModelAdapter());
+    }
   }
 
   Future<void> openBoxed() async {
@@ -45,6 +58,7 @@ class HiveService {
     }
 
     await Hive.openBox<CartHiveModel>(HiveTableConstants.cartTable);
+    await Hive.openBox<OrderHiveModel>(_driverOrdersBox);
   }
 
   Future<void> close() async {
@@ -169,7 +183,6 @@ class HiveService {
       if (productId.isEmpty) return false;
       if (quantity <= 0) quantity = 1;
 
-      // ✅ Use productId as the KEY so updates are easy
       final existing = _cartBox.get(productId);
 
       if (existing != null) {
@@ -214,7 +227,7 @@ class HiveService {
 
       await _cartBox.put(productId, updated);
       return true;
-    } catch (_) {
+    } catch (e) {
       return false;
     }
   }
@@ -240,7 +253,7 @@ class HiveService {
   Future<List<CartHiveModel>> getAllCart() async {
     try {
       return _cartBox.values.toList();
-    } catch (_) {
+    } catch (e) {
       return [];
     }
   }
@@ -248,7 +261,7 @@ class HiveService {
   Future<List<String>> getCartProductIds() async {
     try {
       return _cartBox.values.map((e) => e.productId).toList();
-    } catch (_) {
+    } catch (e) {
       return [];
     }
   }
@@ -282,5 +295,25 @@ class HiveService {
     );
 
     await box.put(item.key, updated);
+  }
+
+  static const String _driverOrdersBox = "driver_orders";
+
+  Box<OrderHiveModel> get _driverOrderBox =>
+      Hive.box<OrderHiveModel>(_driverOrdersBox);
+
+  Future<void> cacheDriverOrders(List<OrderHiveModel> orders) async {
+    await _driverOrderBox.clear();
+    for (final o in orders) {
+      await _driverOrderBox.put(o.id, o);
+    }
+  }
+
+  List<OrderHiveModel> getDriverOrders() {
+    return _driverOrderBox.values.toList();
+  }
+
+  Future<void> clearDriverOrders() async {
+    await _driverOrderBox.clear();
   }
 }

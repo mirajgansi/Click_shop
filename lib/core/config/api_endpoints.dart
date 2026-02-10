@@ -103,4 +103,9 @@ class ApiEndpoints {
   static const String allOrders = orders;
   static String updateStatus(String id) => "$orders/$id/status";
   static String assignDriver(String id) => "$orders/$id/assign-driver";
+
+  // Driver
+  static const String driverMyOrders = "/orders/driver/my-orders";
+  static String driverUpdateOrderStatus(String orderId) =>
+      "/orders/driver/$orderId/status";
 }
