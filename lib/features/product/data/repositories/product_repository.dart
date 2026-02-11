@@ -73,30 +73,39 @@ class ProductRepository implements IProductRepository {
   }
 
   /// ✅ GET PRODUCTS BY CATEGORY
-  // @override
-  // Future<Either<Failure, List<ProductEntity>>> getProductsByCategory(
-  //   String categoryId,
-  // ) async {
-  //   if (await _networkInfo.isConnected) {
-  //     try {
-  //       final products = await _remoteDataSource.getProductsByCategory(
-  //         categoryId,
-  //       );
-  //       return Right(products);
-  //     } catch (e) {
-  //       return Left(ApiFailure(message: e.toString()));
-  //     }
-  //   } else {
-  //     try {
-  //       final products = await _localDataSource.getProductsByCategory(
-  //         categoryId,
-  //       );
-  //       return Right(products);
-  //     } catch (e) {
-  //       return Left(LocalDatabaseFailure(message: e.toString()));
-  //     }
-  //   }
-  // }
+  @override
+  Future<Either<Failure, List<ProductEntity>>> getProductsByCategory(
+    String categoryId,
+  ) async {
+    // helper: read local + convert to entities
+    Future<Either<Failure, List<ProductEntity>>> _getLocal() async {
+      try {
+        final hiveModels = await _localDataSource.getProductsByCategory(
+          categoryId,
+        );
+        // hiveModels: List<ProductHiveModel>
+        final entities = ProductHiveModel.toEntityList(hiveModels);
+        return Right(entities);
+      } catch (e) {
+        return Left(LocalDatabaseFailure(message: e.toString()));
+      }
+    }
+
+    if (await _networkInfo.isConnected) {
+      try {
+        final apiModels = await _remoteDataSource.getProductsByCategory(
+          categoryId,
+        );
+        // apiModels: List<ProductApiModel>
+        final entities = ProductApiModel.toEntityList(apiModels);
+        return Right(entities);
+      } catch (e) {
+        return _getLocal();
+      }
+    } else {
+      return _getLocal();
+    }
+  }
 
   // @override
   // Future<Either<Failure, List<ProductEntity>>> searchProducts(
@@ -179,14 +188,6 @@ class ProductRepository implements IProductRepository {
     } else {
       return _getCachedItems();
     }
-  }
-
-  @override
-  Future<Either<Failure, List<ProductEntity>>> getProductsByCategory(
-    String categoryId,
-  ) {
-    // TODO: implement getProductsByCategory
-    throw UnimplementedError();
   }
 }
   // -------------------- ADMIN METHODS (skip / keep as not implemented) --------------------

@@ -2,30 +2,42 @@ import 'package:click_shop/features/product/domain/entities/product_entity.dart'
 
 class ProductState {
   final bool isLoading;
-  final List<ProductEntity> products;
-  final ProductEntity? selectedProduct;
   final String? error;
 
+  final List<ProductEntity> allProducts; // ✅ home
+  final List<ProductEntity> categoryProducts; // ✅ category screen
+
+  final ProductEntity? selectedProduct;
+
   const ProductState({
-    this.isLoading = false,
-    this.products = const [],
-    this.selectedProduct,
-    this.error,
+    required this.isLoading,
+    required this.error,
+    required this.allProducts,
+    required this.categoryProducts,
+    required this.selectedProduct,
   });
 
-  factory ProductState.initial() => const ProductState();
+  factory ProductState.initial() => const ProductState(
+    isLoading: false,
+    error: null,
+    allProducts: [],
+    categoryProducts: [],
+    selectedProduct: null,
+  );
 
   ProductState copyWith({
     bool? isLoading,
-    List<ProductEntity>? products,
-    ProductEntity? selectedProduct,
     String? error,
+    List<ProductEntity>? allProducts,
+    List<ProductEntity>? categoryProducts,
+    ProductEntity? selectedProduct,
   }) {
     return ProductState(
       isLoading: isLoading ?? this.isLoading,
-      products: products ?? this.products,
-      selectedProduct: selectedProduct ?? this.selectedProduct,
       error: error,
+      allProducts: allProducts ?? this.allProducts,
+      categoryProducts: categoryProducts ?? this.categoryProducts,
+      selectedProduct: selectedProduct ?? this.selectedProduct,
     );
   }
 }

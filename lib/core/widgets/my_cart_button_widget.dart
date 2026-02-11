@@ -8,14 +8,10 @@ import 'package:click_shop/features/cart/presentation/view_model/cart_view_model
 class MyCartButtonWidget extends ConsumerStatefulWidget {
   final String productId;
 
-  const MyCartButtonWidget({
-    super.key,
-    required this.productId,
-  });
+  const MyCartButtonWidget({super.key, required this.productId});
 
   @override
-  ConsumerState<MyCartButtonWidget> createState() =>
-      _MyCartButtonWidgetState();
+  ConsumerState<MyCartButtonWidget> createState() => _MyCartButtonWidgetState();
 }
 
 class _MyCartButtonWidgetState extends ConsumerState<MyCartButtonWidget> {

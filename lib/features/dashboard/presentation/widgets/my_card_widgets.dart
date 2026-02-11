@@ -13,92 +13,91 @@ class CardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final bool isTablet = constraints.maxWidth >= 250;
-
-        final double padding = isTablet ? 6 : 8;
-        final double fontSizeTitle = isTablet ? 14 : 16;
-        final double fontSizePrice = isTablet ? 13 : 14;
-
-        return AspectRatio(
-          aspectRatio: 0.7,
-          child: GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ProductDetailScreen(
-                    productId: product.id!, // if nullable handle null
-                  ),
-                ),
-              );
-            },
-            child: Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Padding(
-                padding: EdgeInsets.all(padding),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+    return GestureDetector(
+      onTap: () {
+        if (product.id != null) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ProductDetailScreen(productId: product.id!),
+            ),
+          );
+        }
+      },
+      child: Card(
+        elevation: 2,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(6, 6, 6, 4), // 🔥 tighter bottom
+          child: Column(
+            mainAxisSize: MainAxisSize.min, // ✅ flexible height
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(
+                height: 80, // 🔥 slightly smaller image area
+                child: Stack(
                   children: [
-                    // IMAGE
-                    AspectRatio(
-                      aspectRatio: 1,
-                      child: Stack(
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: _ProductImage(image: product.image),
-                          ),
-                          const Positioned(
-                            top: 6,
-                            right: 6,
-                            child: MyFavouriteButtonWidgets(),
-                          ),
-                        ],
+                    Center(
+                      child: SizedBox(
+                        height: 65,
+                        width: 65,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: _ProductImage(image: product.image),
+                        ),
                       ),
                     ),
-
-                    const SizedBox(height: 6),
-
-                    // TITLE
-                    Text(
-                      product.name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: fontSizeTitle,
-                      ),
-                    ),
-                    StockPillBadge(stock: product.inStock),
-
-                    // PRICE + CART BUTTON
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Rs ${product.price.toStringAsFixed(0)}",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: fontSizePrice,
-                          ),
-                        ),
-                        MyCartButtonWidget(
-                          // ✅ pass product id to add-to-cart
-                          productId: product.id ?? "",
-                        ),
-                      ],
+                    const Positioned(
+                      top: 4,
+                      right: 4,
+                      child: MyFavouriteButtonWidgets(),
                     ),
                   ],
                 ),
               ),
-            ),
+
+              const SizedBox(height: 4),
+
+              Text(
+                product.name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                ),
+              ),
+
+              const SizedBox(height: 3),
+
+              SizedBox(
+                height: 28, // 🔥 smaller stock badge area
+                child: StockPillBadge(stock: product.inStock),
+              ),
+
+              const SizedBox(height: 2), // 🔥 minimal gap
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Rs ${product.price.toStringAsFixed(0)}",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 12,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 26,
+                    width: 26,
+                    child: MyCartButtonWidget(productId: product.id ?? ""),
+                  ),
+                ],
+              ),
+            ],
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }
