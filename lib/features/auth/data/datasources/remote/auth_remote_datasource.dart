@@ -181,14 +181,13 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
 
   @override
   Future<bool> resetPassword({
-    required String token,
+    required String email,
+    required String code,
     required String newPassword,
   }) async {
     final response = await _apiClient.post(
-      ApiEndpoints.resetPassword(token), // auth/reset-password/:token
-      data: {
-        "password": newPassword,
-      }, // change key if backend expects "newPassword"
+      ApiEndpoints.resetPassword,
+      data: {"email": email, "code": code, "newPassword": newPassword},
     );
 
     if (response.data['success'] == true) {

@@ -15,7 +15,8 @@ abstract interface class IAuthRepository {
   Future<Either<Failure, bool>> requestPasswordReset(String email);
 
   Future<Either<Failure, bool>> resetPassword({
-    required String token,
+    required String email,
+    required String code, // keep as String (to preserve leading zeros)
     required String newPassword,
   });
 }

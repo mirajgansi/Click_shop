@@ -249,15 +249,18 @@ class AuthRepository implements IAuthRepository {
 
   @override
   Future<Either<Failure, bool>> resetPassword({
-    required String token,
+    required String email,
+    required String code,
     required String newPassword,
   }) async {
     if (await _networkInfo.isConnected) {
       try {
         final ok = await _authRemoteDataSource.resetPassword(
-          token: token,
+          email: email,
+          code: code,
           newPassword: newPassword,
         );
+
         return Right(ok);
       } on DioException catch (e) {
         return Left(

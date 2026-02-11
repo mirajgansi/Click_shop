@@ -7,13 +7,18 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ResetPasswordParams extends Equatable {
-  final String token;
+  final String email;
+  final String code; // keep String
   final String newPassword;
 
-  const ResetPasswordParams({required this.token, required this.newPassword});
+  const ResetPasswordParams({
+    required this.email,
+    required this.code,
+    required this.newPassword,
+  });
 
   @override
-  List<Object?> get props => [token, newPassword];
+  List<Object?> get props => [email, code, newPassword];
 }
 
 // provider
@@ -32,7 +37,8 @@ class ResetPasswordUsecase
   @override
   Future<Either<Failure, bool>> call(ResetPasswordParams params) {
     return _authRepository.resetPassword(
-      token: params.token,
+      email: params.email,
+      code: params.code,
       newPassword: params.newPassword,
     );
   }

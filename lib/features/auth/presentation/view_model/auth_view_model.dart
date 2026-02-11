@@ -229,15 +229,15 @@ class AuthViewModel extends Notifier<AuthState> {
     );
   }
 
-  // ✅ NEW: reset password
   Future<void> resetPassword({
-    required String token,
+    required String email,
+    required String code,
     required String newPassword,
   }) async {
     state = state.copyWith(status: AuthStatus.loading);
 
     final result = await _resetPasswordUsecase(
-      ResetPasswordParams(token: token, newPassword: newPassword),
+      ResetPasswordParams(email: email, code: code, newPassword: newPassword),
     );
 
     result.fold(

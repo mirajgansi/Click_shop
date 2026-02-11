@@ -60,7 +60,7 @@ class ApiEndpoints {
   static const String deleteMe = '$auth/me';
 
   static const String requestPasswordReset = '$auth/request-password-reset';
-  static String resetPassword(String token) => '$auth/reset-password/$token';
+  static String resetPassword = '$auth/reset-password';
 
   static String userById(String id) => '/auth/$id';
   static String userPhoto(String id) => '/auth/update-profile';

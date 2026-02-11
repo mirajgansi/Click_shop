@@ -1,3 +1,4 @@
+import 'package:click_shop/features/auth/presentation/pages/reset_code_page.dart';
 import 'package:click_shop/features/auth/presentation/state/auth_state.dart';
 import 'package:click_shop/features/auth/presentation/view_model/auth_view_model.dart';
 import 'package:click_shop/features/auth/presentation/widgets/my_button_widgets.dart';
@@ -5,12 +6,25 @@ import 'package:click_shop/features/auth/presentation/widgets/my_text_field_widg
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ForgotPasswordScreen extends ConsumerWidget {
+class ForgotPasswordScreen extends ConsumerStatefulWidget {
   const ForgotPasswordScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final emailController = TextEditingController();
+  ConsumerState<ForgotPasswordScreen> createState() =>
+      _ForgotPasswordScreenState();
+}
+
+class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
+  final emailController = TextEditingController();
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final authState = ref.watch(AuthViewModelProvider);
     final authViewModel = ref.read(AuthViewModelProvider.notifier);
 
@@ -22,23 +36,17 @@ class ForgotPasswordScreen extends ConsumerWidget {
         child: Column(
           children: [
             const SizedBox(height: 40),
-
             Image.asset('assets/images/Group.jpg', width: 60, height: 60),
-
             const SizedBox(height: 40),
-
             const Text(
               'Forgot Password',
               style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
             ),
-
             const SizedBox(height: 10),
-
             const Text(
-              'Enter your email and we’ll send you a reset link',
+              'Enter your email and we’ll send you a code',
               textAlign: TextAlign.center,
             ),
-
             const SizedBox(height: 30),
 
             MyTextFieldWidgets(
@@ -46,12 +54,9 @@ class ForgotPasswordScreen extends ConsumerWidget {
               hintText: 'Enter your email',
               text: 'Email',
               validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Email cannot be empty';
-                }
-                if (!value.contains('@')) {
-                  return 'Enter a valid email';
-                }
+                final v = value?.trim() ?? "";
+                if (v.isEmpty) return 'Email cannot be empty';
+                if (!v.contains('@')) return 'Enter a valid email';
                 return null;
               },
             ),
@@ -61,24 +66,36 @@ class ForgotPasswordScreen extends ConsumerWidget {
             MyButtonWidgets(
               text: authState.status == AuthStatus.loading
                   ? 'Sending...'
-                  : 'Send Reset Link',
+                  : 'Send Reset Code',
               height: 50,
               borderRadius: 12,
               onPressed: authState.status == AuthStatus.loading
                   ? null
                   : () async {
-                      await authViewModel.requestPasswordReset(
-                        emailController.text.trim(),
-                      );
+                      final email = emailController.text.trim();
+                      if (email.isEmpty || !email.contains('@')) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Enter a valid email')),
+                        );
+                        return;
+                      }
 
-                      if (context.mounted &&
-                          ref.read(AuthViewModelProvider).status ==
-                              AuthStatus.loaded) {
+                      await authViewModel.requestPasswordReset(email);
+
+                      final st = ref.read(AuthViewModelProvider);
+                      if (!context.mounted) return;
+
+                      if (st.status == AuthStatus.loaded) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text(
-                              'Password reset link sent to your email',
-                            ),
+                            content: Text('Reset code sent to your email'),
+                          ),
+                        );
+
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => ResetCodePage(initialEmail: email),
                           ),
                         );
                       }
