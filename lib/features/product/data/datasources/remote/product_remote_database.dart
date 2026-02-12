@@ -25,12 +25,23 @@ class ProductRemoteDatabase implements IProductRemoteDatabase {
        _tokenService = tokenService;
 
   @override
-  Future<List<ProductApiModel>> getAllproduct() async {
-    final res = await _apiClient.get(ApiEndpoints.products);
-
-    final data = (res.data['data']?['products'] as List?) ?? [];
-
-    return data.map((json) => ProductApiModel.fromJson(json)).toList();
+  Future<List<ProductApiModel>> getAllproduct({
+    int page = 1,
+    int size = 20,
+    String? search,
+  }) async {
+    final res = await _apiClient.get(
+      ApiEndpoints.getAllProducts(),
+      queryParameters: {
+        "page": page,
+        "size": size,
+        if (search != null && search.trim().isNotEmpty) "search": search.trim(),
+      },
+    );
+    final list =
+        (res.data["data"]["products"] ?? res.data["products"] ?? res.data)
+            as List;
+    return list.map((e) => ProductApiModel.fromJson(e)).toList();
   }
 
   @override

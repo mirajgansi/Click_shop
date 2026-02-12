@@ -166,9 +166,26 @@ class ProductRepository implements IProductRepository {
   }
 
   @override
-  Future<Either<Failure, List<ProductEntity>>> searchProducts(String query) {
-    // TODO: implement searchProducts
-    throw UnimplementedError();
+  Future<Either<Failure, List<ProductEntity>>> searchProducts({
+    required String query,
+    int page = 1,
+    int size = 20,
+  }) async {
+    if (await _networkInfo.isConnected) {
+      try {
+        final models = await _remoteDataSource.getAllproduct(
+          page: page,
+          size: size,
+          search: query,
+        );
+        final entities = ProductApiModel.toEntityList(models);
+        return Right(entities);
+      } catch (e) {
+        return Left(ApiFailure(message: e.toString()));
+      }
+    } else {
+      return _getCachedItems();
+    }
   }
 
   @override

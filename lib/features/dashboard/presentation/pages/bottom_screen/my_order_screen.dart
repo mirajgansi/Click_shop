@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:click_shop/features/order/presentation/view_model/order_view_model.dart';
 import 'package:click_shop/features/order/domain/entities/order_entities.dart';
+import 'package:path/path.dart';
 
 class MyOrdersPage extends ConsumerStatefulWidget {
   const MyOrdersPage({super.key});
@@ -65,7 +66,8 @@ class _MyOrdersPageState extends ConsumerState<MyOrdersPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => OrderDetailPage(orderId: order.id),
+                          builder: (context) =>
+                              OrderDetailPage(orderId: order.id),
                         ),
                       );
                     },

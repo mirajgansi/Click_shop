@@ -11,5 +11,9 @@ abstract interface class IProductRepository {
   Future<Either<Failure, List<ProductEntity>>> getProductsByCategory(
     String categoryId,
   );
-  Future<Either<Failure, List<ProductEntity>>> searchProducts(String query);
+  Future<Either<Failure, List<ProductEntity>>> searchProducts({
+    required String query,
+    int page,
+    int size,
+  });
 }

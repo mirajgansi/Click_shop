@@ -15,7 +15,11 @@ abstract interface class IProductLocalDatabase {
 
 abstract interface class IProductRemoteDatabase {
   // Future<bool> createProduct(ProductApiModel ProductApiModel);
-  Future<List<ProductApiModel>> getAllproduct();
+  Future<List<ProductApiModel>> getAllproduct({
+    int page = 1,
+    int size = 20,
+    String? search,
+  });
   Future<ProductApiModel?> getProductbyId(String productId);
   // Future<bool> deleteProduct(String productId);
   // Future<bool> updateProduct(ProductApiModel ProductApiModel);

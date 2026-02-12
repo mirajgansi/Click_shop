@@ -1,6 +1,7 @@
 import 'package:click_shop/features/product/domain/usecases/get_all_prodcut_usecase.dart';
 import 'package:click_shop/features/product/domain/usecases/get_category_product_usecase.dart';
 import 'package:click_shop/features/product/domain/usecases/get_product_by_id_usecase.dart';
+import 'package:click_shop/features/product/domain/usecases/search_product_usecase.dart';
 import 'package:click_shop/features/product/presentation/state/product_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -11,7 +12,7 @@ class ProductViewModel extends Notifier<ProductState> {
   late final GetAllProductsUsecase _getAllProductsUsecase;
   late final GetProductByIdUsecase _getProductByIdUsecase;
   late final GetProductsByCategoryUsecase _getProductsByCategoryUsecase;
-
+  late final SearchProductsUsecase _searchProductsUsecase;
   @override
   ProductState build() {
     _getAllProductsUsecase = ref.read(getAllProductUsecaseProvider);
@@ -19,6 +20,7 @@ class ProductViewModel extends Notifier<ProductState> {
     _getProductsByCategoryUsecase = ref.read(
       getProductsByCategoryUsecaseProvider,
     );
+    _searchProductsUsecase = ref.read(searchProductsUsecaseProvider);
 
     Future.microtask(loadProducts);
 
@@ -70,6 +72,24 @@ class ProductViewModel extends Notifier<ProductState> {
       (products) => state = state.copyWith(
         isLoading: false,
         categoryProducts: products, // ✅ store separately
+        error: null,
+      ),
+    );
+  }
+
+  Future<void> search(String query) async {
+    state = state.copyWith(isLoading: true, error: null);
+
+    final result = await _searchProductsUsecase(
+      SearchProductsParams(query: query, page: 1, size: 20),
+    );
+
+    result.fold(
+      (failure) =>
+          state = state.copyWith(isLoading: false, error: failure.message),
+      (products) => state = state.copyWith(
+        isLoading: false,
+        allProducts: products,
         error: null,
       ),
     );

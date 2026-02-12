@@ -264,10 +264,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   Widget build(BuildContext context) {
     final authState = ref.watch(currentUserViewModelProvider);
 
-    if (authState.status == AuthStatus.loading) {
-      return const CircularProgressIndicator();
-    }
-
     if (authState.status == AuthStatus.error) {
       return Center(
         child: Text(authState.errorMessage ?? 'An unexpected error occurred'),
