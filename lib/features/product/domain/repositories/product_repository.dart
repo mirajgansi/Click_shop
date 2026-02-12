@@ -16,4 +16,8 @@ abstract interface class IProductRepository {
     int page,
     int size,
   });
+  Future<Either<Failure, List<ProductEntity>>> getRecentProducts();
+  Future<Either<Failure, List<ProductEntity>>> getTrendingProducts();
+  Future<Either<Failure, List<ProductEntity>>> getPopularProducts();
+  Future<Either<Failure, List<ProductEntity>>> getTopRatedProducts();
 }

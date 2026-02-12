@@ -53,11 +53,31 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               )
               .toList();
 
-    // 10 items each (for now using same products list)
-    final exclusive = products.take(10).toList();
-    final bestSelling = products.length > 10
-        ? products.skip(10).take(10).toList()
-        : products.take(10).toList();
+    final recentBase = state.recentProducts; // ✅ Recently Added
+    final popularBase = state.popularProducts; // ✅ Popular
+    final bestBase = state.trendingProducts; // ✅ Best Selling (using trending)
+
+    // filter helper (search only affects displayed lists)
+    List<ProductEntity> _filter(List<ProductEntity> list) {
+      final s = q.trim().toLowerCase();
+      if (s.isEmpty) return list;
+      return list.where((p) => p.name.toLowerCase().contains(s)).toList();
+    }
+
+    final recentProducts = _filter(recentBase).take(10).toList();
+    final popularProducts = _filter(popularBase).take(10).toList();
+    final bestSellingProducts = _filter(bestBase).take(10).toList();
+
+    // fallback: if API list empty, use allProducts (optional)
+    final recent = recentProducts.isNotEmpty
+        ? recentProducts
+        : _filter(allProducts).take(10).toList();
+    final popular = popularProducts.isNotEmpty
+        ? popularProducts
+        : _filter(allProducts).take(10).toList();
+    final bestSelling = bestSellingProducts.isNotEmpty
+        ? bestSellingProducts
+        : _filter(allProducts).take(10).toList();
 
     return SafeArea(
       child: CustomScrollView(
@@ -96,7 +116,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     padding: EdgeInsets.all(24),
                     child: Center(child: Text("No products found")),
                   )
-                : _HorizontalProductRow(products: exclusive),
+                : _HorizontalProductRow(products: recent),
           ),
 
           SliverToBoxAdapter(
@@ -152,11 +172,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
           // Best Selling row (10 items)
           SliverToBoxAdapter(
-            child: products.isEmpty
+            child: bestSelling.isEmpty
                 ? const SizedBox.shrink()
                 : _HorizontalProductRow(products: bestSelling),
           ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+              child: _SectionHeader(title: "Popular", onSeeAll: () {}),
+            ),
+          ),
 
+          // Popular row
+          SliverToBoxAdapter(
+            child: popular.isEmpty
+                ? const SizedBox.shrink()
+                : _HorizontalProductRow(products: popular),
+          ),
           // Groceries header
           const SliverToBoxAdapter(child: SizedBox(height: 18)),
         ],

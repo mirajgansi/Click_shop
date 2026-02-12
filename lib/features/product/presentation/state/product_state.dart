@@ -4,10 +4,20 @@ class ProductState {
   final bool isLoading;
   final String? error;
 
-  final List<ProductEntity> allProducts; // ✅ home
-  final List<ProductEntity> categoryProducts; // ✅ category screen
-
+  final List<ProductEntity> allProducts;
+  final List<ProductEntity> categoryProducts;
   final ProductEntity? selectedProduct;
+
+  // ✅ new sections
+  final bool isRecentLoading;
+  final bool isTrendingLoading;
+  final bool isPopularLoading;
+  final bool isTopRatedLoading;
+
+  final List<ProductEntity> recentProducts;
+  final List<ProductEntity> trendingProducts;
+  final List<ProductEntity> popularProducts;
+  final List<ProductEntity> topRatedProducts;
 
   const ProductState({
     required this.isLoading,
@@ -15,6 +25,14 @@ class ProductState {
     required this.allProducts,
     required this.categoryProducts,
     required this.selectedProduct,
+    required this.isRecentLoading,
+    required this.isTrendingLoading,
+    required this.isPopularLoading,
+    required this.isTopRatedLoading,
+    required this.recentProducts,
+    required this.trendingProducts,
+    required this.popularProducts,
+    required this.topRatedProducts,
   });
 
   factory ProductState.initial() => const ProductState(
@@ -23,21 +41,55 @@ class ProductState {
     allProducts: [],
     categoryProducts: [],
     selectedProduct: null,
+    isRecentLoading: false,
+    isTrendingLoading: false,
+    isPopularLoading: false,
+    isTopRatedLoading: false,
+    recentProducts: [],
+    trendingProducts: [],
+    popularProducts: [],
+    topRatedProducts: [],
   );
 
   ProductState copyWith({
     bool? isLoading,
     String? error,
+
     List<ProductEntity>? allProducts,
     List<ProductEntity>? categoryProducts,
     ProductEntity? selectedProduct,
+
+    bool? isRecentLoading,
+    bool? isTrendingLoading,
+    bool? isPopularLoading,
+    bool? isTopRatedLoading,
+
+    List<ProductEntity>? recentProducts,
+    List<ProductEntity>? trendingProducts,
+    List<ProductEntity>? popularProducts,
+    List<ProductEntity>? topRatedProducts,
+
+    bool clearError = false,
+    bool clearSelectedProduct = false,
   }) {
     return ProductState(
       isLoading: isLoading ?? this.isLoading,
-      error: error,
+      error: clearError ? null : (error ?? this.error),
       allProducts: allProducts ?? this.allProducts,
       categoryProducts: categoryProducts ?? this.categoryProducts,
-      selectedProduct: selectedProduct ?? this.selectedProduct,
+      selectedProduct: clearSelectedProduct
+          ? null
+          : (selectedProduct ?? this.selectedProduct),
+
+      isRecentLoading: isRecentLoading ?? this.isRecentLoading,
+      isTrendingLoading: isTrendingLoading ?? this.isTrendingLoading,
+      isPopularLoading: isPopularLoading ?? this.isPopularLoading,
+      isTopRatedLoading: isTopRatedLoading ?? this.isTopRatedLoading,
+
+      recentProducts: recentProducts ?? this.recentProducts,
+      trendingProducts: trendingProducts ?? this.trendingProducts,
+      popularProducts: popularProducts ?? this.popularProducts,
+      topRatedProducts: topRatedProducts ?? this.topRatedProducts,
     );
   }
 }

@@ -107,46 +107,6 @@ class ProductRepository implements IProductRepository {
     }
   }
 
-  // @override
-  // Future<Either<Failure, List<ProductEntity>>> searchProducts(
-  //   String query,
-  // ) async {
-  //   try {
-  //     final results = await _localDataSource.searchProducts(query);
-  //     return Right(results);
-  //   } catch (e) {
-  //     return Left(LocalDatabaseFailure(message: e.toString()));
-  //   }
-  // }
-
-  // -------------------- CART --------------------
-
-  //  GET CART PRODUCTS
-  // @override
-  // Future<Either<Failure, List<ProductEntity>>> getCartProducts() async {
-  //   if (await _networkInfo.isConnected) {
-  //     try {
-  //       final products = await _remoteDataSource.getCartProducts();
-  //       return Right(products);
-  //     } catch (e) {
-  //       // fallback local cart
-  //       try {
-  //         final products = await _localDataSource.getCartProducts();
-  //         return Right(products);
-  //       } catch (err) {
-  //         return Left(LocalDatabaseFailure(message: err.toString()));
-  //       }
-  //     }
-  //   } else {
-  //     try {
-  //       final products = await _localDataSource.getCartProducts();
-  //       return Right(products);
-  //     } catch (e) {
-  //       return Left(LocalDatabaseFailure(message: e.toString()));
-  //     }
-  //   }
-  // }
-
   @override
   Future<Either<Failure, bool>> createProduct(ProductEntity productEntity) {
     // TODO: implement createProduct
@@ -195,7 +155,7 @@ class ProductRepository implements IProductRepository {
         final models = await _remoteDataSource.getAllproduct();
         // Cache the data locally for offline access
         final hiveModels = ProductHiveModel.fromApiModelList(models);
-        await _localDataSource.cacheAllProducts(hiveModels);
+        await _localDataSource.cacheAll(hiveModels);
         final entities = ProductApiModel.toEntityList(models);
         return Right(entities);
       } catch (e) {
@@ -206,41 +166,129 @@ class ProductRepository implements IProductRepository {
       return _getCachedItems();
     }
   }
+
+  Future<Either<Failure, List<ProductEntity>>> _getCachedRecent() async {
+    try {
+      final models = await _localDataSource.getRecent();
+      final entities = ProductHiveModel.toEntityList(models);
+      return Right(entities);
+    } catch (e) {
+      return Left(LocalDatabaseFailure(message: e.toString()));
+    }
+  }
+
+  Future<Either<Failure, List<ProductEntity>>> _getCachedTrending() async {
+    try {
+      final models = await _localDataSource.getTrending();
+      final entities = ProductHiveModel.toEntityList(models);
+      return Right(entities);
+    } catch (e) {
+      return Left(LocalDatabaseFailure(message: e.toString()));
+    }
+  }
+
+  Future<Either<Failure, List<ProductEntity>>> _getCachedPopular() async {
+    try {
+      final models = await _localDataSource.getPopular();
+      final entities = ProductHiveModel.toEntityList(models);
+      return Right(entities);
+    } catch (e) {
+      return Left(LocalDatabaseFailure(message: e.toString()));
+    }
+  }
+
+  Future<Either<Failure, List<ProductEntity>>> _getCachedTopRated() async {
+    try {
+      final models = await _localDataSource.getTopRated();
+      final entities = ProductHiveModel.toEntityList(models);
+      return Right(entities);
+    } catch (e) {
+      return Left(LocalDatabaseFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<ProductEntity>>> getRecentProducts() async {
+    if (await _networkInfo.isConnected) {
+      try {
+        final models = await _remoteDataSource.getRecent();
+
+        // cache
+        final hiveModels = ProductHiveModel.fromApiModelList(models);
+        await _localDataSource.cacheRecent(hiveModels);
+
+        // return
+        final entities = ProductApiModel.toEntityList(models);
+        return Right(entities);
+      } catch (e) {
+        // remote failed -> cached
+        return _getCachedRecent();
+      }
+    } else {
+      return _getCachedRecent();
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<ProductEntity>>> getTrendingProducts() async {
+    if (await _networkInfo.isConnected) {
+      try {
+        final models = await _remoteDataSource.getTrending();
+
+        // cache
+        final hiveModels = ProductHiveModel.fromApiModelList(models);
+        await _localDataSource.cacheTrending(hiveModels);
+
+        // return
+        final entities = ProductApiModel.toEntityList(models);
+        return Right(entities);
+      } catch (e) {
+        return _getCachedTrending();
+      }
+    } else {
+      return _getCachedTrending();
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<ProductEntity>>> getPopularProducts() async {
+    if (await _networkInfo.isConnected) {
+      try {
+        final models = await _remoteDataSource.getPopular();
+
+        // cache
+        final hiveModels = ProductHiveModel.fromApiModelList(models);
+        await _localDataSource.cachePopular(hiveModels);
+
+        // return
+        final entities = ProductApiModel.toEntityList(models);
+        return Right(entities);
+      } catch (e) {
+        return _getCachedPopular();
+      }
+    } else {
+      return _getCachedPopular();
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<ProductEntity>>> getTopRatedProducts() async {
+    if (await _networkInfo.isConnected) {
+      try {
+        final models = await _remoteDataSource.getTopRated();
+
+        // cache
+        final hiveModels = ProductHiveModel.fromApiModelList(models);
+        await _localDataSource.cacheTopRated(hiveModels);
+
+        // return
+        final entities = ProductApiModel.toEntityList(models);
+        return Right(entities);
+      } catch (e) {
+        return _getCachedTopRated();
+      }
+    } else {
+      return _getCachedTopRated();
+    }
+  }
 }
-  // -------------------- ADMIN METHODS (skip / keep as not implemented) --------------------
-  // If your IProductRepository still contains these, either remove them or keep as stubs.
-
-  // @override
-  // Future<Either<Failure, bool>> createProduct(
-  //   ProductEntity productEntity,
-  // ) async {
-  //   // user app usually doesn't create products
-  //   try {
-  //     final ok = await _localDataSource.createProduct(productEntity);
-  //     return Right(ok);
-  //   } catch (e) {
-  //     return Left(LocalDatabaseFailure(message: e.toString()));
-  //   }
-  // }
-
-  // @override
-  // Future<Either<Failure, bool>> updateProduct(
-  //   ProductEntity productEntity,
-  // ) async {
-  //   try {
-  //     final ok = await _localDataSource.updateProduct(productEntity);
-  //     return Right(ok);
-  //   } catch (e) {
-  //     return Left(LocalDatabaseFailure(message: e.toString()));
-  //   }
-  // }
-
-  // @override
-  // Future<Either<Failure, bool>> delteProduct(String productId) async {
-  //   try {
-  //     final ok = await _localDataSource.deleteProduct(productId);
-  //     return Right(ok);
-  //   } catch (e) {
-  //     return Left(LocalDatabaseFailure(message: e.toString()));
-  //   }
-  // }

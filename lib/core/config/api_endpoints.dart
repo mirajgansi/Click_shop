@@ -73,7 +73,7 @@ class ApiEndpoints {
   static String getByCategory(String category) =>
       "products/category/$category"; // GET
 
-  static String recent() => "$products/recent";
+  static String recent() => "$products/recent"; // GET
   static String trending() => "$products/trending"; // GET
   static String popular() => "$products/popular"; // GET
   static String topRated() => "$products/top-rated"; // GET

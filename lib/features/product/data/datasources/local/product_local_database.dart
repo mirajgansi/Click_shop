@@ -12,15 +12,25 @@ final ProductLocalDatasourceProvider = Provider<ProdcutLocalDatabase>((ref) {
 
 class ProdcutLocalDatabase implements IProductLocalDatabase {
   final HiveService _hiveService;
+
   ProdcutLocalDatabase({required HiveService hiveService})
     : _hiveService = hiveService;
 
   @override
   Future<List<ProductHiveModel>> getAllproduct() async {
     try {
-      return _hiveService.getAllProducts();
+      return await _hiveService.getAllProducts();
     } catch (e) {
       return [];
+    }
+  }
+
+  @override
+  Future<ProductHiveModel?> getProductbyId(String productId) async {
+    try {
+      return await _hiveService.getProductById(productId);
+    } catch (e) {
+      return null;
     }
   }
 
@@ -31,22 +41,91 @@ class ProdcutLocalDatabase implements IProductLocalDatabase {
     try {
       final all = await getAllproduct();
       final cat = categoryId.trim().toLowerCase();
+
       return all.where((p) => p.category.trim().toLowerCase() == cat).toList();
-    } catch (_) {
+    } catch (e) {
       return [];
     }
   }
 
-  Future<void> cacheAllProducts(List<ProductHiveModel> items) async {
-    await _hiveService.cacheAllProdcuts(items);
+  @override
+  Future<void> cacheAll(List<ProductHiveModel> items) async {
+    try {
+      await _hiveService.cacheAllProdcuts(items);
+    } catch (e) {}
   }
 
   @override
-  Future<ProductHiveModel?> getProductbyId(String productId) async {
+  Future<void> cacheCategory(
+    String categoryId,
+    List<ProductHiveModel> items,
+  ) async {
     try {
-      return _hiveService.getProductById(productId);
+      await _hiveService.cacheAllProdcuts(items);
+    } catch (e) {}
+  }
+
+  @override
+  Future<void> cacheRecent(List<ProductHiveModel> items) async {
+    try {
+      await _hiveService.cacheAllProdcuts(items);
+    } catch (e) {}
+  }
+
+  @override
+  Future<void> cacheTrending(List<ProductHiveModel> items) async {
+    try {
+      await _hiveService.cacheAllProdcuts(items);
+    } catch (e) {}
+  }
+
+  @override
+  Future<void> cachePopular(List<ProductHiveModel> items) async {
+    try {
+      await _hiveService.cacheAllProdcuts(items);
+    } catch (e) {}
+  }
+
+  @override
+  Future<void> cacheTopRated(List<ProductHiveModel> items) async {
+    try {
+      await _hiveService.cacheAllProdcuts(items);
+    } catch (e) {}
+  }
+
+  @override
+  Future<List<ProductHiveModel>> getRecent() async {
+    try {
+      return await getAllproduct();
     } catch (e) {
-      return null;
+      return [];
+    }
+  }
+
+  @override
+  Future<List<ProductHiveModel>> getTrending() async {
+    try {
+      return await getAllproduct();
+    } catch (e) {
+      return [];
+    }
+  }
+
+  @override
+  Future<List<ProductHiveModel>> getPopular() async {
+    try {
+      return await getAllproduct();
+    } catch (e) {
+      return [];
+    }
+  }
+
+  @override
+  Future<List<ProductHiveModel>> getTopRated() async {
+    try {
+      return await getAllproduct();
+    } catch (e) {
+      return [];
     }
   }
 }
