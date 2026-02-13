@@ -12,6 +12,7 @@ import 'package:click_shop/features/auth/presentation/view_model/auth_view_model
 import 'package:click_shop/features/auth/presentation/widgets/my_button_widgets.dart';
 import 'package:click_shop/features/dashboard/presentation/pages/my_account_delete_page.dart';
 import 'package:click_shop/features/dashboard/presentation/pages/my_detail_page.dart';
+import 'package:click_shop/features/dashboard/presentation/pages/theme_setting_page.dart';
 import 'package:click_shop/features/dashboard/presentation/widgets/my_menu_items_widgets.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
@@ -423,9 +424,16 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                       },
                     ),
                     MyMenuItemWidget(
-                      icon: Icons.help_outline,
-                      title: "Help",
-                      onTap: () => Navigator.pushNamed(context, "/help"),
+                      icon: Icons.dark_mode_outlined,
+                      title: "Theme",
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const ThemeSettingsPage(),
+                          ),
+                        );
+                      },
                     ),
 
                     MyMenuItemWidget(
