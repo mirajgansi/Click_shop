@@ -86,7 +86,7 @@ class ProductApiModel {
       manufacturer: manufacturer,
       manufactureDate: manufactureDate,
       expireDate: expireDate,
-      quantity: quantity ?? 1,
+      quantity: quantity,
     );
   }
 

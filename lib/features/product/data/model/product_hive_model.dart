@@ -48,7 +48,6 @@ class ProductHiveModel extends HiveObject {
   @HiveField(9)
   final String? manufacturer;
 
-  // Store dates as ISO strings for Hive safety
   @HiveField(10)
   final String? manufactureDateIso;
 

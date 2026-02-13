@@ -170,7 +170,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
 
-          // Best Selling row (10 items)
           SliverToBoxAdapter(
             child: bestSelling.isEmpty
                 ? const SizedBox.shrink()

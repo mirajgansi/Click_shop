@@ -8,12 +8,19 @@ class ProductEntity extends Equatable {
   final int inStock;
   final String category;
   final String nutritionalInfo;
-  final String image; // main image
-  final List<String> images; // extra images (optional)
+  final String image;
+  final List<String> images;
+
   final String? manufacturer;
   final DateTime? manufactureDate;
   final DateTime? expireDate;
+
   final int? quantity;
+
+  final double? averageRating;
+  final int? reviewCount;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
 
   const ProductEntity({
     this.id,
@@ -29,6 +36,11 @@ class ProductEntity extends Equatable {
     this.manufactureDate,
     this.expireDate,
     this.quantity,
+
+    this.averageRating,
+    this.reviewCount,
+    this.createdAt,
+    this.updatedAt,
   });
 
   ProductEntity copyWith({
@@ -78,6 +90,10 @@ class ProductEntity extends Equatable {
     manufactureDate,
     expireDate,
     quantity,
+    averageRating,
+    reviewCount,
+    createdAt,
+    updatedAt,
   ];
 }
 

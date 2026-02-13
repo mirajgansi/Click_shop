@@ -28,13 +28,13 @@ class CardWidget extends StatelessWidget {
         elevation: 2,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(6, 6, 6, 4), // 🔥 tighter bottom
+          padding: const EdgeInsets.fromLTRB(6, 6, 6, 4),
           child: Column(
-            mainAxisSize: MainAxisSize.min, // ✅ flexible height
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(
-                height: 80, // 🔥 slightly smaller image area
+                height: 80,
                 child: Stack(
                   children: [
                     Center(
@@ -71,11 +71,11 @@ class CardWidget extends StatelessWidget {
               const SizedBox(height: 3),
 
               SizedBox(
-                height: 28, // 🔥 smaller stock badge area
+                height: 28,
                 child: StockPillBadge(stock: product.inStock),
               ),
 
-              const SizedBox(height: 2), // 🔥 minimal gap
+              const SizedBox(height: 2),
 
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -108,7 +108,6 @@ class _ProductImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // ✅ if backend gives full http url
     if (image.startsWith("http")) {
       return Image.network(
         image,
@@ -118,9 +117,7 @@ class _ProductImage extends StatelessWidget {
       );
     }
 
-    // ✅ if backend gives relative path like "uploads/xxx.jpg"
-    // replace baseUrl with your ApiEndpoints host
-    final baseUrl = ApiEndpoints.getHostUrl(); // you already have this
+    final baseUrl = ApiEndpoints.getHostUrl();
     final url = "$baseUrl/$image"
         .replaceAll(RegExp(r'//+'), '/')
         .replaceFirst(':/', '://');
