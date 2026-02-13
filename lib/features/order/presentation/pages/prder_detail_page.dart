@@ -391,7 +391,6 @@ class _CancelButton extends ConsumerWidget {
                   const SnackBar(content: Text("Order cancelled ✅")),
                 );
 
-                // refresh order details
                 await ref
                     .read(orderViewModelProvider.notifier)
                     .getOrderById(order.id);

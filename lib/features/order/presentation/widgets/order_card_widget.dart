@@ -1,5 +1,5 @@
+import 'package:click_shop/features/driver/presentation/widgets/status_pill_widget.dart';
 import 'package:click_shop/features/order/domain/entities/order_entities.dart';
-import 'package:click_shop/features/order/presentation/widgets/status_badge_widget.dart';
 import 'package:flutter/material.dart';
 
 class OrderCard extends StatelessWidget {
@@ -45,7 +45,7 @@ class OrderCard extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                StatusBadge(status: status),
+                StatusPill(type: PillType.order, value: order.status.name),
               ],
             ),
 

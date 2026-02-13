@@ -28,7 +28,6 @@ class DriverOrderCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ── Header: Order ID (left) | Status + time (right)
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -42,7 +41,6 @@ class DriverOrderCard extends StatelessWidget {
                     ),
                   ),
 
-                  // RIGHT
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
