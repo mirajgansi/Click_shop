@@ -9,9 +9,9 @@ class ThemeSettingsPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
 
-    final current = ref.watch(themeModeProvider);
+    final current = ref.watch(appThemeModeProvider);
 
-    Widget tile(String title, ThemeMode mode, String subtitle) {
+    Widget tile(String title, AppThemeMode mode, String subtitle) {
       final selected = current == mode;
 
       return Container(
@@ -33,16 +33,16 @@ class ThemeSettingsPage extends ConsumerWidget {
             subtitle,
             style: TextStyle(color: cs.onSurface.withOpacity(0.65)),
           ),
-          trailing: Radio<ThemeMode>(
+          trailing: Radio<AppThemeMode>(
             value: mode,
             groupValue: current,
             activeColor: cs.primary,
             onChanged: (v) {
               if (v == null) return;
-              ref.read(themeModeProvider.notifier).setMode(v);
+              ref.read(appThemeModeProvider.notifier).setMode(v);
             },
           ),
-          onTap: () => ref.read(themeModeProvider.notifier).setMode(mode),
+          onTap: () => ref.read(appThemeModeProvider.notifier).setMode(mode),
         ),
       );
     }
@@ -64,13 +64,20 @@ class ThemeSettingsPage extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 12),
+
             tile(
               "System (Default)",
-              ThemeMode.system,
+              AppThemeMode.system,
               "Follows your phone settings",
             ),
-            tile("Light", ThemeMode.light, "Always use light mode"),
-            tile("Dark", ThemeMode.dark, "Always use dark mode"),
+            tile("Light", AppThemeMode.light, "Always use light mode"),
+            tile("Dark", AppThemeMode.dark, "Always use dark mode"),
+
+            tile(
+              "Auto (Sensor)",
+              AppThemeMode.sensor,
+              "Changes using room light",
+            ),
           ],
         ),
       ),

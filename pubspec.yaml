@@ -86,6 +86,7 @@ dependencies:
   motion_toast: ^2.15.0
   sensors_plus: ^7.0.0
   local_auth: ^3.0.0
+  light_sensor: ^3.0.2
 
 dev_dependencies:
   flutter_test:

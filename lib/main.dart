@@ -1,4 +1,5 @@
 import 'package:click_shop/app/theme/app_theme.dart';
+import 'package:click_shop/app/theme/effective_theme_mode_provider.dart';
 import 'package:click_shop/app/theme/theme_mode_provider.dart';
 import 'package:click_shop/core/services/hive/hive_service.dart';
 import 'package:click_shop/core/services/storage/user_session_service.dart';
@@ -33,7 +34,7 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final mode = ref.watch(themeModeProvider);
+    final mode = ref.watch(effectiveThemeModeProvider);
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,

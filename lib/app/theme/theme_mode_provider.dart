@@ -1,23 +1,26 @@
 import 'package:click_shop/core/services/storage/user_session_service.dart';
-import 'package:flutter/material.dart' show ThemeMode;
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ThemeModeNotifier extends Notifier<ThemeMode> {
-  static const _key = "theme_mode";
+enum AppThemeMode { system, light, dark, sensor }
 
+class AppThemeModeNotifier extends Notifier<AppThemeMode> {
+  static const _key = "app_theme_mode";
   @override
-  ThemeMode build() {
+  AppThemeMode build() {
     final prefs = ref.read(SharedPreferencesProvider);
     final v = prefs.getInt(_key) ?? 0;
-    return ThemeMode.values[v.clamp(0, 2)];
+    final idx = v.clamp(0, AppThemeMode.values.length - 1);
+    return AppThemeMode.values[idx];
   }
 
-  void setMode(ThemeMode mode) {
+  void setMode(AppThemeMode mode) {
     state = mode;
     ref.read(SharedPreferencesProvider).setInt(_key, mode.index);
   }
 }
 
-final themeModeProvider = NotifierProvider<ThemeModeNotifier, ThemeMode>(
-  ThemeModeNotifier.new,
-);
+final appThemeModeProvider =
+    NotifierProvider<AppThemeModeNotifier, AppThemeMode>(
+      AppThemeModeNotifier.new,
+    );
