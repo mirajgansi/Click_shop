@@ -1,4 +1,6 @@
 import 'package:click_shop/core/config/api_endpoints.dart';
+import 'package:click_shop/features/cart/presentation/widgets/cart_button_widget.dart';
+import 'package:click_shop/features/cart/presentation/widgets/checkout_button_widget.dart';
 import 'package:click_shop/features/order/presentation/view_model/order_view_model.dart';
 import 'package:click_shop/features/order/presentation/widgets/order_form.dart';
 import 'package:flutter/material.dart';
@@ -69,14 +71,16 @@ class _CartScreenState extends ConsumerState<CartScreen> {
               },
             ),
 
-      // Bottom checkout bar
       bottomNavigationBar: state.cartProducts.isEmpty
           ? null
           : SafeArea(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                child: _CheckoutBar(
-                  total: ref.read(cartViewModelProvider.notifier).totalPrice,
+                child: CheckoutButton(
+                  total: ref
+                      .read(cartViewModelProvider.notifier)
+                      .totalPrice
+                      .toDouble(),
                   onCheckout: () {
                     showCheckoutSheet(
                       context: context,
@@ -270,55 +274,6 @@ class _QtyControl extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _CheckoutBar extends StatelessWidget {
-  final num total;
-  final VoidCallback onCheckout;
-
-  const _CheckoutBar({required this.total, required this.onCheckout});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 56,
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF4CAF50),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          elevation: 0,
-        ),
-        onPressed: onCheckout,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Expanded(
-              child: Center(
-                child: Text(
-                  "Go to\nCheckout",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14),
-                ),
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.25),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Text(
-                "Rs.${total.toString()}",
-                style: const TextStyle(fontWeight: FontWeight.w800),
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
