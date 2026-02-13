@@ -25,13 +25,14 @@ class _DeliveredPageState extends ConsumerState<DeliveredPage> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(driverViewModelProvider);
+    final cs = Theme.of(context).colorScheme;
 
-    // ✅ only delivered orders
     final deliveredOrders = state.orders
         .where((o) => o.status == OrderStatus.delivered)
         .toList();
 
     return Scaffold(
+      backgroundColor: cs.background, // ✅ theme background
       body: RefreshIndicator(
         onRefresh: () =>
             ref.read(driverViewModelProvider.notifier).loadMyOrders(),
@@ -50,11 +51,17 @@ class _DeliveredPageState extends ConsumerState<DeliveredPage> {
                     child: Text(
                       state.errorMessage ?? "Something went wrong",
                       textAlign: TextAlign.center,
+                      style: TextStyle(color: cs.error),
                     ),
                   ),
                   const SizedBox(height: 12),
                   Center(
                     child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: cs.primary,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                      ),
                       onPressed: () => ref
                           .read(driverViewModelProvider.notifier)
                           .loadMyOrders(),
@@ -78,18 +85,20 @@ class _DeliveredPageState extends ConsumerState<DeliveredPage> {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  const Center(
+                  Center(
                     child: Text(
                       "No delivered orders yet",
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
+                        color: cs.onSurface,
                       ),
                     ),
                   ),
                 ],
               );
             }
+
             return ListView.builder(
               physics: const AlwaysScrollableScrollPhysics(),
               itemCount: deliveredOrders.length,

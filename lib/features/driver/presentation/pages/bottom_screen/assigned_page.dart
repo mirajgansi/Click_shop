@@ -25,12 +25,14 @@ class _AssignedPageState extends ConsumerState<AssignedPage> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(driverViewModelProvider);
+    final cs = Theme.of(context).colorScheme;
 
     final assignedOrders = state.orders
         .where((o) => o.status == OrderStatus.shipped)
         .toList();
 
     return Scaffold(
+      backgroundColor: cs.background, // ✅ theme background
       body: RefreshIndicator(
         onRefresh: () =>
             ref.read(driverViewModelProvider.notifier).loadMyOrders(),
@@ -49,11 +51,17 @@ class _AssignedPageState extends ConsumerState<AssignedPage> {
                     child: Text(
                       state.errorMessage ?? "Something went wrong",
                       textAlign: TextAlign.center,
+                      style: TextStyle(color: cs.error), // ✅ error color
                     ),
                   ),
                   const SizedBox(height: 12),
                   Center(
                     child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: cs.primary, // ✅ theme primary
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                      ),
                       onPressed: () => ref
                           .read(driverViewModelProvider.notifier)
                           .loadMyOrders(),
@@ -77,12 +85,13 @@ class _AssignedPageState extends ConsumerState<AssignedPage> {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  const Center(
+                  Center(
                     child: Text(
                       "No assigned orders yet",
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
+                        color: cs.onSurface, // ✅ theme text
                       ),
                     ),
                   ),

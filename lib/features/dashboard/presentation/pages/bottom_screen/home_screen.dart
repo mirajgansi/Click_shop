@@ -27,6 +27,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
+    final bg = cs.brightness == Brightness.dark
+        ? cs.surface
+        : cs.primary.withOpacity(0.08);
+
+    final border = cs.brightness == Brightness.dark
+        ? cs.outlineVariant
+        : cs.primary.withOpacity(0.25);
+
     final state = ref.watch(productViewModelProvider);
     final allProducts = state.allProducts;
 
@@ -53,9 +63,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               )
               .toList();
 
-    final recentBase = state.recentProducts; // ✅ Recently Added
-    final popularBase = state.popularProducts; // ✅ Popular
-    final bestBase = state.trendingProducts; // ✅ Best Selling (using trending)
+    final recentBase = state.recentProducts;
+    final popularBase = state.popularProducts;
+    final bestBase = state.trendingProducts;
 
     // filter helper (search only affects displayed lists)
     List<ProductEntity> _filter(List<ProductEntity> list) {
@@ -68,7 +78,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final popularProducts = _filter(popularBase).take(10).toList();
     final bestSellingProducts = _filter(bestBase).take(10).toList();
 
-    // fallback: if API list empty, use allProducts (optional)
     final recent = recentProducts.isNotEmpty
         ? recentProducts
         : _filter(allProducts).take(10).toList();
@@ -79,10 +88,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ? bestSellingProducts
         : _filter(allProducts).take(10).toList();
 
-    return SafeArea(
+    return InkWell(
       child: CustomScrollView(
         slivers: [
-          // TOP: search + banner
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
@@ -101,7 +109,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
 
-          // Exclusive Offer header
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 6),
@@ -109,12 +116,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
 
-          // Exclusive Offer row (10 items)
           SliverToBoxAdapter(
             child: products.isEmpty
-                ? const Padding(
-                    padding: EdgeInsets.all(24),
-                    child: Center(child: Text("No products found")),
+                ? Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Center(
+                      child: Text(
+                        "No products found",
+                        style: TextStyle(color: cs.onSurface.withOpacity(0.7)),
+                      ),
+                    ),
                   )
                 : _HorizontalProductRow(products: recent),
           ),
@@ -126,7 +137,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
 
-          // Groceries row (rectangle categories)
           SliverToBoxAdapter(
             child: SizedBox(
               height: 86,
@@ -146,7 +156,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       borderColor: cat.border,
                       borderWidth: 1.2,
                       borderRadius: 16,
-                      aspectRatio: 2.8, // ✅ rectangle
+                      aspectRatio: 2.8,
                       onTap: () {
                         AppRoutes.push(
                           context,
@@ -162,7 +172,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
             ),
           ),
-          // Best Selling header
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
@@ -182,13 +191,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
 
-          // Popular row
           SliverToBoxAdapter(
             child: popular.isEmpty
                 ? const SizedBox.shrink()
                 : _HorizontalProductRow(products: popular),
           ),
-          // Groceries header
           const SliverToBoxAdapter(child: SizedBox(height: 18)),
         ],
       ),
@@ -300,14 +307,23 @@ class _SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     return Row(
       children: [
         Text(
           title,
-          style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16),
+          style: TextStyle(
+            fontWeight: FontWeight.w800,
+            fontSize: 16,
+            color: cs.onSurface,
+          ),
         ),
         const Spacer(),
-        TextButton(onPressed: onSeeAll, child: const Text("See all")),
+        TextButton(
+          onPressed: onSeeAll,
+          child: Text("See all", style: TextStyle(color: cs.primary)),
+        ),
       ],
     );
   }

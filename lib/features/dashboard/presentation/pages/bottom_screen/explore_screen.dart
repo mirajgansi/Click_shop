@@ -26,6 +26,8 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     final productState = ref.watch(productViewModelProvider);
     final searchedProducts = productState.allProducts;
     final filtered = appCategories.where((c) {
@@ -50,7 +52,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                 hintText: "Search Store",
                 prefixIcon: const Icon(Icons.search),
                 filled: true,
-                fillColor: const Color(0xFFF4F4F4),
+                fillColor: cs.surfaceVariant,
                 contentPadding: const EdgeInsets.symmetric(vertical: 12),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),

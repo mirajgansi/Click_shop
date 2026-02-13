@@ -2,7 +2,7 @@ import 'package:click_shop/features/dashboard/presentation/pages/bottom_screen/p
 import 'package:click_shop/features/driver/presentation/pages/bottom_screen/assigned_page.dart';
 import 'package:click_shop/features/driver/presentation/pages/bottom_screen/delivered_page.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class DriverHomePage extends StatefulWidget {
   const DriverHomePage({super.key});
@@ -14,7 +14,11 @@ class DriverHomePage extends StatefulWidget {
 class _DriverHomePageState extends State<DriverHomePage> {
   int _selectedIndex = 0;
 
-  final List<String> _titles = ["Assigned Orders", "Deliverd Orders", ""];
+  final List<String> _titles = [
+    "Assigned Orders",
+    "Delivered Orders",
+    "Account",
+  ];
 
   final List<Widget> lstBottomScreen = [
     const AssignedPage(),
@@ -26,13 +30,14 @@ class _DriverHomePageState extends State<DriverHomePage> {
     required String asset,
     required String label,
     required int index,
+    required Color color,
   }) {
     return BottomNavigationBarItem(
       icon: SvgPicture.asset(
         asset,
         width: 25,
         height: 25,
-        color: _selectedIndex == index ? const Color(0xFF53B175) : Colors.black,
+        colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
       ),
       label: label,
     );
@@ -40,13 +45,14 @@ class _DriverHomePageState extends State<DriverHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
+    final cs = Theme.of(context).colorScheme;
 
+    return Scaffold(
+      backgroundColor: cs.background,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         elevation: 0,
-        backgroundColor: Colors.white,
+        backgroundColor: cs.surface,
         title: Row(
           children: [
             Image.asset(
@@ -58,10 +64,10 @@ class _DriverHomePageState extends State<DriverHomePage> {
             const SizedBox(width: 10),
             Text(
               _titles[_selectedIndex],
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w800,
-                color: Colors.black,
+                color: cs.onSurface,
               ),
             ),
           ],
@@ -72,30 +78,41 @@ class _DriverHomePageState extends State<DriverHomePage> {
 
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
+        backgroundColor: cs.surface,
         currentIndex: _selectedIndex,
-        selectedItemColor: const Color(0xFF53B175),
-        unselectedItemColor: Colors.black,
+        selectedItemColor: cs.primary,
+        unselectedItemColor: cs.onSurface.withOpacity(0.6),
+
         onTap: (index) {
           setState(() {
             _selectedIndex = index;
           });
         },
+
         items: [
           _svgNavItem(
             asset: 'assets/icons/home.svg',
-            label: 'Assinged',
+            label: 'Assigned',
             index: 0,
+            color: _selectedIndex == 0
+                ? cs.primary
+                : cs.onSurface.withOpacity(0.6),
           ),
-
           _svgNavItem(
             asset: 'assets/icons/delivery.svg',
-            label: 'Deliverd',
+            label: 'Delivered',
             index: 1,
+            color: _selectedIndex == 1
+                ? cs.primary
+                : cs.onSurface.withOpacity(0.6),
           ),
           _svgNavItem(
             asset: 'assets/icons/account.svg',
             label: 'Account',
             index: 2,
+            color: _selectedIndex == 2
+                ? cs.primary
+                : cs.onSurface.withOpacity(0.6),
           ),
         ],
       ),

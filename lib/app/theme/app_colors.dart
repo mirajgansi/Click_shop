@@ -43,11 +43,6 @@ class AppColors {
   // Login/Auth Colors (Green theme)
   static const Color authPrimary = Color(0xFF4CAF50);
 
-  // Item Status Colors
-  static const Color lostColor = Color(0xFFE53935);
-  static const Color foundColor = Color(0xFF43A047);
-  static const Color claimedColor = Color(0xFF9E9E9E);
-
   // Onboarding Colors (Green-based)
   static const Color onboarding1Primary = Color(0xFF66BB6A);
   static const Color onboarding1Secondary = Color(0xFF43A047);

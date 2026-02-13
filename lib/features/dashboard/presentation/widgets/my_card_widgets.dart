@@ -5,6 +5,7 @@ import 'package:click_shop/features/dashboard/presentation/widgets/my_stock_badg
 import 'package:click_shop/features/product/presentation/pages/product_screen.dart';
 import 'package:click_shop/features/product/domain/entities/product_entity.dart';
 import 'package:flutter/material.dart';
+import 'package:path/path.dart';
 
 class CardWidget extends StatelessWidget {
   final ProductEntity product;
@@ -13,6 +14,8 @@ class CardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     return GestureDetector(
       onTap: () {
         if (product.id != null) {
@@ -25,6 +28,7 @@ class CardWidget extends StatelessWidget {
         }
       },
       child: Card(
+        color: cs.surface,
         elevation: 2,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         child: Padding(

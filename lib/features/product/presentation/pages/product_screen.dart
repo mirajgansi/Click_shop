@@ -49,6 +49,8 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     final state = ref.watch(productViewModelProvider);
 
     if (state.isLoading) {
@@ -68,17 +70,17 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
     }
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: cs.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: cs.surface,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(Icons.arrow_back, color: cs.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.share_outlined, color: Colors.black),
+            icon: Icon(Icons.share_outlined, color: cs.onSurface),
             onPressed: () => _toast("Share coming soon"),
           ),
         ],
@@ -89,7 +91,8 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
           height: 54,
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF4CAF50),
+              backgroundColor: cs.primary,
+              foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(14),
               ),
@@ -111,11 +114,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
             },
             child: const Text(
               "Add To Basket",
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
-              ),
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
           ),
         ),
@@ -130,7 +129,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
               margin: const EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16),
-                color: Colors.grey.shade100,
+                color: cs.surfaceVariant,
               ),
               child: Center(
                 child: (product.image.isEmpty)
@@ -158,9 +157,10 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                       Expanded(
                         child: Text(
                           product.name,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w700,
+                            color: cs.onSurface,
                           ),
                         ),
                       ),
@@ -170,26 +170,35 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                   ),
                   Text(
                     "Rs. ${product.price}",
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: Color(0xFF4CAF50),
+                      color: cs.primary,
                     ),
                   ),
 
                   const SizedBox(height: 12),
-                  const Divider(),
+                  Divider(color: cs.outlineVariant.withOpacity(0.6)),
 
                   sectionTitle("Product Info"),
                   const SizedBox(height: 8),
 
-                  infoTile("Category", product.category),
-                  infoTile("Manufacturer", product.manufacturer ?? "-"),
+                  infoTile(context, "Category", product.category),
                   infoTile(
+                    context,
+                    "Manufacturer",
+                    product.manufacturer ?? "-",
+                  ),
+                  infoTile(
+                    context,
                     "Manufacture Date",
                     _fmtDate(product.manufactureDate),
                   ),
-                  infoTile("Expire Date", _fmtDate(product.expireDate)),
+                  infoTile(
+                    context,
+                    "Expire Date",
+                    _fmtDate(product.expireDate),
+                  ),
 
                   const Divider(),
 
@@ -206,7 +215,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                             ? TextOverflow.visible
                             : TextOverflow.ellipsis,
                         style: TextStyle(
-                          color: Colors.grey.shade700,
+                          color: cs.onSurface.withOpacity(0.7),
                           height: 1.5,
                         ),
                       ),
@@ -220,8 +229,8 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                           padding: const EdgeInsets.only(top: 4),
                           child: Text(
                             isDescriptionExpanded ? "Show Less" : "Read More",
-                            style: const TextStyle(
-                              color: Color(0xFF4CAF50),
+                            style: TextStyle(
+                              color: cs.primary,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -245,7 +254,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                             ? TextOverflow.visible
                             : TextOverflow.ellipsis,
                         style: TextStyle(
-                          color: Colors.grey.shade700,
+                          color: cs.onSurface.withOpacity(0.7),
                           height: 1.5,
                         ),
                       ),
@@ -259,8 +268,8 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                           padding: const EdgeInsets.only(top: 4),
                           child: Text(
                             isNutritionExpanded ? "Show Less" : "Read More",
-                            style: const TextStyle(
-                              color: Color(0xFF4CAF50),
+                            style: TextStyle(
+                              color: cs.primary,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -280,13 +289,21 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
   }
 
   Widget sectionTitle(String title) {
+    final cs = Theme.of(context).colorScheme;
+
     return Text(
       title,
-      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+      style: TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.w600,
+        color: cs.onSurface,
+      ),
     );
   }
 
-  Widget infoTile(String label, String value) {
+  Widget infoTile(BuildContext context, String label, String value) {
+    final cs = Theme.of(context).colorScheme;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Row(
@@ -296,13 +313,16 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
             width: 130,
             child: Text(
               label,
-              style: const TextStyle(fontWeight: FontWeight.w600),
+              style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: cs.onSurface,
+              ),
             ),
           ),
           Expanded(
             child: Text(
               value.isEmpty ? "-" : value,
-              style: const TextStyle(color: Colors.black87),
+              style: TextStyle(color: cs.onSurface.withOpacity(0.8)),
             ),
           ),
         ],

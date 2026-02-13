@@ -34,7 +34,10 @@ class CategoryCard extends StatelessWidget {
     final imageMaxH = isTablet ? 52.0 : 80.0;
     final imageMaxW = isTablet ? 70.0 : 100.0;
     final titleSize = isTablet ? 12.5 : 13.5;
-
+    final textColor =
+        ThemeData.estimateBrightnessForColor(backgroundColor) == Brightness.dark
+        ? Colors.white
+        : Colors.black87;
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(borderRadius),
@@ -75,6 +78,7 @@ class CategoryCard extends StatelessWidget {
                 style: TextStyle(
                   fontSize: titleSize,
                   fontWeight: FontWeight.w700,
+                  color: textColor,
                 ),
               ),
             ],

@@ -1,3 +1,4 @@
+import 'package:click_shop/core/utils/snackbar_utils.dart';
 import 'package:click_shop/features/auth/domain/usecases/get_currentuacase.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -79,7 +80,7 @@ class _CheckoutBottomSheetState extends ConsumerState<_CheckoutBottomSheet> {
   Map<String, dynamic> _shippingToJson() {
     final map = <String, dynamic>{
       "userName": nameCtrl.text.trim(),
-      "phone": phoneCtrl.text.trim(), // ✅ string
+      "phone": phoneCtrl.text.trim(),
       "address1": address1Ctrl.text.trim(),
       "address2": address2Ctrl.text.trim(),
       "city": cityCtrl.text.trim(),
@@ -120,6 +121,7 @@ class _CheckoutBottomSheetState extends ConsumerState<_CheckoutBottomSheet> {
   @override
   Widget build(BuildContext context) {
     final orderState = ref.watch(orderViewModelProvider);
+    final cs = Theme.of(context).colorScheme;
 
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
@@ -131,9 +133,11 @@ class _CheckoutBottomSheetState extends ConsumerState<_CheckoutBottomSheet> {
           maxChildSize: 0.92,
           builder: (context, scrollCtrl) {
             return Container(
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+              decoration: BoxDecoration(
+                color: cs.surface,
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(24),
+                ),
               ),
               child: SingleChildScrollView(
                 controller: scrollCtrl,
@@ -147,7 +151,7 @@ class _CheckoutBottomSheetState extends ConsumerState<_CheckoutBottomSheet> {
                         width: 44,
                         height: 5,
                         decoration: BoxDecoration(
-                          color: Colors.black12,
+                          color: cs.onSurface.withOpacity(0.15),
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
@@ -157,17 +161,22 @@ class _CheckoutBottomSheetState extends ConsumerState<_CheckoutBottomSheet> {
                     // Header
                     Row(
                       children: [
-                        const Text(
+                        Text(
                           "Checkout",
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w800,
+                            color: cs.onSurface,
                           ),
                         ),
                         const Spacer(),
                         InkWell(
                           onTap: () => Navigator.pop(context),
-                          child: const Icon(Icons.close, size: 20),
+                          child: Icon(
+                            Icons.close,
+                            size: 20,
+                            color: cs.onSurface.withOpacity(0.7),
+                          ),
                         ),
                       ],
                     ),
@@ -255,11 +264,11 @@ class _CheckoutBottomSheetState extends ConsumerState<_CheckoutBottomSheet> {
                     const Divider(height: 1),
                     const SizedBox(height: 10),
 
-                    const Text(
+                    Text(
                       "By placing an order you agree to our Terms & Conditions.",
                       style: TextStyle(
                         fontSize: 11,
-                        color: Colors.black54,
+                        color: cs.onSurface.withOpacity(0.6),
                         height: 1.2,
                       ),
                     ),
@@ -271,7 +280,7 @@ class _CheckoutBottomSheetState extends ConsumerState<_CheckoutBottomSheet> {
                       height: 52,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF4CAF50),
+                          backgroundColor: cs.primary,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
                           ),
@@ -314,10 +323,9 @@ class _CheckoutBottomSheetState extends ConsumerState<_CheckoutBottomSheet> {
                                       .read(orderViewModelProvider.notifier)
                                       .clearActionSuccess();
                                   Navigator.pop(context); // close sheet
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text("Order created ✅"),
-                                    ),
+                                  SnackbarUtils.showSuccess(
+                                    context,
+                                    'Order created successfully',
                                   );
                                 }
                               },
@@ -330,11 +338,12 @@ class _CheckoutBottomSheetState extends ConsumerState<_CheckoutBottomSheet> {
                                   color: Colors.white,
                                 ),
                               )
-                            : const Text(
+                            : Text(
                                 "Place Order",
                                 style: TextStyle(
                                   fontWeight: FontWeight.w800,
                                   fontSize: 14,
+                                  color: cs.surface,
                                 ),
                               ),
                       ),
@@ -369,6 +378,8 @@ class _RowItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(14),
@@ -376,7 +387,7 @@ class _RowItem extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 10),
         child: Row(
           children: [
-            Icon(leadingIcon, size: 18, color: Colors.black54),
+            Icon(leadingIcon, size: 18, color: cs.onSurface.withOpacity(0.6)),
             const SizedBox(width: 10),
             Expanded(
               child: Text(
@@ -389,17 +400,17 @@ class _RowItem extends StatelessWidget {
             ),
             Text(
               trailing,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
-                color: Colors.black54,
+                color: cs.onSurface.withOpacity(0.6),
               ),
             ),
             const SizedBox(width: 8),
             if (trailingWidget != null) trailingWidget!,
             if (showChevron) ...[
               const SizedBox(width: 6),
-              const Icon(Icons.chevron_right, color: Colors.black38),
+              Icon(Icons.chevron_right, color: cs.onSurface.withOpacity(0.4)),
             ],
           ],
         ),
@@ -427,22 +438,30 @@ class _ShippingForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.grey.shade200),
+        color: cs.surfaceVariant,
+        border: Border.all(color: cs.outlineVariant.withOpacity(0.4)),
       ),
       child: Column(
         children: [
-          _field("Full Name", nameCtrl, TextInputType.name),
+          _field(context, "Full Name", nameCtrl, TextInputType.name),
           const SizedBox(height: 10),
-          _field("Phone", phoneCtrl, TextInputType.phone),
-          const SizedBox(height: 10),
-          _field("Address Line 1", address1Ctrl, TextInputType.streetAddress),
+          _field(context, "Phone", phoneCtrl, TextInputType.phone),
           const SizedBox(height: 10),
           _field(
+            context,
+            "Address Line 1",
+            address1Ctrl,
+            TextInputType.streetAddress,
+          ),
+          const SizedBox(height: 10),
+          _field(
+            context,
             "Address Line 2 (optional)",
             address2Ctrl,
             TextInputType.streetAddress,
@@ -451,11 +470,21 @@ class _ShippingForm extends StatelessWidget {
           Row(
             children: [
               Expanded(
-                child: _field("City (optional)", cityCtrl, TextInputType.text),
+                child: _field(
+                  context,
+                  "City (optional)",
+                  cityCtrl,
+                  TextInputType.text,
+                ),
               ),
               const SizedBox(width: 10),
               Expanded(
-                child: _field("ZIP (optional)", zipCtrl, TextInputType.number),
+                child: _field(
+                  context,
+                  "ZIP (optional)",
+                  zipCtrl,
+                  TextInputType.number,
+                ),
               ),
             ],
           ),
@@ -464,19 +493,32 @@ class _ShippingForm extends StatelessWidget {
     );
   }
 
-  Widget _field(String label, TextEditingController c, TextInputType type) {
+  Widget _field(
+    BuildContext context,
+    String label,
+    TextEditingController c,
+    TextInputType type,
+  ) {
+    final cs = Theme.of(context).colorScheme;
+
     return TextField(
       controller: c,
       keyboardType: type,
+      style: TextStyle(color: cs.onSurface),
       decoration: InputDecoration(
         labelText: label,
+        labelStyle: TextStyle(color: cs.onSurface.withOpacity(0.6)),
         isDense: true,
         filled: true,
-        fillColor: Colors.white,
+        fillColor: cs.surface,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade200),
+          borderSide: BorderSide(color: cs.outlineVariant.withOpacity(0.6)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: cs.primary, width: 1.4),
         ),
       ),
     );

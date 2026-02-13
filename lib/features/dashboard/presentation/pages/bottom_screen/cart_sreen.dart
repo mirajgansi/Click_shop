@@ -27,9 +27,10 @@ class _CartScreenState extends ConsumerState<CartScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(cartViewModelProvider);
+    final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: cs.background,
 
       body: state.isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -127,10 +128,12 @@ class _CartItemTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cs.surface,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: Colors.grey.shade200),
       ),
@@ -143,7 +146,7 @@ class _CartItemTile extends StatelessWidget {
             width: 54,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
-              color: Colors.grey.shade100,
+              color: cs.surfaceVariant,
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(12),
@@ -236,12 +239,14 @@ class _QtyControl extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     return Container(
       height: 34,
       padding: const EdgeInsets.symmetric(horizontal: 6),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: Colors.grey.shade300),
+        border: Border.all(color: cs.surfaceVariant),
       ),
       child: Row(
         children: [

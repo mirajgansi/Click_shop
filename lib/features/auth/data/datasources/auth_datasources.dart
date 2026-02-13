@@ -4,14 +4,6 @@ import 'package:click_shop/features/auth/data/models/auth_api_model.dart';
 import 'package:click_shop/features/auth/data/models/auth_hive_model.dart';
 import 'package:click_shop/features/auth/domain/entities/auth_entity.dart';
 
-// abstract interface class IAuthDatasource {
-//   Future<AuthHiveModel> register(AuthHiveModel user);
-//   Future<AuthHiveModel?> login(String email, String password);
-//   Future<AuthHiveModel?> getCurrentUser();
-//   Future<bool> logout();
-//   Future<bool> isEmailExists(String email);
-// }
-
 //use this for future
 abstract interface class IAuthLocalDataSource {
   Future<AuthHiveModel> register(AuthHiveModel user);

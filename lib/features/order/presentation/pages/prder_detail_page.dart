@@ -1,3 +1,4 @@
+import 'package:click_shop/core/utils/snackbar_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:click_shop/features/order/presentation/view_model/order_view_model.dart';
@@ -25,19 +26,23 @@ class _OrderDetailPageState extends ConsumerState<OrderDetailPage> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(orderViewModelProvider);
+    final cs = Theme.of(context).colorScheme;
 
     final order = state.selectedOrder;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: cs.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: cs.surface,
         elevation: 0,
-        title: const Text(
+        title: Text(
           "Order Details",
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.w800),
+          style: TextStyle(
+            color: cs.onSurface.withOpacity(0.6),
+            fontWeight: FontWeight.w800,
+          ),
         ),
-        iconTheme: const IconThemeData(color: Colors.black),
+        iconTheme: IconThemeData(color: cs.onSurface),
       ),
       body: state.isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -103,11 +108,14 @@ class _HeaderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
+        color: cs.surface,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: cs.outlineVariant.withOpacity(0.4)),
       ),
       child: Row(
         children: [
@@ -116,18 +124,27 @@ class _HeaderCard extends StatelessWidget {
               "Order #${order.id}",
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14),
+              style: TextStyle(
+                fontWeight: FontWeight.w800,
+                fontSize: 14,
+                color: cs.onSurface,
+              ),
             ),
           ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
-              color: Colors.grey.shade100,
+              color: cs.surfaceVariant,
               borderRadius: BorderRadius.circular(999),
+              border: Border.all(color: cs.outlineVariant.withOpacity(0.35)),
             ),
             child: Text(
               order.paymentStatus.name.toUpperCase(),
-              style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 11),
+              style: TextStyle(
+                fontWeight: FontWeight.w800,
+                fontSize: 11,
+                color: cs.onSurface,
+              ),
             ),
           ),
         ],
@@ -144,25 +161,30 @@ class _StatusCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(14),
-        color: Colors.grey.shade50,
-        border: Border.all(color: Colors.grey.shade200),
+        color: cs.surfaceVariant,
+        border: Border.all(color: cs.outlineVariant.withOpacity(0.4)),
       ),
       child: Row(
         children: [
-          const Icon(
+          Icon(
             Icons.local_shipping_outlined,
             size: 18,
-            color: Colors.black54,
+            color: cs.onSurface.withOpacity(0.6),
           ),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               "Status: ${status.toUpperCase()}",
-              style: const TextStyle(fontWeight: FontWeight.w800),
+              style: TextStyle(
+                fontWeight: FontWeight.w800,
+                color: cs.onSurface,
+              ),
             ),
           ),
           Text(
@@ -170,7 +192,7 @@ class _StatusCard extends StatelessWidget {
             style: TextStyle(
               fontWeight: FontWeight.w800,
               fontSize: 12,
-              color: canCancel ? Colors.green : Colors.redAccent,
+              color: canCancel ? cs.primary : cs.error,
             ),
           ),
         ],
@@ -186,19 +208,21 @@ class _ShippingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     final s = order.shippingAddress!;
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: cs.outlineVariant.withOpacity(0.4)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             "Shipping Address",
-            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14),
+            style: TextStyle(color: cs.onSurface.withOpacity(0.6)),
           ),
           const SizedBox(height: 8),
           Text(
@@ -211,7 +235,7 @@ class _ShippingCard extends StatelessWidget {
                 .where((e) => (e ?? "").trim().isNotEmpty)
                 .map((e) => e!)
                 .join(", "),
-            style: const TextStyle(color: Colors.black54),
+            style: TextStyle(color: cs.onSurface),
           ),
         ],
       ),
@@ -227,12 +251,14 @@ class _ItemTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final lineTotal = item.lineTotal;
+    final cs = Theme.of(context).colorScheme;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: cs.outlineVariant.withOpacity(0.4)),
       ),
       child: Row(
         children: [
@@ -252,8 +278,8 @@ class _ItemTile extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   "Qty: ${item.quantity}  •  Rs.${item.price}",
-                  style: const TextStyle(
-                    color: Colors.black54,
+                  style: TextStyle(
+                    color: cs.onSurface.withOpacity(0.6),
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -277,6 +303,8 @@ class _TotalsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     Widget row(String left, num right, {bool bold = false}) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -285,12 +313,14 @@ class _TotalsCard extends StatelessWidget {
             left,
             style: TextStyle(
               fontWeight: bold ? FontWeight.w800 : FontWeight.w600,
+              color: cs.onSurface,
             ),
           ),
           Text(
             "Rs.$right",
             style: TextStyle(
               fontWeight: bold ? FontWeight.w800 : FontWeight.w600,
+              color: cs.onSurface,
             ),
           ),
         ],
@@ -301,15 +331,15 @@ class _TotalsCard extends StatelessWidget {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(14),
-        color: Colors.grey.shade50,
-        border: Border.all(color: Colors.grey.shade200),
+        color: cs.surfaceVariant,
+        border: Border.all(color: cs.outlineVariant.withOpacity(0.4)),
       ),
       child: Column(
         children: [
           row("Subtotal", order.subtotal),
           const SizedBox(height: 6),
           row("Shipping", order.shippingFee),
-          const Divider(height: 18),
+          Divider(height: 18, color: cs.outlineVariant.withOpacity(0.6)),
           row("Total", order.total, bold: true),
         ],
       ),
@@ -324,6 +354,8 @@ class _CancelButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final cs = Theme.of(context).colorScheme;
+
     final state = ref.watch(orderViewModelProvider);
     final canCancel = order.status.name == "pending";
 
@@ -332,7 +364,7 @@ class _CancelButton extends ConsumerWidget {
       width: double.infinity,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: canCancel ? Colors.redAccent : Colors.grey.shade400,
+          backgroundColor: canCancel ? cs.error : cs.outlineVariant,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -387,9 +419,7 @@ class _CancelButton extends ConsumerWidget {
                   return;
                 }
 
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Order cancelled ✅")),
-                );
+                SnackbarUtils.showSuccess(context, "Order Cancelled");
 
                 await ref
                     .read(orderViewModelProvider.notifier)
@@ -406,7 +436,10 @@ class _CancelButton extends ConsumerWidget {
               )
             : Text(
                 canCancel ? "Cancel Order" : "Cannot Cancel",
-                style: const TextStyle(fontWeight: FontWeight.w800),
+                style: const TextStyle(
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
+                ),
               ),
       ),
     );

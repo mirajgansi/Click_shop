@@ -17,10 +17,20 @@ class DriverOrderDetailPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final a = order.shippingAddress;
+    final cs = Theme.of(context).colorScheme;
 
+    final a = order.shippingAddress;
     return Scaffold(
-      appBar: AppBar(title: const Text("Order Details")),
+      backgroundColor: cs.background,
+      appBar: AppBar(
+        backgroundColor: cs.surface,
+        foregroundColor: cs.onSurface,
+        elevation: 0,
+        title: Text(
+          "Order Details",
+          style: TextStyle(color: cs.onSurface, fontWeight: FontWeight.w800),
+        ),
+      ),
       body: ListView(
         padding: const EdgeInsets.all(12),
         children: [
@@ -50,7 +60,10 @@ class DriverOrderDetailPage extends ConsumerWidget {
                     total: item.lineTotal,
                     imagePath: item.image,
                   ),
-                  const Divider(height: 16),
+                  Divider(
+                    height: 16,
+                    color: cs.outlineVariant.withOpacity(0.6),
+                  ),
                 ],
               ],
             ),
@@ -118,6 +131,7 @@ class DriverOrderDetailPage extends ConsumerWidget {
             const SizedBox(height: 12),
 
             Card(
+              color: cs.surface,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -126,17 +140,26 @@ class DriverOrderDetailPage extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       "Actions",
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
+                        color: cs.onSurface,
                       ),
                     ),
                     const SizedBox(height: 10),
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: cs.primary,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
                         icon: const Icon(Icons.check),
                         label: const Text("Mark as Delivered"),
                         onPressed: () async {

@@ -10,14 +10,14 @@ class OrderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     final orderId = (order.id.isNotEmpty) ? order.id : "N/A";
     final shortId = orderId.length > 8
         ? orderId.substring(orderId.length - 8)
         : orderId;
 
-    final total = order.total; // double/num
-    final status =
-        order.status.name; // if enum -> .name, else change to order.status
+    final total = order.total;
 
     return InkWell(
       onTap: onTap,
@@ -25,22 +25,24 @@ class OrderCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: cs.surface, // ✅ was white
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.grey.shade200),
+          border: Border.all(
+            color: cs.outlineVariant.withOpacity(0.4), // ✅ was grey
+          ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Top row: Order # + Status badge
             Row(
               children: [
                 Expanded(
                   child: Text(
                     "Order #$shortId",
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.w800,
                       fontSize: 14,
+                      color: cs.onSurface, // ✅
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -51,22 +53,22 @@ class OrderCard extends StatelessWidget {
 
             const SizedBox(height: 10),
 
-            // Total + Date
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   "Total: Rs.${total.toString()}",
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.w800,
                     fontSize: 13,
+                    color: cs.onSurface,
                   ),
                 ),
                 Text(
                   _formatDate(order.createdAt),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
-                    color: Colors.black54,
+                    color: cs.onSurface.withOpacity(0.6),
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -75,10 +77,12 @@ class OrderCard extends StatelessWidget {
 
             const SizedBox(height: 10),
 
-            // Items count (optional)
             Text(
               "${order.items.length} item(s)",
-              style: const TextStyle(fontSize: 12, color: Colors.black54),
+              style: TextStyle(
+                fontSize: 12,
+                color: cs.onSurface.withOpacity(0.6), // ✅ was black54
+              ),
             ),
           ],
         ),
@@ -88,7 +92,6 @@ class OrderCard extends StatelessWidget {
 
   static String _formatDate(DateTime? dt) {
     if (dt == null) return "";
-    // quick formatting (no intl)
     return "${dt.year}-${dt.month.toString().padLeft(2, "0")}-${dt.day.toString().padLeft(2, "0")}";
   }
 }

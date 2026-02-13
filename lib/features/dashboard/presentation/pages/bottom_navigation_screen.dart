@@ -36,13 +36,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
     required String asset,
     required String label,
     required int index,
+    required Color color,
   }) {
     return BottomNavigationBarItem(
       icon: SvgPicture.asset(
         asset,
         width: 25,
         height: 25,
-        color: _selectedIndex == index ? const Color(0xFF53B175) : Colors.black,
+        colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
       ),
       label: label,
     );
@@ -50,13 +51,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      // ✅ Use theme background
+      backgroundColor: cs.background,
 
       appBar: AppBar(
         automaticallyImplyLeading: false,
         elevation: 0,
-        backgroundColor: Colors.white,
+        // ✅ Let theme control appbar color
+        backgroundColor: cs.surface,
         title: Row(
           children: [
             Image.asset(
@@ -68,10 +73,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
             const SizedBox(width: 10),
             Text(
               _titles[_selectedIndex],
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w800,
-                color: Colors.black,
+                color: cs.onSurface, // ✅ dynamic
               ),
             ),
           ],
@@ -83,30 +88,58 @@ class _DashboardScreenState extends State<DashboardScreen> {
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: _selectedIndex,
-        selectedItemColor: const Color(0xFF53B175),
-        unselectedItemColor: Colors.black,
+
+        // ✅ Use theme colors
+        backgroundColor: cs.surface,
+        selectedItemColor: cs.primary,
+        unselectedItemColor: cs.onSurface.withOpacity(0.6),
+
         onTap: (index) {
           setState(() {
             _selectedIndex = index;
           });
         },
+
         items: [
-          _svgNavItem(asset: 'assets/icons/home.svg', label: 'Home', index: 0),
+          _svgNavItem(
+            asset: 'assets/icons/home.svg',
+            label: 'Home',
+            index: 0,
+            color: _selectedIndex == 0
+                ? cs.primary
+                : cs.onSurface.withOpacity(0.6),
+          ),
           _svgNavItem(
             asset: 'assets/icons/explore.svg',
             label: 'Explore',
             index: 1,
+            color: _selectedIndex == 1
+                ? cs.primary
+                : cs.onSurface.withOpacity(0.6),
           ),
-          _svgNavItem(asset: 'assets/icons/cart.svg', label: 'Cart', index: 2),
+          _svgNavItem(
+            asset: 'assets/icons/cart.svg',
+            label: 'Cart',
+            index: 2,
+            color: _selectedIndex == 2
+                ? cs.primary
+                : cs.onSurface.withOpacity(0.6),
+          ),
           _svgNavItem(
             asset: 'assets/icons/delivery.svg',
             label: 'Order',
             index: 3,
+            color: _selectedIndex == 3
+                ? cs.primary
+                : cs.onSurface.withOpacity(0.6),
           ),
           _svgNavItem(
             asset: 'assets/icons/account.svg',
             label: 'Account',
             index: 4,
+            color: _selectedIndex == 4
+                ? cs.primary
+                : cs.onSurface.withOpacity(0.6),
           ),
         ],
       ),

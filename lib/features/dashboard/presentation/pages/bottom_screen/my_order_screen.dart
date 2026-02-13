@@ -23,9 +23,10 @@ class _MyOrdersPageState extends ConsumerState<MyOrdersPage> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(orderViewModelProvider);
+    final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: cs.background,
 
       body: RefreshIndicator(
         onRefresh: () =>
@@ -39,16 +40,25 @@ class _MyOrdersPageState extends ConsumerState<MyOrdersPage> {
                   Center(
                     child: Text(
                       state.errorMessage!,
-                      style: const TextStyle(color: Colors.red),
+                      style: TextStyle(color: cs.error),
+                      textAlign: TextAlign.center,
                     ),
                   ),
                 ],
               )
             : state.orders.isEmpty
             ? ListView(
-                children: const [
-                  SizedBox(height: 140),
-                  Center(child: Text("No orders yet")),
+                children: [
+                  const SizedBox(height: 140),
+                  Center(
+                    child: Text(
+                      "No orders yet",
+                      style: TextStyle(
+                        color: cs.onSurface.withOpacity(0.7),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
                 ],
               )
             : ListView.separated(

@@ -1,3 +1,4 @@
+import 'package:click_shop/app/theme/app_theme.dart';
 import 'package:click_shop/core/services/hive/hive_service.dart';
 import 'package:click_shop/core/services/storage/user_session_service.dart';
 import 'package:click_shop/features/driver/presentation/pages/driver_home_page.dart';
@@ -16,12 +17,12 @@ void main() async {
   final hiveService = HiveService();
   await hiveService.init();
 
-  //shared prefrence
   final sharedPrefs = await SharedPreferences.getInstance();
+
   runApp(
     ProviderScope(
       overrides: [SharedPreferencesProvider.overrideWithValue(sharedPrefs)],
-      child: MyApp(),
+      child: const MyApp(),
     ),
   );
 }
@@ -30,9 +31,12 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContextcontext) {
+  Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      theme: AppTheme.light(),
+      darkTheme: AppTheme.dark(),
+      themeMode: ThemeMode.system,
       initialRoute: '/',
       routes: {
         '/': (context) => const AppStartScreen(),
