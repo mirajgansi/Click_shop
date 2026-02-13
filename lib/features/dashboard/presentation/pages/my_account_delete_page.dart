@@ -26,6 +26,8 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     final authState = ref.watch(AuthViewModelProvider);
     final vm = ref.read(AuthViewModelProvider.notifier);
 
@@ -33,20 +35,16 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
     final isLoading = authState.status == AuthStatus.loading;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: cs.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: cs.surface,
         elevation: 0.5,
-        title: const Text(
+        title: Text(
           "Delete my account",
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
+          style: TextStyle(color: cs.onSurface, fontWeight: FontWeight.w600),
         ),
         leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios_new,
-            color: Colors.black,
-            size: 18,
-          ),
+          icon: Icon(Icons.arrow_back_ios_new, color: cs.onSurface, size: 18),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -61,8 +59,11 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
                 children: [
                   CircleAvatar(
                     radius: 22,
-                    backgroundColor: Colors.grey.shade200,
-                    child: const Icon(Icons.person, color: Colors.black54),
+                    backgroundColor: cs.surfaceVariant,
+                    child: Icon(
+                      Icons.person,
+                      color: cs.onSurface.withOpacity(0.6),
+                    ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -71,10 +72,10 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
                       children: [
                         Text(
                           user?.username ?? "Your name",
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
-                            color: Colors.black,
+                            color: cs.onSurface,
                           ),
                         ),
                         const SizedBox(height: 3),
@@ -82,7 +83,7 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
                           user?.email ?? "",
                           style: TextStyle(
                             fontSize: 12.5,
-                            color: Colors.grey.shade600,
+                            color: cs.onSurface.withOpacity(0.65),
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -94,12 +95,12 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
 
               const SizedBox(height: 22),
 
-              const Text(
+              Text(
                 "Confirm your password",
                 style: TextStyle(
                   fontSize: 14.5,
                   fontWeight: FontWeight.w700,
-                  color: Colors.black,
+                  color: cs.onSurface,
                 ),
               ),
               const SizedBox(height: 8),
@@ -108,7 +109,7 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
                 style: TextStyle(
                   fontSize: 12.5,
                   height: 1.35,
-                  color: Colors.grey.shade700,
+                  color: cs.onSurface.withOpacity(0.7),
                 ),
               ),
 
@@ -119,26 +120,37 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
                 child: TextFormField(
                   controller: _passwordController,
                   obscureText: _obscure,
+                  style: TextStyle(color: cs.onSurface),
                   decoration: InputDecoration(
                     hintText: "Password",
+                    hintStyle: TextStyle(color: cs.onSurface.withOpacity(0.45)),
                     filled: true,
-                    fillColor: Colors.grey.shade100,
+                    fillColor: cs.surfaceVariant,
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 14,
                       vertical: 14,
                     ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(color: Colors.grey.shade300),
+                      borderSide: BorderSide(
+                        color: cs.outlineVariant.withOpacity(0.6),
+                      ),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide(color: Colors.grey.shade300),
+                      borderSide: BorderSide(
+                        color: cs.outlineVariant.withOpacity(0.6),
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide(color: cs.primary, width: 1.4),
                     ),
                     suffixIcon: IconButton(
                       onPressed: () => setState(() => _obscure = !_obscure),
                       icon: Icon(
                         _obscure ? Icons.visibility_off : Icons.visibility,
+                        color: cs.onSurface.withOpacity(0.7),
                       ),
                     ),
                   ),
@@ -159,8 +171,8 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
                   padding: const EdgeInsets.only(bottom: 10),
                   child: Text(
                     authState.errorMessage ?? "Something went wrong",
-                    style: const TextStyle(
-                      color: Colors.red,
+                    style: TextStyle(
+                      color: cs.error,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -171,9 +183,7 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
                 height: 50,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(
-                      0xFFE53935,
-                    ), // red like screenshot
+                    backgroundColor: cs.error, // ✅ theme error (red)
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -186,13 +196,19 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
                           if (!(_formKey.currentState?.validate() ?? false))
                             return;
 
-                          // optional: confirm dialog
                           final ok = await showDialog<bool>(
                             context: context,
                             builder: (_) => AlertDialog(
-                              title: const Text("Delete account?"),
-                              content: const Text(
+                              backgroundColor: cs.surface,
+                              title: Text(
+                                "Delete account?",
+                                style: TextStyle(color: cs.onSurface),
+                              ),
+                              content: Text(
                                 "This action is permanent and cannot be undone.",
+                                style: TextStyle(
+                                  color: cs.onSurface.withOpacity(0.75),
+                                ),
                               ),
                               actions: [
                                 TextButton(
@@ -203,7 +219,7 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
                                 TextButton(
                                   onPressed: () => Navigator.pop(context, true),
                                   style: TextButton.styleFrom(
-                                    foregroundColor: Colors.red,
+                                    foregroundColor: cs.error,
                                   ),
                                   child: const Text("Delete"),
                                 ),

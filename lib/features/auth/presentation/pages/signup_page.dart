@@ -64,6 +64,8 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     final authState = ref.watch(AuthViewModelProvider);
     //Listen to auth state changes
     ref.listen<AuthState>(AuthViewModelProvider, (previous, next) {
@@ -93,7 +95,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                 Expanded(
                   flex: 1,
                   child: Container(
-                    color: Colors.grey.shade100,
+                    color: cs.surfaceVariant,
                     child: Center(
                       child: Image.asset('assets/images/8140 1.jpg'),
                     ),
@@ -121,20 +123,22 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                             ),
 
                           const SizedBox(height: 20),
-
-                          const Text(
+                          Text(
                             'Signup',
                             style: TextStyle(
                               fontSize: 32,
                               fontWeight: FontWeight.bold,
+                              color: cs.onSurface,
                             ),
                           ),
 
                           const SizedBox(height: 10),
-
-                          const Text(
+                          Text(
                             "Enter your credentials to continue",
-                            style: TextStyle(fontSize: 16, color: Colors.black),
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: cs.onSurface.withOpacity(0.7),
+                            ),
                           ),
 
                           const SizedBox(height: 20),
@@ -214,16 +218,24 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                             children: [
                               Checkbox(
                                 value: _agreedToTerms,
+                                activeColor: cs.primary,
+                                checkColor: Colors.white,
+                                side: BorderSide(
+                                  color: cs.outlineVariant.withOpacity(0.8),
+                                ),
                                 onChanged: (value) {
                                   setState(() {
                                     _agreedToTerms = value ?? false;
                                   });
                                 },
                               ),
-                              const Expanded(
+                              Expanded(
                                 child: Text(
                                   "I agree to the Terms of Service and Privacy Policy",
-                                  style: TextStyle(fontSize: 14),
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: cs.onSurface.withOpacity(0.75),
+                                  ),
                                 ),
                               ),
                             ],
@@ -243,17 +255,17 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                             child: RichText(
                               text: TextSpan(
                                 text: "Already have an account? ",
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 16,
-                                  color: Colors.black,
+                                  color: cs.onSurface,
                                   fontWeight: FontWeight.bold,
                                 ),
                                 children: [
                                   TextSpan(
                                     text: "Log in",
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 16,
-                                      color: Colors.green,
+                                      color: cs.primary,
                                       decoration: TextDecoration.underline,
                                     ),
                                     recognizer: TapGestureRecognizer()

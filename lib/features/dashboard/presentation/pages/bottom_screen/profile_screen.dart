@@ -262,16 +262,26 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     final authState = ref.watch(currentUserViewModelProvider);
 
     if (authState.status == AuthStatus.error) {
       return Center(
-        child: Text(authState.errorMessage ?? 'An unexpected error occurred'),
+        child: Text(
+          authState.errorMessage ?? 'An unexpected error occurred',
+          style: TextStyle(color: cs.error),
+        ),
       );
     }
     final user = authState.user;
     if (user == null) {
-      return const Text("User not available yet");
+      return Center(
+        child: Text(
+          "User not available yet",
+          style: TextStyle(color: cs.onSurface),
+        ),
+      );
     }
 
     final name = user.username ?? "No name";
@@ -297,151 +307,158 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
         bool notificationsEnabled = true;
 
-        return SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  GestureDetector(
-                    onTap: () => _pickMediaDailog(context),
-                    child: CircleAvatar(
-                      radius: avatarRadius,
-                      backgroundImage: _selectedMedia.isNotEmpty
-                          ? FileImage(File(_selectedMedia.first.path))
-                          : (imageUrl != null
-                                ? NetworkImage(imageUrl)
-                                : const AssetImage('assets/images/Group.jpg')
-                                      as ImageProvider),
+        return Container(
+          color: cs.background,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    GestureDetector(
+                      onTap: () => _pickMediaDailog(context),
+                      child: CircleAvatar(
+                        radius: avatarRadius,
+                        backgroundImage: _selectedMedia.isNotEmpty
+                            ? FileImage(File(_selectedMedia.first.path))
+                            : (imageUrl != null
+                                  ? NetworkImage(imageUrl)
+                                  : const AssetImage('assets/images/Group.jpg')
+                                        as ImageProvider),
+                      ),
                     ),
-                  ),
 
-                  SizedBox(width: spacingH),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Text(
-                              name,
-                              style: TextStyle(
-                                fontSize: fontName,
-                                fontWeight: FontWeight.bold,
+                    SizedBox(width: spacingH),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                name,
+                                style: TextStyle(
+                                  fontSize: fontName,
+                                  fontWeight: FontWeight.bold,
+                                  color: cs.onSurface,
+                                ),
                               ),
-                            ),
-                            SizedBox(width: spacingH / 2),
-                            Icon(
-                              Icons.edit,
-                              size: iconSize,
-                              color: Colors.grey,
-                            ),
-                          ],
-                        ),
+                              SizedBox(width: spacingH / 2),
+                              Icon(
+                                Icons.edit,
+                                size: iconSize,
+                                color: cs.onSurface.withOpacity(0.55),
+                              ),
+                            ],
+                          ),
 
-                        const SizedBox(height: 4),
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.email,
-                              size: iconSize,
-                              color: Colors.grey,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              email,
-                              style: TextStyle(
-                                fontSize: fontEmail,
-                                color: Colors.grey,
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.email,
+                                size: iconSize,
+                                color: cs.onSurface.withOpacity(0.55),
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
+                              const SizedBox(width: 4),
+                              Text(
+                                email,
+                                style: TextStyle(
+                                  fontSize: fontEmail,
+                                  color: cs.onSurface.withOpacity(0.65),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
-
-              Divider(thickness: dividerThickness, height: 32),
-
-              Column(
-                children: [
-                  MyMenuItemWidget(
-                    icon: Icons.person,
-                    title: "My Details",
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const MyDetailsScreen(),
-                        ),
-                      );
-                    },
-                  ),
-
-                  // MyMenuItemWidget(
-                  //   icon: Icons.location_on_outlined,
-                  //   title: "Delivery address",
-                  //   onTap: () {
-                  //     Navigator.push(
-                  //       context,
-                  //       MaterialPageRoute(
-                  //         builder: (_) => const DeliveryAddressScreen(),
-                  //       ),
-                  //     );
-                  //   },
-                  // ),
-                  MyMenuItemWidget(
-                    icon: Icons.notifications,
-                    title: "Delete My Account",
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const DeleteAccountScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                  MyMenuItemWidget(
-                    icon: Icons.help_outline,
-                    title: "Help",
-                    onTap: () => Navigator.pushNamed(context, "/help"),
-                  ),
-
-                  MyMenuItemWidget(
-                    icon: Icons.info_outline,
-                    title: "About",
-                    onTap: () => Navigator.pushNamed(context, "/about"),
-                  ),
-                ],
-              ),
-
-              SizedBox(height: 200),
-
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: MyButtonWidgets(
-                  text: 'Log Out',
-                  onPressed: () async {
-                    await ref.read(UserSessionServiceProvider).logout();
-
-                    if (!context.mounted) return;
-                    Navigator.pushNamedAndRemoveUntil(
-                      context,
-                      '/login',
-                      (route) => false,
-                    );
-                  },
-                  height: 12,
-                  borderRadius: 12,
+                  ],
                 ),
-              ),
-            ],
+
+                Divider(
+                  thickness: dividerThickness,
+                  height: 32,
+                  color: cs.outlineVariant.withOpacity(0.6),
+                ),
+                Column(
+                  children: [
+                    MyMenuItemWidget(
+                      icon: Icons.person,
+                      title: "My Details",
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const MyDetailsScreen(),
+                          ),
+                        );
+                      },
+                    ),
+
+                    // MyMenuItemWidget(
+                    //   icon: Icons.location_on_outlined,
+                    //   title: "Delivery address",
+                    //   onTap: () {
+                    //     Navigator.push(
+                    //       context,
+                    //       MaterialPageRoute(
+                    //         builder: (_) => const DeliveryAddressScreen(),
+                    //       ),
+                    //     );
+                    //   },
+                    // ),
+                    MyMenuItemWidget(
+                      icon: Icons.delete_forever_outlined,
+                      title: "Delete My Account",
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const DeleteAccountScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                    MyMenuItemWidget(
+                      icon: Icons.help_outline,
+                      title: "Help",
+                      onTap: () => Navigator.pushNamed(context, "/help"),
+                    ),
+
+                    MyMenuItemWidget(
+                      icon: Icons.info_outline,
+                      title: "About",
+                      onTap: () => Navigator.pushNamed(context, "/about"),
+                    ),
+                  ],
+                ),
+
+                SizedBox(height: 200),
+
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: MyButtonWidgets(
+                    text: 'Log Out',
+                    onPressed: () async {
+                      await ref.read(UserSessionServiceProvider).logout();
+
+                      if (!context.mounted) return;
+                      Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        '/login',
+                        (route) => false,
+                      );
+                    },
+                    height: 12,
+                    borderRadius: 12,
+                  ),
+                ),
+              ],
+            ),
           ),
         );
       },

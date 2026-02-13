@@ -7,12 +7,15 @@ class StockPillBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     final bool available = stock != null && stock! > 0;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: available ? const Color(0xFFE9F8EC) : const Color(0xFFFDECEC),
+        color: available
+            ? cs.primary.withOpacity(0.12)
+            : cs.error.withOpacity(0.12),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
@@ -21,11 +24,11 @@ class StockPillBadge extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
-              color: available ? const Color(0xFF22C55E) : Colors.red,
+              color: available ? cs.primary : cs.error,
               shape: BoxShape.circle,
             ),
             child: Icon(
-              available ? Icons.percent : Icons.close,
+              available ? Icons.check : Icons.close,
               size: 14,
               color: Colors.white,
             ),
@@ -34,10 +37,10 @@ class StockPillBadge extends StatelessWidget {
           const SizedBox(width: 8),
 
           Text(
-            available ? "${(stock!)}+ in stock " : "Unavailable",
+            available ? "${stock!}+ in stock" : "Unavailable",
             style: TextStyle(
-              color: available ? const Color(0xFF16A34A) : Colors.red,
-              fontSize: 14,
+              color: available ? cs.primary : cs.error,
+              fontSize: 13,
               fontWeight: FontWeight.w600,
             ),
           ),

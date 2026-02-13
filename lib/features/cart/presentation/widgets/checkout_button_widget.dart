@@ -57,7 +57,7 @@ class _CheckoutButtonState extends State<CheckoutButton> {
   void dispose() {
     _accelerometerSub?.cancel();
     super.dispose();
-  } // ✅ THIS WAS MISSING
+  }
 
   @override
   Widget build(BuildContext context) {

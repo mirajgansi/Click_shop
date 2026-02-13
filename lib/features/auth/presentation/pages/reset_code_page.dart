@@ -49,8 +49,11 @@ class _ResetCodePageState extends State<ResetCodePage> {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final email = widget.initialEmail ?? _emailCtrl.text;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F7FB),
+      backgroundColor: cs.background,
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
@@ -58,13 +61,18 @@ class _ResetCodePageState extends State<ResetCodePage> {
             constraints: const BoxConstraints(maxWidth: 420),
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: cs.surface,
               borderRadius: BorderRadius.circular(22),
-              boxShadow: const [
+              border: Border.all(color: cs.outlineVariant.withOpacity(0.6)),
+              boxShadow: [
                 BoxShadow(
                   blurRadius: 22,
-                  color: Colors.black12,
-                  offset: Offset(0, 8),
+                  color: Colors.black.withOpacity(
+                    Theme.of(context).brightness == Brightness.dark
+                        ? 0.18
+                        : 0.08,
+                  ),
+                  offset: const Offset(0, 8),
                 ),
               ],
             ),
@@ -73,56 +81,56 @@ class _ResetCodePageState extends State<ResetCodePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     "Verify code",
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w700,
+                      color: cs.onSurface,
+                    ),
                   ),
                   const SizedBox(height: 6),
-                  const Text(
-                    "Enter the 6-digit code sent to your email.",
-                    style: TextStyle(color: Colors.black54),
-                  ),
-                  const SizedBox(height: 18),
-
-                  const Text(
-                    "Email",
-                    style: TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                  const SizedBox(height: 8),
-                  TextFormField(
-                    controller: _emailCtrl,
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: InputDecoration(
-                      hintText: "you@example.com",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14),
+                  RichText(
+                    text: TextSpan(
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: cs.onSurface.withOpacity(0.75),
                       ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 12,
-                      ),
+                      children: [
+                        const TextSpan(
+                          text: "Enter the 6-digit code sent to your ",
+                        ),
+                        TextSpan(
+                          text: email,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            color: cs.primary,
+                          ),
+                        ),
+                      ],
                     ),
-                    validator: (v) {
-                      final s = (v ?? "").trim();
-                      if (s.isEmpty) return "Email is required";
-                      final ok = RegExp(r'^[^@]+@[^@]+\.[^@]+$').hasMatch(s);
-                      if (!ok) return "Invalid email";
-                      return null;
-                    },
                   ),
 
                   const SizedBox(height: 16),
-                  const Text(
+                  Text(
                     "Reset code",
-                    style: TextStyle(fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      color: cs.onSurface,
+                    ),
                   ),
                   const SizedBox(height: 10),
+
                   OtpInput(length: 6, onChanged: (v) => _code = v),
+
                   const SizedBox(height: 10),
-                  const Center(
+                  Center(
                     child: Text(
                       "Code expires in 10 minutes.",
-                      style: TextStyle(color: Colors.black54, fontSize: 12),
+                      style: TextStyle(
+                        color: cs.onSurface.withOpacity(0.65),
+                        fontSize: 12,
+                      ),
                     ),
                   ),
 
@@ -132,10 +140,12 @@ class _ResetCodePageState extends State<ResetCodePage> {
                     height: 46,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
+                        backgroundColor: cs.primary,
+                        foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
                         ),
+                        elevation: 0,
                       ),
                       onPressed: _next,
                       child: const Text("Next"),
@@ -145,10 +155,11 @@ class _ResetCodePageState extends State<ResetCodePage> {
                   const SizedBox(height: 12),
                   Center(
                     child: TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: const Text("Resend code"),
+                      onPressed: () => Navigator.pop(context),
+                      child: Text(
+                        "Resend code",
+                        style: TextStyle(color: cs.primary),
+                      ),
                     ),
                   ),
                 ],

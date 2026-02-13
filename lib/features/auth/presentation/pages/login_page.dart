@@ -72,9 +72,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final secondaryTextColor =
-        Theme.of(context).textTheme.bodySmall?.color ?? AppColors.textMuted;
+    final secondaryTextColor = cs.onSurface.withOpacity(0.7);
 
     final authState = ref.watch(AuthViewModelProvider);
 
@@ -98,7 +99,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               if (isTablet)
                 Expanded(
                   child: Container(
-                    color: Colors.grey.shade100,
+                    color: cs.surfaceVariant,
                     child: Center(
                       child: Image.asset(
                         'assets/images/8140 1.jpg',
@@ -130,21 +131,21 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
                         const SizedBox(height: 20),
 
-                        const Text(
+                        Text(
                           'Login',
                           style: TextStyle(
                             fontSize: 32,
                             fontWeight: FontWeight.bold,
+                            color: cs.onSurface,
                           ),
                         ),
 
                         const SizedBox(height: 10),
-
-                        const Text(
+                        Text(
                           "Enter your Email and Password",
                           style: TextStyle(
                             fontSize: 16,
-                            color: Colors.black,
+                            color: cs.onSurface.withOpacity(0.7),
                             fontWeight: FontWeight.normal,
                           ),
                         ),
@@ -171,11 +172,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         GestureDetector(
                           onTap: () =>
                               Navigator.pushNamed(context, '/forgotpassword'),
-                          child: const Text(
+                          child: Text(
                             "Forgot Password?",
                             style: TextStyle(
                               fontSize: 16,
-                              color: Colors.blueGrey,
+                              color: cs.primary,
                               fontWeight: FontWeight.normal,
                             ),
                           ),
@@ -206,7 +207,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                 ),
                               ),
                             ),
-                            Expanded(child: Divider()),
+                            Expanded(
+                              child: Divider(
+                                color: cs.outlineVariant.withOpacity(0.7),
+                              ),
+                            ),
                           ],
                         ),
                         const SizedBox(height: 24),
@@ -230,6 +235,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                 ),
                                 label: Text('Google'),
                                 style: OutlinedButton.styleFrom(
+                                  foregroundColor: cs.onSurface,
+                                  side: BorderSide(
+                                    color: cs.outlineVariant.withOpacity(0.8),
+                                  ),
                                   padding: const EdgeInsets.symmetric(
                                     vertical: 16,
                                   ),
@@ -256,6 +265,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                 ),
                                 label: Text('Apple'),
                                 style: OutlinedButton.styleFrom(
+                                  foregroundColor: cs.onSurface,
+                                  side: BorderSide(
+                                    color: cs.outlineVariant.withOpacity(0.8),
+                                  ),
                                   padding: const EdgeInsets.symmetric(
                                     vertical: 16,
                                   ),
@@ -273,17 +286,18 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                           child: RichText(
                             text: TextSpan(
                               text: "Don't have an account? ",
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 16,
-                                color: Colors.black,
+                                color: cs.onSurface,
                                 fontWeight: FontWeight.bold,
                               ),
+
                               children: [
                                 TextSpan(
                                   text: "Sign up",
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 16,
-                                    color: Colors.green,
+                                    color: cs.primary,
                                     fontWeight: FontWeight.bold,
                                     decoration: TextDecoration.underline,
                                   ),

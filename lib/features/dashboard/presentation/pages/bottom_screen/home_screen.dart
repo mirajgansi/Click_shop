@@ -112,7 +112,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 6),
-              child: _SectionHeader(title: "Exclusive Offer", onSeeAll: () {}),
+              child: _SectionHeader(title: "Recently Added", onSeeAll: () {}),
             ),
           ),
 

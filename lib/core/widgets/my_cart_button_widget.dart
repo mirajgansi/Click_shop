@@ -1,3 +1,4 @@
+import 'package:click_shop/core/utils/snackbar_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -41,17 +42,10 @@ class _MyCartButtonWidgetState extends ConsumerState<MyCartButtonWidget> {
                     setState(() => isLoading = false);
 
                     if (!context.mounted) return;
-
                     if (success) {
-                      MotionToast.success(
-                        description: const Text("Item added to cart"),
-                        toastDuration: const Duration(seconds: 1),
-                      ).show(context);
+                      SnackbarUtils.showSuccess(context, "Item addded to cart");
                     } else {
-                      MotionToast.error(
-                        description: const Text("Failed to add item"),
-                        toastDuration: const Duration(seconds: 1),
-                      ).show(context);
+                      SnackbarUtils.showError(context, "Failed to add to Cart");
                     }
                   },
             style: ElevatedButton.styleFrom(

@@ -31,37 +31,44 @@ class _MyTextFieldWidgetsState extends State<MyTextFieldWidgets> {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     return TextFormField(
       controller: widget.controller,
       obscureText: _obscure,
+      style: TextStyle(color: cs.onSurface),
       decoration: InputDecoration(
         hintText: widget.hintText,
+        hintStyle: TextStyle(color: cs.onSurface.withOpacity(0.45)),
         labelText: widget.text,
         labelStyle: TextStyle(
           fontSize: 16,
-          color: Colors.black,
+          color: cs.onSurface.withOpacity(0.75),
           fontWeight: FontWeight.normal,
         ),
 
         enabledBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.grey),
+          borderSide: BorderSide(color: cs.outlineVariant.withOpacity(0.8)),
         ),
 
         focusedBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.blueGrey, width: 2),
+          borderSide: BorderSide(color: cs.primary, width: 2),
         ),
 
         errorBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.red, width: 2),
+          borderSide: BorderSide(color: cs.error, width: 2),
         ),
 
         focusedErrorBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.red, width: 2),
+          borderSide: BorderSide(color: cs.error, width: 2),
         ),
 
         suffixIcon: widget.obscureText
             ? IconButton(
-                icon: Icon(_obscure ? Icons.visibility_off : Icons.visibility),
+                icon: Icon(
+                  _obscure ? Icons.visibility_off : Icons.visibility,
+                  color: cs.onSurface.withOpacity(0.65),
+                ),
                 onPressed: () {
                   setState(() {
                     _obscure = !_obscure;
@@ -70,7 +77,6 @@ class _MyTextFieldWidgetsState extends State<MyTextFieldWidgets> {
               )
             : null,
       ),
-
       validator:
           widget.validator ??
           (value) {

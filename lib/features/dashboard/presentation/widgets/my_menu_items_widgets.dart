@@ -18,27 +18,35 @@ class MyMenuItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     return Column(
       children: [
         ListTile(
-          leading: Icon(icon, size: 26, color: Colors.black),
+          leading: Icon(icon, size: 26, color: cs.onSurface.withOpacity(0.85)),
           title: Text(
             title,
-            style: const TextStyle(
-              fontSize: 20,
+            style: TextStyle(
+              fontSize: 18, // 20 was too big for list tile
               fontWeight: FontWeight.bold,
-              color: Colors.black,
+              color: cs.onSurface,
             ),
           ),
           subtitle: subtitle != null
-              ? Text(subtitle!, style: const TextStyle(fontSize: 14))
+              ? Text(
+                  subtitle!,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: cs.onSurface.withOpacity(0.65),
+                  ),
+                )
               : null,
           trailing:
               trailing ??
-              const Icon(
+              Icon(
                 Icons.arrow_forward_ios,
                 size: 18,
-                color: Colors.black,
+                color: cs.onSurface.withOpacity(0.55),
               ),
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 20,
@@ -46,7 +54,7 @@ class MyMenuItemWidget extends StatelessWidget {
           ),
           onTap: onTap,
         ),
-        const Divider(height: 1),
+        Divider(height: 1, color: cs.outlineVariant.withOpacity(0.6)),
       ],
     );
   }
