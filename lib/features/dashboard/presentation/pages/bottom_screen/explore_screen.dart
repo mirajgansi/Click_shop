@@ -63,8 +63,8 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
 
             Expanded(
               child: q.trim().isEmpty
-                  ? _buildCategoryGrid(filtered)
-                  : _buildProductGrid(searchedProducts),
+                  ? _buildCategoryGrid(context, filtered)
+                  : _buildProductGrid(context, searchedProducts),
             ),
           ],
         ),
@@ -73,14 +73,37 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
   }
 }
 
-Widget _buildCategoryGrid(List filtered) {
+int _gridCrossAxisCount(BuildContext context) {
+  final w = MediaQuery.of(context).size.width;
+
+  if (w >= 1200) return 5;
+  if (w >= 900) return 4;
+  if (w >= 600) return 3;
+  return 2;
+}
+
+double _categoryRatio(BuildContext context) {
+  final w = MediaQuery.of(context).size.width;
+  return w >= 600 ? 1 : 1.0;
+}
+
+double _productRatio(BuildContext context) {
+  final w = MediaQuery.of(context).size.width;
+  if (w >= 900) return 1.0;
+  if (w >= 600) return 0.95;
+  return 0.85;
+}
+
+Widget _buildCategoryGrid(BuildContext context, List filtered) {
+  final cols = _gridCrossAxisCount(context);
+
   return GridView.builder(
     itemCount: filtered.length,
-    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-      crossAxisCount: 2,
+    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+      crossAxisCount: cols,
       crossAxisSpacing: 12,
       mainAxisSpacing: 12,
-      childAspectRatio: 1,
+      childAspectRatio: _categoryRatio(context),
     ),
     itemBuilder: (context, i) {
       final cat = filtered[i];
@@ -104,18 +127,20 @@ Widget _buildCategoryGrid(List filtered) {
   );
 }
 
-Widget _buildProductGrid(List products) {
+Widget _buildProductGrid(BuildContext context, List products) {
   if (products.isEmpty) {
     return const Center(child: Text("No products found"));
   }
 
+  final w = MediaQuery.of(context).size.width;
+
   return GridView.builder(
     itemCount: products.length,
-    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-      crossAxisCount: 2,
+    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+      crossAxisCount: w >= 600 ? 2 : 2,
       crossAxisSpacing: 12,
       mainAxisSpacing: 12,
-      childAspectRatio: 0.85,
+      childAspectRatio: w >= 600 ? 1.0 : 0.85,
     ),
     itemBuilder: (context, i) {
       return CardWidget(product: products[i]);

@@ -2,7 +2,6 @@ import 'dart:core';
 
 import 'package:click_shop/features/product/data/model/product_api_model.dart';
 import 'package:click_shop/features/product/data/model/product_hive_model.dart';
-import 'package:click_shop/features/product/domain/entities/product_entity.dart';
 
 abstract interface class IProductLocalDatabase {
   Future<List<ProductHiveModel>> getAllproduct();

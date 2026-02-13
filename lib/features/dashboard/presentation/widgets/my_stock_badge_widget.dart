@@ -18,7 +18,6 @@ class StockPillBadge extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Icon badge
           Container(
             padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
@@ -34,7 +33,6 @@ class StockPillBadge extends StatelessWidget {
 
           const SizedBox(width: 8),
 
-          // Text
           Text(
             available ? "${(stock!)}+ in stock " : "Unavailable",
             style: TextStyle(

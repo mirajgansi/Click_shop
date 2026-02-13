@@ -28,7 +28,7 @@ class _CategoryProductsPageState extends ConsumerState<CategoryProductsPage> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(productViewModelProvider);
-    final products = state.categoryProducts; // ✅ use this list
+    final products = state.categoryProducts;
 
     return Scaffold(
       appBar: AppBar(title: Text(widget.title ?? "Category")),
@@ -41,11 +41,15 @@ class _CategoryProductsPageState extends ConsumerState<CategoryProductsPage> {
           : GridView.builder(
               padding: const EdgeInsets.all(12),
               itemCount: products.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 12,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: MediaQuery.of(context).size.width >= 600
+                    ? 3
+                    : 2,
+                crossAxisSpacing: 20,
                 mainAxisSpacing: 12,
-                childAspectRatio: 0.7,
+                childAspectRatio: MediaQuery.of(context).size.width >= 600
+                    ? 2
+                    : 0.7,
               ),
               itemBuilder: (context, i) {
                 final product = products[i];

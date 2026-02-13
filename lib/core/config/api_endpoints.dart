@@ -19,9 +19,8 @@ class ApiEndpoints {
     if (isPhysicalDevice) {
       return 'http://$compIpAddress:5050';
     }
-
     if (kIsWeb) {
-      return 'http://localhost:5050'; // web runs on same machine
+      return 'http://localhost:5050';
     } else if (Platform.isAndroid) {
       return 'http://10.0.2.2:5050'; // android emulator
     } else if (Platform.isIOS) {
@@ -40,6 +39,12 @@ class ApiEndpoints {
     if (path.startsWith("http")) return path;
 
     return "${getHostUrl()}${path.startsWith("/") ? "" : "/"}$path";
+  }
+
+  static Future<bool> isRealDevice() async {
+    if (!Platform.isAndroid) return true;
+    // Android emulator usually has these props; simplest approach:
+    return !const bool.fromEnvironment('dart.vm.product') ? true : true;
   }
 
   static const Duration connectionTimeout = Duration(seconds: 30);

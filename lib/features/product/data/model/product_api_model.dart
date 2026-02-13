@@ -3,12 +3,6 @@ import 'package:click_shop/features/product/domain/entities/product_entity.dart'
 
 part 'product_api_model.g.dart';
 
-String? _extractId(dynamic value) {
-  if (value == null) return null;
-  if (value is Map) return value['_id'] as String?;
-  return value as String?;
-}
-
 @JsonSerializable()
 class ProductApiModel {
   @JsonKey(name: '_id')

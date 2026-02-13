@@ -28,29 +28,33 @@ class CardWidget extends StatelessWidget {
         elevation: 2,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(6, 6, 6, 4),
+          padding: const EdgeInsets.fromLTRB(10, 8, 8, 20),
           child: Column(
-            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(
-                height: 80,
+              Expanded(
                 child: Stack(
                   children: [
                     Center(
                       child: SizedBox(
-                        height: 65,
-                        width: 65,
+                        height: 90,
+                        width: 60,
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(10),
                           child: _ProductImage(image: product.image),
                         ),
                       ),
                     ),
-                    const Positioned(
-                      top: 4,
+                    Positioned(
+                      bottom: 4,
                       right: 4,
-                      child: MyFavouriteButtonWidgets(),
+                      child: SizedBox(
+                        height: 22,
+                        child: FittedBox(
+                          fit: BoxFit.fitWidth,
+                          child: StockPillBadge(stock: product.inStock),
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -58,24 +62,20 @@ class CardWidget extends StatelessWidget {
 
               const SizedBox(height: 4),
 
-              Text(
-                product.name,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
-                ),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      product.name,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-
-              const SizedBox(height: 3),
-
-              SizedBox(
-                height: 28,
-                child: StockPillBadge(stock: product.inStock),
-              ),
-
-              const SizedBox(height: 2),
 
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -88,8 +88,8 @@ class CardWidget extends StatelessWidget {
                     ),
                   ),
                   SizedBox(
-                    height: 26,
-                    width: 26,
+                    height: 24,
+                    width: 24,
                     child: MyCartButtonWidget(productId: product.id ?? ""),
                   ),
                 ],
