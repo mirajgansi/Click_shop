@@ -1,5 +1,4 @@
 import 'package:click_shop/features/driver/presentation/view_model/driver_view_model.dart';
-import 'package:click_shop/features/driver/presentation/widgets/chip_widget.dart';
 import 'package:click_shop/features/driver/presentation/widgets/driver_order_dailog.dart';
 import 'package:click_shop/features/driver/presentation/widgets/item_tile_widget.dart';
 import 'package:click_shop/features/driver/presentation/widgets/row_text_widget.dart';

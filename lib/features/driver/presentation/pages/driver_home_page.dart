@@ -102,7 +102,7 @@ class _DriverHomePageState extends State<DriverHomePage> {
                 : cs.onSurface.withOpacity(0.6),
           ),
           _svgNavItem(
-            asset: 'assets/icons/home.svg',
+            asset: 'assets/icons/ic--round-inventory-2.svg',
             label: 'Assigned',
             index: 1,
             color: _selectedIndex == 1
