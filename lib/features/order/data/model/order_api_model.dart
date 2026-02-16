@@ -68,9 +68,7 @@ class OrderApiModel {
       status: (json['status'] ?? 'pending').toString(),
       paymentStatus: (json['paymentStatus'] ?? 'unpaid').toString(),
       shippingAddress: json['shippingAddress'] != null
-          ? ShippingAddressApiModel.fromJson(
-              json['shippingAddress'] as Map<String, dynamic>,
-            )
+          ? ShippingAddressApiModel.fromJson(json['shippingAddress'])
           : null,
       notes: json['notes'] as String?,
       driverId: _extractId(json['driverId']),

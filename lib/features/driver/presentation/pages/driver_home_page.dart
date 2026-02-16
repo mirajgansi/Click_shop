@@ -1,5 +1,6 @@
 import 'package:click_shop/features/dashboard/presentation/pages/bottom_screen/profile_screen.dart';
 import 'package:click_shop/features/driver/presentation/pages/bottom_screen/assigned_page.dart';
+import 'package:click_shop/features/driver/presentation/pages/bottom_screen/dashboard_page.dart';
 import 'package:click_shop/features/driver/presentation/pages/bottom_screen/delivered_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -15,12 +16,14 @@ class _DriverHomePageState extends State<DriverHomePage> {
   int _selectedIndex = 0;
 
   final List<String> _titles = [
+    "Dashboard",
     "Assigned Orders",
     "Delivered Orders",
     "Account",
   ];
 
   final List<Widget> lstBottomScreen = [
+    const DriverDashboardPage(),
     const AssignedPage(),
     const DeliveredPage(),
     const ProfileScreen(),
@@ -99,18 +102,26 @@ class _DriverHomePageState extends State<DriverHomePage> {
                 : cs.onSurface.withOpacity(0.6),
           ),
           _svgNavItem(
-            asset: 'assets/icons/delivery.svg',
-            label: 'Delivered',
+            asset: 'assets/icons/home.svg',
+            label: 'Assigned',
             index: 1,
             color: _selectedIndex == 1
                 ? cs.primary
                 : cs.onSurface.withOpacity(0.6),
           ),
           _svgNavItem(
-            asset: 'assets/icons/account.svg',
-            label: 'Account',
+            asset: 'assets/icons/delivery.svg',
+            label: 'Delivered',
             index: 2,
             color: _selectedIndex == 2
+                ? cs.primary
+                : cs.onSurface.withOpacity(0.6),
+          ),
+          _svgNavItem(
+            asset: 'assets/icons/account.svg',
+            label: 'Account',
+            index: 3,
+            color: _selectedIndex == 3
                 ? cs.primary
                 : cs.onSurface.withOpacity(0.6),
           ),

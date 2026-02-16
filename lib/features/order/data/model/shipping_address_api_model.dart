@@ -1,4 +1,4 @@
-import 'package:click_shop/features/order/domain/entities/shipping_address.dart';
+import 'package:click_shop/features/driver/domain/entities/shipping_address.dart';
 
 class ShippingAddressApiModel {
   final String? userName;
@@ -18,14 +18,20 @@ class ShippingAddressApiModel {
   });
 
   /// ---------- FROM JSON ----------
-  factory ShippingAddressApiModel.fromJson(Map<String, dynamic> json) {
+  /// ---------- FROM JSON (SAFE) ----------
+  factory ShippingAddressApiModel.fromJson(dynamic raw) {
+    if (raw == null) return const ShippingAddressApiModel();
+
+    // supports Map<dynamic, dynamic> and Map<String, dynamic>
+    final Map json = raw as Map;
+
     return ShippingAddressApiModel(
-      userName: json['userName'] as String?,
-      phone: json['phone'] as String?,
-      address1: json['address1'] as String?,
-      address2: json['address2'] as String?,
-      city: json['city'] as String?,
-      zip: json['zip'] as String?,
+      userName: json['userName']?.toString(),
+      phone: json['phone']?.toString(),
+      address1: json['address1']?.toString(),
+      address2: json['address2']?.toString(),
+      city: json['city']?.toString(),
+      zip: json['zip']?.toString(),
     );
   }
 

@@ -1,5 +1,5 @@
 import 'package:click_shop/core/constants/hive_table_constants.dart';
-import 'package:click_shop/features/order/domain/entities/shipping_address.dart';
+import 'package:click_shop/features/driver/domain/entities/shipping_address.dart';
 import 'package:hive/hive.dart';
 
 part 'shipping_address_hive_model.g.dart';

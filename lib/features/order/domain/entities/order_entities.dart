@@ -1,5 +1,5 @@
 import 'package:click_shop/features/order/domain/entities/order_item_entities.dart';
-import 'package:click_shop/features/order/domain/entities/shipping_address.dart';
+import 'package:click_shop/features/driver/domain/entities/shipping_address.dart';
 import 'package:equatable/equatable.dart';
 import 'order_status.dart';
 
@@ -75,14 +75,22 @@ class OrderEntity extends Equatable {
       status: OrderStatusX.fromString(json['status']),
       paymentStatus: PaymentStatusX.fromString(json['paymentStatus']),
 
-      driverId: json['driverId'],
-      driverName: json['driverName'],
+      shippingAddress: json['shippingAddress'] != null
+          ? ShippingAddressEntity.fromJson(
+              Map<String, dynamic>.from(json['shippingAddress'] as Map),
+            )
+          : null,
+
+      notes: json['notes']?.toString(),
+
+      driverId: json['driverId']?.toString(),
+      driverName: json['driverName']?.toString(),
 
       createdAt: json['createdAt'] != null
-          ? DateTime.parse(json['createdAt'])
+          ? DateTime.parse(json['createdAt'].toString())
           : null,
       updatedAt: json['updatedAt'] != null
-          ? DateTime.parse(json['updatedAt'])
+          ? DateTime.parse(json['updatedAt'].toString())
           : null,
     );
   }

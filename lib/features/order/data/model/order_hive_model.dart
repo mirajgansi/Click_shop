@@ -1,6 +1,6 @@
 import 'package:click_shop/core/constants/hive_table_constants.dart';
 import 'package:click_shop/features/order/data/model/order_item_hive_model.dart';
-import 'package:click_shop/features/order/data/model/shipping_address_hive_model.dart';
+import 'package:click_shop/features/driver/data/model/shipping_address_hive_model.dart';
 import 'package:click_shop/features/order/domain/entities/order_entities.dart';
 import 'package:click_shop/features/order/domain/entities/order_status.dart';
 import 'package:hive/hive.dart';

@@ -32,7 +32,7 @@ class _AssignedPageState extends ConsumerState<AssignedPage> {
         .toList();
 
     return Scaffold(
-      backgroundColor: cs.background, // ✅ theme background
+      backgroundColor: cs.background,
       body: RefreshIndicator(
         onRefresh: () =>
             ref.read(driverViewModelProvider.notifier).loadMyOrders(),
@@ -51,14 +51,14 @@ class _AssignedPageState extends ConsumerState<AssignedPage> {
                     child: Text(
                       state.errorMessage ?? "Something went wrong",
                       textAlign: TextAlign.center,
-                      style: TextStyle(color: cs.error), // ✅ error color
+                      style: TextStyle(color: cs.error),
                     ),
                   ),
                   const SizedBox(height: 12),
                   Center(
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: cs.primary, // ✅ theme primary
+                        backgroundColor: cs.primary,
                         foregroundColor: Colors.white,
                         elevation: 0,
                       ),
@@ -91,7 +91,7 @@ class _AssignedPageState extends ConsumerState<AssignedPage> {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
-                        color: cs.onSurface, // ✅ theme text
+                        color: cs.onSurface,
                       ),
                     ),
                   ),

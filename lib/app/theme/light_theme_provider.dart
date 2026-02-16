@@ -11,5 +11,5 @@ final autoThemeModeProvider = Provider<ThemeMode>((ref) {
 
   final lux = luxAsync.value ?? 100;
 
-  return lux < 200 ? ThemeMode.dark : ThemeMode.light;
+  return lux < 100 ? ThemeMode.dark : ThemeMode.light;
 });

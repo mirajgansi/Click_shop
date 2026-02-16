@@ -15,7 +15,7 @@ final effectiveThemeModeProvider = Provider<ThemeMode>((ref) {
       return ThemeMode.dark;
     case AppThemeMode.sensor:
       final luxAsync = ref.watch(luxProvider);
-      final lux = luxAsync.value ?? 100; // fallback
-      return lux < 20 ? ThemeMode.dark : ThemeMode.light;
+      final lux = luxAsync.value ?? 100;
+      return lux < 100 ? ThemeMode.dark : ThemeMode.light;
   }
 });

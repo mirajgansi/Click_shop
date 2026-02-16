@@ -1,31 +1,33 @@
+// lib/features/driver/presentation/state/driver_state.dart
+import 'package:click_shop/features/driver/domain/entities/driver_order_stats.dart';
 import 'package:click_shop/features/order/domain/entities/order_entities.dart';
-import 'package:equatable/equatable.dart';
 
 enum DriverStatus { initial, loading, loaded, updating, error }
 
-class DriverState extends Equatable {
+class DriverState {
   final DriverStatus status;
   final List<OrderEntity> orders;
+  final DriverOrderStats stats;
   final String? errorMessage;
 
   const DriverState({
     this.status = DriverStatus.initial,
     this.orders = const [],
+    this.stats = const DriverOrderStats(totalAssigned: 0, totalDelivered: 0),
     this.errorMessage,
   });
 
   DriverState copyWith({
     DriverStatus? status,
     List<OrderEntity>? orders,
+    DriverOrderStats? stats,
     String? errorMessage,
   }) {
     return DriverState(
       status: status ?? this.status,
       orders: orders ?? this.orders,
+      stats: stats ?? this.stats,
       errorMessage: errorMessage,
     );
   }
-
-  @override
-  List<Object?> get props => [status, orders, errorMessage];
 }
