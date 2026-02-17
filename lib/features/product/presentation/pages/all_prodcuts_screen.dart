@@ -44,9 +44,7 @@ class AllProdcutsScreen extends ConsumerWidget {
           ),
           itemCount: products.length,
           itemBuilder: (context, index) {
-            return CardWidget(
-              product: products[index], // ✅ real data
-            );
+            return CardWidget(product: products[index]);
           },
         );
       },

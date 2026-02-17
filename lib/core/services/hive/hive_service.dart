@@ -24,6 +24,9 @@ class HiveService {
     await openBoxed();
   }
 
+  static const String _recentIdsBox = "recent_ids_box";
+  static const String _popularIdsBox = "popular_ids_box";
+  static const String _trendingIdsBox = "trending_ids_box";
   void _registerAdapter() {
     // Auth adapter
     if (!Hive.isAdapterRegistered(HiveTableConstants.authtypeId)) {
@@ -59,6 +62,9 @@ class HiveService {
 
     await Hive.openBox<CartHiveModel>(HiveTableConstants.cartTable);
     await Hive.openBox<OrderHiveModel>(_driverOrdersBox);
+    await Hive.openBox<String>(_recentIdsBox);
+    await Hive.openBox<String>(_popularIdsBox);
+    await Hive.openBox<String>(_trendingIdsBox);
   }
 
   Future<void> close() async {
@@ -174,6 +180,55 @@ class HiveService {
     return true;
   }
 
+  Box<String> get _recentBox => Hive.box<String>(_recentIdsBox);
+  Box<String> get _popularBox => Hive.box<String>(_popularIdsBox);
+  Box<String> get _trendingBox => Hive.box<String>(_trendingIdsBox);
+
+  Future<void> cacheRecentIds(List<String> ids) async {
+    await _recentBox.clear();
+    for (final id in ids) {
+      await _recentBox.add(id);
+    }
+  }
+
+  Future<void> cachePopularIds(List<String> ids) async {
+    await _popularBox.clear();
+    for (final id in ids) {
+      await _popularBox.add(id);
+    }
+  }
+
+  Future<void> cacheTrendingIds(List<String> ids) async {
+    await _trendingBox.clear();
+    for (final id in ids) {
+      await _trendingBox.add(id);
+    }
+  }
+
+  Future<List<ProductHiveModel>> getRecentFromCache() async {
+    final ids = _recentBox.values.toList();
+    return ids
+        .map((id) => _productBox.get(id))
+        .whereType<ProductHiveModel>()
+        .toList();
+  }
+
+  Future<List<ProductHiveModel>> getPopularFromCache() async {
+    final ids = _popularBox.values.toList();
+    return ids
+        .map((id) => _productBox.get(id))
+        .whereType<ProductHiveModel>()
+        .toList();
+  }
+
+  Future<List<ProductHiveModel>> getTrendingFromCache() async {
+    final ids = _trendingBox.values.toList();
+    return ids
+        .map((id) => _productBox.get(id))
+        .whereType<ProductHiveModel>()
+        .toList();
+  }
+
   // ==================== CART ====================
   Box<CartHiveModel> get _cartBox =>
       Hive.box<CartHiveModel>(HiveTableConstants.cartTable);
@@ -271,9 +326,11 @@ class HiveService {
   }
 
   Future<void> cacheAllProdcuts(List<ProductHiveModel> products) async {
-    await _productBox.clear();
-    for (var product in products) {
-      await _productBox.put(product.id, product);
+    for (final p in products) {
+      final id = p.id;
+      if (id != null && id.isNotEmpty) {
+        await _productBox.put(id, p);
+      }
     }
   }
 

@@ -17,14 +17,18 @@ class ProductDetailScreen extends ConsumerStatefulWidget {
 
 class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
   int quantity = 1;
-
   @override
   void initState() {
     super.initState();
-    Future.microtask(() {
-      ref
+
+    Future.microtask(() async {
+      await ref
           .read(productViewModelProvider.notifier)
           .getProductById(widget.productId);
+
+      ref
+          .read(productViewModelProvider.notifier)
+          .incrementView(widget.productId);
     });
   }
 

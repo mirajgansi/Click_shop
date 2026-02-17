@@ -4,6 +4,7 @@ import 'package:click_shop/core/services/storage/token_service.dart';
 import 'package:click_shop/features/product/data/datasources/product_database.dart';
 import 'package:click_shop/features/product/data/model/product_api_model.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final ProductRemoteDatabaseProvider = Provider<IProductRemoteDatabase>((ref) {
@@ -110,14 +111,20 @@ class ProductRemoteDatabase implements IProductRemoteDatabase {
   @override
   Future<List<ProductApiModel>> getRecent() async {
     try {
-      final res = await _apiClient.get(ApiEndpoints.recent());
-      return _parseProductList(res.data);
-    } on DioException catch (e) {
-      throw Exception(
-        e.response?.data?["message"] ?? "Failed to fetch recent products",
+      final url = ApiEndpoints.recent();
+      debugPrint("🔵 CALLING RECENT: $url");
+
+      final res = await _apiClient.get(url);
+
+      final list = _parseProductList(res.data);
+
+      debugPrint(
+        "🔵 RECENT RESULT: ${list.map((e) => e.name).take(5).toList()}",
       );
+
+      return list;
     } catch (e) {
-      throw Exception("Unexpected error while fetching recent products");
+      throw Exception("Failed to fetch recent products");
     }
   }
 
@@ -127,28 +134,40 @@ class ProductRemoteDatabase implements IProductRemoteDatabase {
   @override
   Future<List<ProductApiModel>> getTrending() async {
     try {
-      final res = await _apiClient.get(ApiEndpoints.trending());
-      return _parseProductList(res.data);
-    } on DioException catch (e) {
-      throw Exception(
-        e.response?.data?["message"] ?? "Failed to fetch trending products",
+      final url = ApiEndpoints.trending();
+      debugPrint("🟢 CALLING TRENDING: $url");
+
+      final res = await _apiClient.get(url);
+
+      final list = _parseProductList(res.data);
+
+      debugPrint(
+        "🟢 TRENDING RESULT: ${list.map((e) => e.name).take(5).toList()}",
       );
+
+      return list;
     } catch (e) {
-      throw Exception("Unexpected error while fetching trending products");
+      throw Exception("Failed to fetch trending products");
     }
   }
 
   @override
   Future<List<ProductApiModel>> getPopular() async {
     try {
-      final res = await _apiClient.get(ApiEndpoints.popular());
-      return _parseProductList(res.data);
-    } on DioException catch (e) {
-      throw Exception(
-        e.response?.data?["message"] ?? "Failed to fetch popular products",
+      final url = ApiEndpoints.popular();
+      debugPrint("🟣 CALLING POPULAR: $url");
+
+      final res = await _apiClient.get(url);
+
+      final list = _parseProductList(res.data);
+
+      debugPrint(
+        "🟣 POPULAR RESULT: ${list.map((e) => e.name).take(5).toList()}",
       );
+
+      return list;
     } catch (e) {
-      throw Exception("Unexpected error while fetching popular products");
+      throw Exception("Failed to fetch popular products");
     }
   }
 
@@ -164,5 +183,38 @@ class ProductRemoteDatabase implements IProductRemoteDatabase {
     } catch (e) {
       throw Exception("Unexpected error while fetching top rated products");
     }
+  }
+
+  // @override
+  // Future<List<ProductApiModel>> getOutOfStock() async {
+  //   try {
+  //     final res = await _apiClient.get(ApiEndpoints.outOfStock());
+  //     return _parseProductList(res.data);
+  //   } on DioException catch (e) {
+  //     throw Exception(
+  //       e.response?.data?["message"] ?? "Failed to fetch out-of-stock products",
+  //     );
+  //   } catch (e) {
+  //     throw Exception("Unexpected error while fetching out-of-stock products");
+  //   }
+  // }
+
+  @override
+  Future<void> incrementViewCount(String productId) async {
+    try {
+      await _apiClient.patch(ApiEndpoints.incrementView(productId));
+    } on DioException catch (e) {
+      throw Exception(
+        e.response?.data?["message"] ?? "Failed to increment view count",
+      );
+    } catch (e) {
+      throw Exception("Unexpected error while incrementing view count");
+    }
+  }
+
+  @override
+  Future<List<ProductApiModel>> getOutOfStock() {
+    // TODO: implement getOutOfStock
+    throw UnimplementedError();
   }
 }

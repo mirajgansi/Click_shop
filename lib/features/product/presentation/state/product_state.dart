@@ -8,7 +8,6 @@ class ProductState {
   final List<ProductEntity> categoryProducts;
   final ProductEntity? selectedProduct;
 
-  // ✅ new sections
   final bool isRecentLoading;
   final bool isTrendingLoading;
   final bool isPopularLoading;

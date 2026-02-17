@@ -291,4 +291,53 @@ class ProductRepository implements IProductRepository {
       return _getCachedTopRated();
     }
   }
+
+  Future<Either<Failure, List<ProductEntity>>> _getCachedOutOfStock() async {
+    try {
+      final models = await _localDataSource.getOutOfStock();
+      final entities = ProductHiveModel.toEntityList(models);
+      return Right(entities);
+    } catch (e) {
+      return Left(LocalDatabaseFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<ProductEntity>>> getOutOfStockProducts() async {
+    if (await _networkInfo.isConnected) {
+      try {
+        final models = await _remoteDataSource.getOutOfStock();
+
+        // cache locally
+        final hiveModels = ProductHiveModel.fromApiModelList(models);
+        await _localDataSource.cacheOutOfStock(hiveModels);
+
+        // return entities
+        final entities = ProductApiModel.toEntityList(models);
+        return Right(entities);
+      } catch (e) {
+        // remote failed -> cached
+        return _getCachedOutOfStock();
+      }
+    } else {
+      return _getCachedOutOfStock();
+    }
+  }
+
+  // -------------------- VIEW COUNT --------------------
+
+  @override
+  Future<Either<Failure, bool>> incrementViewCount(String productId) async {
+    if (await _networkInfo.isConnected) {
+      try {
+        await _remoteDataSource.incrementViewCount(productId);
+        return const Right(true);
+      } catch (e) {
+        return Left(ApiFailure(message: e.toString()));
+      }
+    } else {
+      // offline: don't fail product page just because views can't update
+      return const Right(false);
+    }
+  }
 }

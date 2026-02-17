@@ -18,6 +18,29 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   final _searchCtrl = TextEditingController();
   String q = "";
+  bool _booted = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (!_booted) {
+      _booted = true;
+      Future.microtask(() {
+        ref.read(productViewModelProvider.notifier).initHome();
+      });
+    }
+  }
+
+  Future<void> onRefresh() async {
+    final vm = ref.read(productViewModelProvider.notifier);
+
+    // ✅ re-fetch from backend (based on your VM methods)
+    await vm.initHome(); // all products / home data
+    await vm.loadTrending(); // best seller
+    await vm.loadPopular(); // favorites/most bought
+    // await vm.loadRecent();  // if you still use recent
+  }
 
   @override
   void dispose() {
@@ -27,280 +50,168 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
-
-    final bg = cs.brightness == Brightness.dark
-        ? cs.surface
-        : cs.primary.withOpacity(0.08);
-
-    final border = cs.brightness == Brightness.dark
-        ? cs.outlineVariant
-        : cs.primary.withOpacity(0.25);
-
     final state = ref.watch(productViewModelProvider);
-    final allProducts = state.allProducts;
+    final isSearching = q.trim().isNotEmpty;
 
-    if (state.isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-    if (state.error != null) {
-      return Center(child: Text(state.error!));
-    }
+    List<ProductEntity> listToShow = state.allProducts;
 
-    // Products shown on home
-    final products = q.trim().isEmpty
-        ? allProducts
-        : allProducts
-              .where((p) => p.name.toLowerCase().contains(q.toLowerCase()))
-              .toList();
-
-    // Categories row (also filtered by search)
-    final filteredCats = q.trim().isEmpty
-        ? appCategories
-        : appCategories
-              .where(
-                (c) => c.title.toLowerCase().contains(q.trim().toLowerCase()),
-              )
-              .toList();
-
-    final recentBase = state.recentProducts;
-    final popularBase = state.popularProducts;
-    final bestBase = state.trendingProducts;
-
-    // filter helper (search only affects displayed lists)
-    List<ProductEntity> _filter(List<ProductEntity> list) {
+    List<ProductEntity> filterLocal(List<ProductEntity> list) {
+      if (!isSearching) return list;
       final s = q.trim().toLowerCase();
-      if (s.isEmpty) return list;
       return list.where((p) => p.name.toLowerCase().contains(s)).toList();
     }
 
-    final recentProducts = _filter(recentBase).take(10).toList();
-    final popularProducts = _filter(popularBase).take(10).toList();
-    final bestSellingProducts = _filter(bestBase).take(10).toList();
+    final products = filterLocal(listToShow).take(20).toList();
+    final filteredCats = appCategories;
 
-    final recent = recentProducts.isNotEmpty
-        ? recentProducts
-        : _filter(allProducts).take(10).toList();
-    final popular = popularProducts.isNotEmpty
-        ? popularProducts
-        : _filter(allProducts).take(10).toList();
-    final bestSelling = bestSellingProducts.isNotEmpty
-        ? bestSellingProducts
-        : _filter(allProducts).take(10).toList();
-
-    return InkWell(
+    return RefreshIndicator(
+      onRefresh: onRefresh,
       child: CustomScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
+          const SliverToBoxAdapter(child: SizedBox(height: 10)),
+
+          // ---------------- SEARCH BAR ----------------
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 12),
-                  _PromoBanner(
-                    title: "Fresh Vegetables",
-                    subtitle: "Get up to 40% off",
-                    imageAsset: "assets/images/banner_veg.png",
-                    onTap: () {},
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 10),
+              child: TextField(
+                controller: _searchCtrl,
+                onChanged: (v) {
+                  setState(() => q = v);
+
+                  final query = v.trim();
+                  if (query.isNotEmpty) {
+                    ref.read(productViewModelProvider.notifier).search(query);
+                  } else {
+                    ref.read(productViewModelProvider.notifier).initHome();
+                  }
+                },
+                decoration: InputDecoration(
+                  hintText: "Search",
+                  prefixIcon: const Icon(Icons.search),
+                  suffixIcon: isSearching
+                      ? IconButton(
+                          onPressed: () {
+                            _searchCtrl.clear();
+                            setState(() => q = "");
+                            ref
+                                .read(productViewModelProvider.notifier)
+                                .initHome();
+                          },
+                          icon: const Icon(Icons.close),
+                        )
+                      : null,
+                  filled: true,
+                  fillColor: Theme.of(context).colorScheme.surfaceVariant,
+                  contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide.none,
                   ),
-                ],
+                ),
               ),
             ),
           ),
 
+          // ✅ ONLY SHOW CATEGORIES WHEN NOT SEARCHING
+          if (!isSearching) ...[
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+                child: const _SectionHeader(title: "Groceries"),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: SizedBox(
+                height: 86,
+                child: ListView.separated(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  scrollDirection: Axis.horizontal,
+                  itemCount: filteredCats.length,
+                  separatorBuilder: (_, __) => const SizedBox(width: 12),
+                  itemBuilder: (context, i) {
+                    final cat = filteredCats[i];
+                    return SizedBox(
+                      width: 190,
+                      child: CategoryCard(
+                        title: cat.titleOneLine,
+                        imagePath: cat.image,
+                        backgroundColor: cat.bg,
+                        borderColor: cat.border,
+                        borderWidth: 1.2,
+                        borderRadius: 16,
+                        aspectRatio: 2.8,
+                        onTap: () {
+                          AppRoutes.push(
+                            context,
+                            CategoryProductsPage(
+                              categoryId: cat.id,
+                              title: cat.titleOneLine,
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ],
+
+          // ---------------- TITLE ----------------
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 6),
+              padding: const EdgeInsets.fromLTRB(16, 18, 16, 10),
               child: _SectionHeader(
-                title: "Recently Added",
-                onSeeAll: () async {
-                  await ref
-                      .read(productViewModelProvider.notifier)
-                      .loadRecent();
-                },
+                title: isSearching ? "Search Results" : "All Products",
               ),
             ),
           ),
 
-          SliverToBoxAdapter(
-            child: products.isEmpty
-                ? Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Center(
-                      child: Text(
-                        "No products found",
-                        style: TextStyle(color: cs.onSurface.withOpacity(0.7)),
-                      ),
-                    ),
-                  )
-                : _HorizontalProductRow(products: recent),
-          ),
+          // ---------------- PRODUCTS ----------------
+          if (state.isLoading)
+            const SliverToBoxAdapter(
+              child: SizedBox(
+                height: 240,
+                child: Center(child: CircularProgressIndicator()),
+              ),
+            )
+          else if (products.isEmpty)
+            SliverToBoxAdapter(
+              child: SizedBox(
+                height: 240,
+                child: Center(
+                  child: Text(
+                    isSearching ? "No results for \"$q\"" : "No products",
+                  ),
+                ),
+              ),
+            )
+          else
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              sliver: SliverGrid(
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  final p = products[index];
+                  final yOffset = (index % 2 == 0) ? 0.0 : 22.0;
 
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
-              child: _SectionHeader(title: "Groceries", onSeeAll: () {}),
-            ),
-          ),
-
-          SliverToBoxAdapter(
-            child: SizedBox(
-              height: 86,
-              child: ListView.separated(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                scrollDirection: Axis.horizontal,
-                itemCount: filteredCats.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 12),
-                itemBuilder: (context, i) {
-                  final cat = filteredCats[i];
-                  return SizedBox(
-                    width: 190,
-                    child: CategoryCard(
-                      title: cat.titleOneLine,
-                      imagePath: cat.image,
-                      backgroundColor: cat.bg,
-                      borderColor: cat.border,
-                      borderWidth: 1.2,
-                      borderRadius: 16,
-                      aspectRatio: 2.8,
-                      onTap: () {
-                        AppRoutes.push(
-                          context,
-                          CategoryProductsPage(
-                            categoryId: cat.id,
-                            title: cat.titleOneLine,
-                          ),
-                        );
-                      },
-                    ),
+                  return Transform.translate(
+                    offset: Offset(0, yOffset),
+                    child: CardWidget(key: ValueKey(p.id ?? index), product: p),
                   );
-                },
+                }, childCount: products.length),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 18,
+                  crossAxisSpacing: 14,
+                  childAspectRatio: 0.72,
+                ),
               ),
             ),
-          ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
-              child: _SectionHeader(title: "Best Selling", onSeeAll: () {}),
-            ),
-          ),
 
-          SliverToBoxAdapter(
-            child: bestSelling.isEmpty
-                ? const SizedBox.shrink()
-                : _HorizontalProductRow(products: bestSelling),
-          ),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
-              child: _SectionHeader(title: "Popular", onSeeAll: () {}),
-            ),
-          ),
-
-          SliverToBoxAdapter(
-            child: popular.isEmpty
-                ? const SizedBox.shrink()
-                : _HorizontalProductRow(products: popular),
-          ),
-          const SliverToBoxAdapter(child: SizedBox(height: 18)),
+          const SliverToBoxAdapter(child: SizedBox(height: 30)),
         ],
-      ),
-    );
-  }
-}
-
-/// -------------------- Horizontal product row (scroll) --------------------
-
-class _HorizontalProductRow extends StatelessWidget {
-  final List<ProductEntity> products;
-
-  const _HorizontalProductRow({required this.products});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 200, // tweak if needed
-      child: ListView.separated(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        scrollDirection: Axis.horizontal,
-        itemCount: products.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 12),
-        itemBuilder: (context, i) {
-          return SizedBox(width: 170, child: CardWidget(product: products[i]));
-        },
-      ),
-    );
-  }
-}
-
-/// -------------------- widgets --------------------
-
-class _PromoBanner extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final String imageAsset;
-  final VoidCallback onTap;
-
-  const _PromoBanner({
-    required this.title,
-    required this.subtitle,
-    required this.imageAsset,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      borderRadius: BorderRadius.circular(16),
-      onTap: onTap,
-      child: Ink(
-        height: 92,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          color: const Color(0xFFEFFAF2),
-          border: Border.all(color: const Color(0xFFD9F3DF)),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(12),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      subtitle,
-                      style: TextStyle(
-                        color: Colors.grey.shade700,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 10),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(14),
-                child: Image.asset(
-                  imageAsset,
-                  width: 90,
-                  height: 70,
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }
@@ -308,14 +219,11 @@ class _PromoBanner extends StatelessWidget {
 
 class _SectionHeader extends StatelessWidget {
   final String title;
-  final VoidCallback onSeeAll;
-
-  const _SectionHeader({required this.title, required this.onSeeAll});
+  const _SectionHeader({required this.title});
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-
     return Row(
       children: [
         Text(
@@ -325,11 +233,6 @@ class _SectionHeader extends StatelessWidget {
             fontSize: 16,
             color: cs.onSurface,
           ),
-        ),
-        const Spacer(),
-        TextButton(
-          onPressed: onSeeAll,
-          child: Text("See all", style: TextStyle(color: cs.primary)),
         ),
       ],
     );

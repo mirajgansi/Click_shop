@@ -20,7 +20,6 @@ class HiveTableConstants {
   static const String categoryTable = 'category_table';
 
   // ================= ORDERS =================
-  // ✅ Use NEW, UNIQUE typeIds
   static const int orderTypeId = 30;
   static const int orderItemTypeId = 31;
   static const int shippingAddressTypeId = 32;

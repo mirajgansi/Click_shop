@@ -73,15 +73,30 @@ class ApiEndpoints {
   // ============ Item Endpoints ============
   static const String products = "products";
 
-  static String getAllProducts() => "products"; // GET
-  static String getProductById(String id) => "products/$id"; // GET
+  static String getAllProducts() => products; // GET /api/products
+  static String getProductById(String id) =>
+      "$products/$id"; // GET /api/products/:id
   static String getByCategory(String category) =>
-      "products/category/$category"; // GET
+      "$products/category/$category"; // GET /api/products/category/:category
 
-  static String recent() => "$products/recent"; // GET
-  static String trending() => "$products/trending"; // GET
-  static String popular() => "$products/popular"; // GET
-  static String topRated() => "$products/top-rated"; // GET
+  static String recent() => "$products/recent"; // GET /api/products/recent
+  static String trending() =>
+      "$products/trending"; // GET /api/products/trending
+  static String popular() => "$products/popular"; // GET /api/products/popular
+  static String topRated() =>
+      "$products/top-rated"; // GET /api/products/top-rated
+
+  static String incrementView(String id) =>
+      "$products/$id/view"; // PATCH /api/products/:id/view
+
+  // admin (if you call from admin app)
+  static String createProduct() => products; // POST /api/products
+  static String updateProduct(String id) =>
+      "$products/$id"; // PUT /api/products/:id
+  static String deleteProduct(String id) =>
+      "$products/$id"; // DELETE /api/products/:id
+  static String restockProduct(String id) =>
+      "$products/$id/restock"; // PUT /api/products/:id/restock
 
   // cart
   static String cartGet() => "cart"; // GET /api/cart
