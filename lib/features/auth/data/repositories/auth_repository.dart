@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:click_shop/core/error/failures.dart';
@@ -48,18 +49,41 @@ class AuthRepository implements IAuthRepository {
 
   @override
   Future<Either<Failure, AuthEntity>> getCurrentUser() async {
+    // 1) return cache immediately (fast)
+    final cached = await _authDatasource.getCurrentUser();
+    if (cached != null) {
+      // refresh in background (don’t block UI)
+      unawaited(_refreshCurrentUser());
+      return Right(cached.toEntity());
+    }
+
+    // 2) if no cache, go network
     if (await _networkInfo.isConnected) {
       try {
         final apiModel = await _authRemoteDataSource.whoAmI();
-        final entity = apiModel.toEntity();
-
-        return Right(entity);
+        await _authDatasource.saveUser(apiModel.toHiveModel()); // ✅ cache
+        return Right(apiModel.toEntity());
+      } on DioException catch (e) {
+        return Left(
+          ApiFailure(
+            message: e.response?.data['message'] ?? 'Failed to fetch user',
+            statusCode: e.response?.statusCode,
+          ),
+        );
       } catch (e) {
-        return _getCachedUser();
+        return Left(ApiFailure(message: e.toString()));
       }
-    } else {
-      return _getCachedUser();
     }
+
+    return const Left(LocalDatabaseFailure(message: "No cached user"));
+  }
+
+  Future<void> _refreshCurrentUser() async {
+    if (!await _networkInfo.isConnected) return;
+    try {
+      final apiModel = await _authRemoteDataSource.whoAmI();
+      await _authDatasource.saveUser(apiModel.toHiveModel());
+    } catch (_) {}
   }
 
   @override

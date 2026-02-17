@@ -1,3 +1,4 @@
+import 'package:click_shop/features/dashboard/presentation/widgets/cart_sekeleton_widget.dart';
 import 'package:click_shop/features/order/presentation/pages/prder_detail_page.dart';
 import 'package:click_shop/features/order/presentation/widgets/order_card_widget.dart';
 import 'package:flutter/material.dart';
@@ -32,7 +33,7 @@ class _MyOrdersPageState extends ConsumerState<MyOrdersPage> {
         onRefresh: () =>
             ref.read(orderViewModelProvider.notifier).loadMyOrders(),
         child: state.isLoading
-            ? const Center(child: CircularProgressIndicator())
+            ? const CartSkeleton(itemCount: 6)
             : state.errorMessage != null
             ? ListView(
                 children: [

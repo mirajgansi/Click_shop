@@ -27,6 +27,8 @@ class HiveService {
   static const String _recentIdsBox = "recent_ids_box";
   static const String _popularIdsBox = "popular_ids_box";
   static const String _trendingIdsBox = "trending_ids_box";
+  static const String _myOrdersBox = "my_orders";
+  static const String _orderDetailsBox = "order_details";
   void _registerAdapter() {
     // Auth adapter
     if (!Hive.isAdapterRegistered(HiveTableConstants.authtypeId)) {
@@ -65,6 +67,8 @@ class HiveService {
     await Hive.openBox<String>(_recentIdsBox);
     await Hive.openBox<String>(_popularIdsBox);
     await Hive.openBox<String>(_trendingIdsBox);
+    await Hive.openBox<OrderHiveModel>(_myOrdersBox);
+    await Hive.openBox<OrderHiveModel>(_orderDetailsBox);
   }
 
   Future<void> close() async {
@@ -358,6 +362,9 @@ class HiveService {
 
   Box<OrderHiveModel> get _driverOrderBox =>
       Hive.box<OrderHiveModel>(_driverOrdersBox);
+  Box<OrderHiveModel> get _myOrderBox => Hive.box<OrderHiveModel>(_myOrdersBox);
+  Box<OrderHiveModel> get _orderDetails =>
+      Hive.box<OrderHiveModel>(_orderDetailsBox);
 
   Future<void> cacheDriverOrders(List<OrderHiveModel> orders) async {
     await _driverOrderBox.clear();
@@ -372,5 +379,54 @@ class HiveService {
 
   Future<void> clearDriverOrders() async {
     await _driverOrderBox.clear();
+  }
+
+  Future<void> cacheMyOrders(List<OrderHiveModel> orders) async {
+    await _myOrderBox.clear();
+    for (final o in orders) {
+      final id = o.id;
+      if (id != null && id.isNotEmpty) {
+        await _myOrderBox.put(id, o);
+      }
+    }
+  }
+
+  List<OrderHiveModel> getMyOrdersFromCache() {
+    return _myOrderBox.values.toList();
+  }
+
+  Future<void> clearMyOrders() async {
+    await _myOrderBox.clear();
+  }
+
+  Future<void> cacheOrderDetail(OrderHiveModel order) async {
+    final id = order.id;
+    if (id == null || id.isEmpty) return;
+    await _orderDetails.put(id, order);
+  }
+
+  OrderHiveModel? getOrderDetailFromCache(String id) {
+    return _orderDetails.get(id);
+  }
+
+  Future<void> clearOrderDetails() async {
+    await _orderDetails.clear();
+  }
+
+  // ==================== MY ORDERS ====================
+
+  Future<List<OrderHiveModel>> getCachedMyOrders() async {
+    return _myOrderBox.values.toList();
+  }
+
+  Future<void> cacheOrder(OrderHiveModel order) async {
+    final id = order.id;
+    if (id == null || id.isEmpty) return;
+
+    await _myOrderBox.put(id, order);
+  }
+
+  Future<OrderHiveModel?> getCachedOrderById(String id) async {
+    return _myOrderBox.get(id);
   }
 }

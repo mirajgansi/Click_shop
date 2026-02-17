@@ -72,7 +72,6 @@ class ProductRepository implements IProductRepository {
     }
   }
 
-  /// ✅ GET PRODUCTS BY CATEGORY
   @override
   Future<Either<Failure, List<ProductEntity>>> getProductsByCategory(
     String categoryId,
