@@ -1,6 +1,7 @@
 import 'package:click_shop/features/driver/presentation/pages/order_detail_page.dart';
 import 'package:click_shop/features/driver/presentation/state/driver_state.dart';
 import 'package:click_shop/features/driver/presentation/view_model/driver_view_model.dart';
+import 'package:click_shop/features/driver/presentation/widgets/assigned_page_sekeleton.dart';
 import 'package:click_shop/features/driver/presentation/widgets/driver_card_widget.dart';
 import 'package:click_shop/features/order/domain/entities/order_status.dart';
 import 'package:flutter/material.dart';
@@ -39,7 +40,7 @@ class _AssignedPageState extends ConsumerState<AssignedPage> {
         child: Builder(
           builder: (_) {
             if (state.status == DriverStatus.loading) {
-              return const Center(child: CircularProgressIndicator());
+              return const AssignedPageSkeleton();
             }
 
             if (state.status == DriverStatus.error) {
