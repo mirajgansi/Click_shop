@@ -49,10 +49,13 @@ class ProdcutLocalDatabase implements IProductLocalDatabase {
   }
 
   @override
-  Future<void> cacheAll(List<ProductHiveModel> items) async {
+  Future<bool> cacheAll(List<ProductHiveModel> items) async {
     try {
       await _hiveService.cacheAllProdcuts(items);
-    } catch (e) {}
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
   @override
