@@ -1,6 +1,8 @@
 import 'package:click_shop/app/routes/app_routes.dart';
 import 'package:click_shop/core/constants/app_categories.dart';
+import 'package:click_shop/features/dashboard/presentation/widgets/cateegory_sekeleton_widget.dart';
 import 'package:click_shop/features/dashboard/presentation/widgets/my_card_widgets.dart';
+import 'package:click_shop/features/dashboard/presentation/widgets/skeleton_product_card_widget.dart';
 import 'package:click_shop/features/product/presentation/pages/product_category_screen.dart';
 import 'package:click_shop/features/product/presentation/view_model/product_view_model.dart';
 import 'package:click_shop/features/product/presentation/widgets/my_category_widget.dart';
@@ -64,7 +66,9 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
             const SizedBox(height: 14),
 
             Expanded(
-              child: q.trim().isEmpty
+              child: productState.isLoading
+                  ? _buildExploreSkeleton(context, q.trim().isEmpty)
+                  : q.trim().isEmpty
                   ? _buildCategoryGrid(context, filtered)
                   : _buildProductGrid(context, searchedProducts),
             ),
@@ -148,4 +152,30 @@ Widget _buildProductGrid(BuildContext context, List products) {
       return CardWidget(product: products[i]);
     },
   );
+}
+
+Widget _buildExploreSkeleton(BuildContext context, bool showCategories) {
+  if (showCategories) {
+    return GridView.builder(
+      itemCount: 6,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: _gridCrossAxisCount(context),
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        childAspectRatio: _categoryRatio(context),
+      ),
+      itemBuilder: (_, __) => const CategorySkeleton(),
+    );
+  } else {
+    return GridView.builder(
+      itemCount: 6,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        childAspectRatio: _productRatio(context),
+      ),
+      itemBuilder: (_, __) => const ProductCardSkeleton(),
+    );
+  }
 }

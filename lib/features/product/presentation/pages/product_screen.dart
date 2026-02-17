@@ -2,6 +2,7 @@ import 'package:click_shop/core/config/api_endpoints.dart';
 import 'package:click_shop/features/cart/domain/usecases/add_cart_product_usecase.dart';
 import 'package:click_shop/features/dashboard/presentation/widgets/my_stock_badge_widget.dart';
 import 'package:click_shop/features/product/presentation/view_model/product_view_model.dart';
+import 'package:click_shop/features/product/presentation/widgets/product_detail_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -58,7 +59,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
     final state = ref.watch(productViewModelProvider);
 
     if (state.isLoading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const ProductDetailSkeleton();
     }
 
     if (state.error != null) {

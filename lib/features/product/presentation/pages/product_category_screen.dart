@@ -1,5 +1,6 @@
 import 'package:click_shop/features/dashboard/presentation/widgets/my_card_widgets.dart';
 import 'package:click_shop/features/product/presentation/view_model/product_view_model.dart';
+import 'package:click_shop/features/product/presentation/widgets/product_grid_sekeleton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -33,7 +34,12 @@ class _CategoryProductsPageState extends ConsumerState<CategoryProductsPage> {
     return Scaffold(
       appBar: AppBar(title: Text(widget.title ?? "Category")),
       body: state.isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? ProductGridSkeleton(
+              crossAxisCount: MediaQuery.of(context).size.width >= 600 ? 3 : 2,
+              childAspectRatio: MediaQuery.of(context).size.width >= 600
+                  ? 2
+                  : 0.7,
+            )
           : state.error != null
           ? Center(child: Text(state.error!))
           : products.isEmpty
@@ -52,8 +58,7 @@ class _CategoryProductsPageState extends ConsumerState<CategoryProductsPage> {
                     : 0.7,
               ),
               itemBuilder: (context, i) {
-                final product = products[i];
-                return CardWidget(product: product);
+                return CardWidget(product: products[i]);
               },
             ),
     );

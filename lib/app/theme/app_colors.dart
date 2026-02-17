@@ -163,4 +163,12 @@ class AppColors {
   static const List<BoxShadow> darkSoftShadow = [
     BoxShadow(color: Color(0x1A000000), blurRadius: 12, offset: Offset(0, 4)),
   ];
+
+  // Skeleton Colors (Light Theme)
+  static const Color skeletonBase = Color(0xFFE5E7EB); // soft grey
+  static const Color skeletonHighlight = Color(0xFFF3F4F6);
+
+  // Skeleton Colors (Dark Theme)
+  static const Color darkSkeletonBase = Color(0xFF2D3339);
+  static const Color darkSkeletonHighlight = Color(0xFF3A4048);
 }

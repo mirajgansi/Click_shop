@@ -1,6 +1,7 @@
 import 'package:click_shop/app/routes/app_routes.dart';
 import 'package:click_shop/core/constants/app_categories.dart';
 import 'package:click_shop/features/dashboard/presentation/widgets/my_card_widgets.dart';
+import 'package:click_shop/features/dashboard/presentation/widgets/skeleton_product_card_widget.dart';
 import 'package:click_shop/features/product/domain/entities/product_entity.dart';
 import 'package:click_shop/features/product/presentation/pages/product_category_screen.dart';
 import 'package:click_shop/features/product/presentation/view_model/product_view_model.dart';
@@ -35,7 +36,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Future<void> onRefresh() async {
     final vm = ref.read(productViewModelProvider.notifier);
 
-    // ✅ re-fetch from backend (based on your VM methods)
     await vm.initHome(); // all products / home data
     await vm.loadTrending(); // best seller
     await vm.loadPopular(); // favorites/most bought
@@ -71,7 +71,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         slivers: [
           const SliverToBoxAdapter(child: SizedBox(height: 10)),
 
-          // ---------------- SEARCH BAR ----------------
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 10),
@@ -114,7 +113,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
 
-          // ✅ ONLY SHOW CATEGORIES WHEN NOT SEARCHING
           if (!isSearching) ...[
             SliverToBoxAdapter(
               child: Padding(
@@ -171,10 +169,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
           // ---------------- PRODUCTS ----------------
           if (state.isLoading)
-            const SliverToBoxAdapter(
-              child: SizedBox(
-                height: 240,
-                child: Center(child: CircularProgressIndicator()),
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              sliver: SliverGrid(
+                delegate: SliverChildBuilderDelegate((context, index) {
+                  final yOffset = (index % 2 == 0) ? 0.0 : 22.0;
+
+                  return Transform.translate(
+                    offset: Offset(0, yOffset),
+                    child: const ProductCardSkeleton(),
+                  );
+                }, childCount: 8),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 18,
+                  crossAxisSpacing: 14,
+                  childAspectRatio: 0.72,
+                ),
               ),
             )
           else if (products.isEmpty)
