@@ -3,8 +3,12 @@ import 'package:click_shop/features/dashboard/presentation/pages/bottom_screen/c
 import 'package:click_shop/features/dashboard/presentation/pages/bottom_screen/home_screen.dart';
 import 'package:click_shop/features/dashboard/presentation/pages/bottom_screen/my_order_screen.dart';
 import 'package:click_shop/features/dashboard/presentation/pages/bottom_screen/profile_screen.dart';
+import 'package:click_shop/features/dashboard/presentation/view_model/notification_view_model.dart';
+import 'package:click_shop/features/dashboard/presentation/widgets/notification_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -49,18 +53,36 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
+  // Future<void> setupFirebaseNotification(BuildContext context) async {
+  //   final hasPermission = await requestNotificationPermission(context);
+  //   if (!hasPermission) return;
+
+  //   final settings = await FirebaseMessaging.instance.requestPermission(
+  //     alert: true,
+  //     badge: true,
+  //     sound: true,
+  //   );
+
+  //   if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+  //     print("Notification permission granted");
+
+  //     final token = await FirebaseMessaging.instance.getToken();
+  //     print("FCM Token: $token");
+
+  //     // TODO: send token to backend
+  //   }
+  // }
+
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
-      // ✅ Use theme background
       backgroundColor: cs.background,
 
       appBar: AppBar(
         automaticallyImplyLeading: false,
         elevation: 0,
-        // ✅ Let theme control appbar color
         backgroundColor: cs.surface,
         title: Row(
           children: [
@@ -76,11 +98,63 @@ class _DashboardScreenState extends State<DashboardScreen> {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w800,
-                color: cs.onSurface, // ✅ dynamic
+                color: cs.onSurface,
               ),
             ),
           ],
         ),
+        actions: [
+          Consumer(
+            builder: (context, ref, _) {
+              final state = ref.watch(notificationViewModelProvider);
+
+              return IconButton(
+                onPressed: () async {
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const NotificationsPage(),
+                    ),
+                  );
+
+                  ref
+                      .read(notificationViewModelProvider.notifier)
+                      .loadUnreadCount();
+                },
+                icon: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    const Icon(Icons.notifications),
+
+                    if (state.unreadCount > 0)
+                      Positioned(
+                        right: -4,
+                        top: -4,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: Text(
+                            "${state.unreadCount}",
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
       ),
 
       body: lstBottomScreen[_selectedIndex],

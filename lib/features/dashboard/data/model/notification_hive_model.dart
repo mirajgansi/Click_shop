@@ -51,7 +51,6 @@ class NotificationHiveModel extends HiveObject {
     );
   }
 
-  // ✅ From Entity → Hive
   factory NotificationHiveModel.fromEntity(NotificationEntity entity) {
     return NotificationHiveModel(
       id: entity.id,
@@ -63,7 +62,6 @@ class NotificationHiveModel extends HiveObject {
     );
   }
 
-  // ✅ Hive → Entity
   NotificationEntity toEntity() {
     return NotificationEntity(
       id: id,
@@ -75,7 +73,6 @@ class NotificationHiveModel extends HiveObject {
     );
   }
 
-  // ✅ Convert List<Hive> → List<Entity>
   static List<NotificationEntity> toEntityList(
     List<NotificationHiveModel> hiveModels,
   ) {

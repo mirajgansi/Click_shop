@@ -32,15 +32,14 @@ class NotificationRemoteDataSource implements INotificationRemoteDataSource {
   @override
   Future<List<NotificationApiModel>> getMyNotifications() async {
     final response = await _apiClient.get(
-      ApiEndpoints.myNotifications(), // "notifications/me"
+      ApiEndpoints.myNotifications(),
       options: _authOptions(),
     );
 
     if (response.data['success'] == true) {
-      final raw = response.data['data'];
+      final raw = response.data['items'];
 
-      // expected: data is List
-      final list = (raw as List)
+      final list = (raw as List? ?? [])
           .map((e) => NotificationApiModel.fromJson(e as Map<String, dynamic>))
           .toList();
 
@@ -55,7 +54,7 @@ class NotificationRemoteDataSource implements INotificationRemoteDataSource {
   @override
   Future<int> getUnreadCount() async {
     final response = await _apiClient.get(
-      ApiEndpoints.notificationUnreadCount(), // "notifications/me/unread-count"
+      ApiEndpoints.notificationUnreadCount(),
       options: _authOptions(),
     );
 

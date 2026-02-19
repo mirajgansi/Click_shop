@@ -8,12 +8,77 @@ import 'package:click_shop/features/product/presentation/view_model/product_view
 import 'package:click_shop/features/product/presentation/widgets/my_category_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+Future<bool> requestNotificationPermission(BuildContext context) async {
+  final status = await Permission.notification.status;
+
+  if (status.isGranted) return true;
+
+  if (status.isDenied) {
+    final res = await Permission.notification.request();
+    return res.isGranted;
+  }
+
+  if (status.isPermanentlyDenied) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text("Enable Notifications"),
+        content: const Text(
+          "Notifications are permanently denied. Enable them from App Settings.",
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              await openAppSettings();
+            },
+            child: const Text("Open Settings"),
+          ),
+        ],
+      ),
+    );
+    return false;
+  }
+
+  return false;
+}
+
+void _showNotificationPermissionDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text("Enable Notifications"),
+      content: const Text(
+        "Notifications are permanently denied. Please enable them from App Settings.",
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text("Cancel"),
+        ),
+        TextButton(
+          onPressed: () async {
+            Navigator.pop(context);
+            await openAppSettings();
+          },
+          child: const Text("Open Settings"),
+        ),
+      ],
+    ),
+  );
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
@@ -46,6 +111,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   void dispose() {
     _searchCtrl.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() async {
+      await requestNotificationPermission(context);
+    });
   }
 
   @override

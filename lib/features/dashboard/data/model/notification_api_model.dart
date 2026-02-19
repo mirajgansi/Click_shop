@@ -11,11 +11,13 @@ class NotificationApiModel {
 
   final String title;
   final String message;
+
+  @JsonKey(name: 'read') //  FIX HERE
   final bool isRead;
+
   final String? type;
 
-  /// If backend sends ISO string, keep String OR DateTime.
-  /// Here we use String to match your Hive/Entity `createdAt` String.
+  @JsonKey(name: 'createdAt')
   final String createdAt;
 
   NotificationApiModel({
@@ -26,13 +28,11 @@ class NotificationApiModel {
     required this.createdAt,
     this.type,
   });
-
   Map<String, dynamic> toJson() => _$NotificationApiModelToJson(this);
 
   factory NotificationApiModel.fromJson(Map<String, dynamic> json) =>
       _$NotificationApiModelFromJson(json);
 
-  // ✅ API -> Entity
   NotificationEntity toEntity() {
     return NotificationEntity(
       id: id,
@@ -44,7 +44,6 @@ class NotificationApiModel {
     );
   }
 
-  // ✅ Entity -> API
   factory NotificationApiModel.fromEntity(NotificationEntity entity) {
     return NotificationApiModel(
       id: entity.id,
@@ -56,7 +55,6 @@ class NotificationApiModel {
     );
   }
 
-  // ✅ API -> Hive
   NotificationHiveModel toHiveModel() {
     return NotificationHiveModel(
       id: id,
@@ -68,7 +66,6 @@ class NotificationApiModel {
     );
   }
 
-  // ✅ List<API> -> List<Entity>
   static List<NotificationEntity> toEntityList(
     List<NotificationApiModel> models,
   ) {

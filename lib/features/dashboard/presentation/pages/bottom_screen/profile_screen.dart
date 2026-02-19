@@ -19,9 +19,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path/path.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:riverpod/src/framework.dart';
 
 final currentUserViewModelProvider = NotifierProvider<AuthViewModel, AuthState>(
   AuthViewModel.new,
