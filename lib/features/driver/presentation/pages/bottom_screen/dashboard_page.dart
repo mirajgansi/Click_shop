@@ -1,5 +1,5 @@
 import 'package:click_shop/features/auth/domain/usecases/get_currentuacase.dart';
-import 'package:click_shop/features/driver/presentation/widgets/dashboard_sekeleton..dart';
+import 'package:click_shop/features/driver/presentation/widgets/dashboard_sekeleton.dart';
 import 'package:click_shop/features/driver/presentation/widgets/stats_card_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

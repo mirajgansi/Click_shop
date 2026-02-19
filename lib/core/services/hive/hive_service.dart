@@ -1,6 +1,7 @@
 import 'package:click_shop/core/constants/hive_table_constants.dart';
 import 'package:click_shop/features/auth/data/models/auth_hive_model.dart';
 import 'package:click_shop/features/cart/data/model/cart_hive_model.dart';
+import 'package:click_shop/features/dashboard/data/model/notification_hive_model.dart';
 import 'package:click_shop/features/order/data/model/order_hive_model.dart';
 import 'package:click_shop/features/order/data/model/order_item_hive_model.dart';
 import 'package:click_shop/features/driver/data/model/shipping_address_hive_model.dart';
@@ -50,6 +51,9 @@ class HiveService {
     if (!Hive.isAdapterRegistered(HiveTableConstants.orderTypeId)) {
       Hive.registerAdapter(OrderHiveModelAdapter());
     }
+    if (!Hive.isAdapterRegistered(HiveTableConstants.notificationTypeId)) {
+      Hive.registerAdapter(NotificationHiveModelAdapter());
+    }
   }
 
   Future<void> openBoxed() async {
@@ -69,6 +73,9 @@ class HiveService {
     await Hive.openBox<String>(_trendingIdsBox);
     await Hive.openBox<OrderHiveModel>(_myOrdersBox);
     await Hive.openBox<OrderHiveModel>(_orderDetailsBox);
+    await Hive.openBox<NotificationHiveModel>(
+      HiveTableConstants.notificationTable,
+    );
   }
 
   Future<void> close() async {
@@ -385,7 +392,7 @@ class HiveService {
     await _myOrderBox.clear();
     for (final o in orders) {
       final id = o.id;
-      if (id != null && id.isNotEmpty) {
+      if (id.isNotEmpty) {
         await _myOrderBox.put(id, o);
       }
     }
@@ -401,7 +408,7 @@ class HiveService {
 
   Future<void> cacheOrderDetail(OrderHiveModel order) async {
     final id = order.id;
-    if (id == null || id.isEmpty) return;
+    if (id.isEmpty) return;
     await _orderDetails.put(id, order);
   }
 
@@ -421,12 +428,54 @@ class HiveService {
 
   Future<void> cacheOrder(OrderHiveModel order) async {
     final id = order.id;
-    if (id == null || id.isEmpty) return;
+    if (id.isEmpty) return;
 
     await _myOrderBox.put(id, order);
   }
 
   Future<OrderHiveModel?> getCachedOrderById(String id) async {
     return _myOrderBox.get(id);
+  }
+
+  // ==================== NOTIFICATIONS ====================
+  Box<NotificationHiveModel> get _notifBox =>
+      Hive.box<NotificationHiveModel>(HiveTableConstants.notificationTable);
+
+  Future<void> cacheNotifications(List<NotificationHiveModel> list) async {
+    await _notifBox.clear();
+    for (final n in list) {
+      if (n.id.isNotEmpty) {
+        await _notifBox.put(n.id, n);
+      }
+    }
+  }
+
+  List<NotificationHiveModel> getNotificationsFromCache() {
+    final items = _notifBox.values.toList();
+    // newest first (if createdAt is ISO string)
+    items.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    return items;
+  }
+
+  int getUnreadCountFromCache() {
+    return _notifBox.values.where((n) => n.isRead == false).length;
+  }
+
+  Future<void> markNotificationReadLocal(String id) async {
+    final n = _notifBox.get(id);
+    if (n == null) return;
+    await _notifBox.put(id, n.copyWith(isRead: true));
+  }
+
+  Future<void> markAllNotificationsReadLocal() async {
+    for (final n in _notifBox.values) {
+      if (!n.isRead) {
+        await _notifBox.put(n.id, n.copyWith(isRead: true));
+      }
+    }
+  }
+
+  Future<void> clearNotifications() async {
+    await _notifBox.clear();
   }
 }

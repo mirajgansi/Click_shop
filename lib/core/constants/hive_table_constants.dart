@@ -25,4 +25,7 @@ class HiveTableConstants {
   static const int shippingAddressTypeId = 32;
 
   static const String orderTable = 'orders_table';
+
+  static const int notificationTypeId = 4;
+  static const String notificationTable = 'notification_table';
 }

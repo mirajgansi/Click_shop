@@ -17,7 +17,6 @@ class AuthApiModel {
 
   final String? image;
 
-  // ✅ NEW (match Mongo model)
   final String? phoneNumber;
   final String? location;
   final String? gender;

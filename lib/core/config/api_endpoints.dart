@@ -128,4 +128,16 @@ class ApiEndpoints {
   static const String driverMyOrders = "/orders/driver/my-orders";
   static String driverUpdateOrderStatus(String orderId) =>
       "/orders/driver/$orderId/status";
+
+  //Notifications
+  static const String notifications = "notifications";
+
+  // user
+  static String myNotifications() => "$notifications/me";
+  static String notificationUnreadCount() => "$notifications/me/unread-count";
+  static String markAllNotificationsRead() => "$notifications/me/read-all";
+  static String markNotificationRead(String id) => "$notifications/$id/read";
+
+  // admin/system
+  static String createNotification() => notifications;
 }
