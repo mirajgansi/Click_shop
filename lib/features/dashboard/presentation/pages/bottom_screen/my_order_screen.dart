@@ -27,7 +27,7 @@ class _MyOrdersPageState extends ConsumerState<MyOrdersPage> {
     final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: cs.background,
+      backgroundColor: cs.surface,
 
       body: RefreshIndicator(
         onRefresh: () =>

@@ -23,7 +23,7 @@ class CartSkeleton extends StatelessWidget {
     }
 
     return Scaffold(
-      backgroundColor: cs.background,
+      backgroundColor: cs.surface,
       body: ListView.separated(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 110),
         itemCount: itemCount,

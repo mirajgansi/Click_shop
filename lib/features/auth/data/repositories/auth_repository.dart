@@ -227,7 +227,6 @@ class AuthRepository implements IAuthRepository {
         if (ok) {
           await _authDatasource.clearUser();
           await _tokenService.removeToken();
-          ;
         }
 
         return Right(ok);
@@ -307,7 +306,6 @@ class AuthRepository implements IAuthRepository {
   Future<Either<Failure, AuthEntity>> updateUser(AuthEntity user) async {
     if (await _networkInfo.isConnected) {
       try {
-        // ✅ send AuthEntity (not Map)
         final updatedApi = await _authRemoteDataSource.updateUser(user);
 
         // cache/update locally
@@ -353,5 +351,19 @@ class AuthRepository implements IAuthRepository {
         return Left(LocalDatabaseFailure(message: e.toString()));
       }
     }
+  }
+
+  @override
+  Future<Either<Failure, bool>> saveFcmToken(String token) async {
+    if (await _networkInfo.isConnected) {
+      try {
+        final result = await _authRemoteDataSource.saveFcmToken(token);
+        return Right(result);
+      } catch (e) {
+        return Left(ApiFailure(message: e.toString()));
+      }
+    }
+
+    return const Left(LocalDatabaseFailure(message: "No internet"));
   }
 }

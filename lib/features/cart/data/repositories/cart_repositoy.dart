@@ -101,26 +101,24 @@ class ItemRepository implements ICartRepository {
       // If it returns ProductHiveModel, convert accordingly.
       //
       // ✅ Recommended: local returns List<CartHiveModel>
-      if (hiveModels is List<CartHiveModel>) {
-        final entities = hiveModels
-            .map(
-              (m) => ProductEntity(
-                // You only have productId + quantity in cart hive;
-                // to show product details you must fetch product by id.
-                // For now we create a minimal entity (not ideal).
-                id: m.productId,
-                name: "",
-                description: "",
-                price: 0,
-                inStock: 0,
-                category: "",
-                nutritionalInfo: "",
-                image: "",
-              ),
-            )
-            .toList();
-        return Right(entities);
-      }
+      final entities = hiveModels
+          .map(
+            (m) => ProductEntity(
+              // You only have productId + quantity in cart hive;
+              // to show product details you must fetch product by id.
+              // For now we create a minimal entity (not ideal).
+              id: m.productId,
+              name: "",
+              description: "",
+              price: 0,
+              inStock: 0,
+              category: "",
+              nutritionalInfo: "",
+              image: "",
+            ),
+          )
+          .toList();
+      return Right(entities);
     } catch (e) {
       return Left(LocalDatabaseFailure(message: (error ?? e).toString()));
     }

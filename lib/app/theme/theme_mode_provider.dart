@@ -1,5 +1,4 @@
 import 'package:click_shop/core/services/storage/user_session_service.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 enum AppThemeMode { system, light, dark, sensor }

@@ -126,7 +126,7 @@ class DriverOrderCard extends StatelessWidget {
       a.address1,
       a.address2,
       a.city,
-    ].where((e) => e != null && e!.isNotEmpty).join(", ");
+    ].where((e) => e != null && e.isNotEmpty).join(", ");
   }
 
   String _timeAgo(DateTime? date) {

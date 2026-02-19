@@ -95,7 +95,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                 Expanded(
                   flex: 1,
                   child: Container(
-                    color: cs.surfaceVariant,
+                    color: cs.surfaceContainerHighest,
                     child: Center(
                       child: Image.asset('assets/images/8140 1.jpg'),
                     ),

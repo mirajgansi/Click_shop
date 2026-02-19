@@ -24,7 +24,7 @@ class CartRemoteDatasource implements ICartRemoteDatabase {
        _tokenService = tokenService;
 
   Future<Options> _authOptions() async {
-    final token = await _tokenService.getToken();
+    final token = _tokenService.getToken();
     return Options(
       headers: {
         "Authorization": "Bearer $token",

@@ -99,7 +99,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               if (isTablet)
                 Expanded(
                   child: Container(
-                    color: cs.surfaceVariant,
+                    color: cs.surfaceContainerHighest,
                     child: Center(
                       child: Image.asset(
                         'assets/images/8140 1.jpg',

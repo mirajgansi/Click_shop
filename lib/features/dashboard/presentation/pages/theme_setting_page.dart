@@ -49,7 +49,7 @@ class ThemeSettingsPage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text("Theme")),
-      backgroundColor: cs.background,
+      backgroundColor: cs.surface,
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(

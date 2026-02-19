@@ -51,7 +51,7 @@ class _DriverHomePageState extends State<DriverHomePage> {
     final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: cs.background,
+      backgroundColor: cs.surface,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         elevation: 0,

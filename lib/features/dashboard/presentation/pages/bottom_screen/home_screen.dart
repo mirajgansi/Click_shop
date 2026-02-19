@@ -1,11 +1,17 @@
 import 'package:click_shop/app/routes/app_routes.dart';
 import 'package:click_shop/core/constants/app_categories.dart';
+import 'package:click_shop/core/providers/socket_service_provider.dart';
+import 'package:click_shop/features/auth/domain/usecases/save_fcm_token_usecase.dart';
+import 'package:click_shop/features/auth/presentation/view_model/auth_view_model.dart';
+import 'package:click_shop/features/dashboard/presentation/view_model/notification_view_model.dart';
 import 'package:click_shop/features/dashboard/presentation/widgets/my_card_widgets.dart';
+import 'package:click_shop/features/dashboard/presentation/widgets/my_notification_banner.dart';
 import 'package:click_shop/features/dashboard/presentation/widgets/skeleton_product_card_widget.dart';
 import 'package:click_shop/features/product/domain/entities/product_entity.dart';
 import 'package:click_shop/features/product/presentation/pages/product_category_screen.dart';
 import 'package:click_shop/features/product/presentation/view_model/product_view_model.dart';
 import 'package:click_shop/features/product/presentation/widgets/my_category_widget.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -17,43 +23,49 @@ class HomeScreen extends ConsumerStatefulWidget {
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-Future<bool> requestNotificationPermission(BuildContext context) async {
+Future<void> enableNotifications(BuildContext context, WidgetRef ref) async {
   final status = await Permission.notification.status;
+  print("NOTIF status => $status");
 
-  if (status.isGranted) return true;
+  if (status.isGranted) {
+    print("NOTIF: granted -> send token");
+    await _generateAndSendFcmToken(ref);
+    return;
+  }
 
   if (status.isDenied) {
+    print("NOTIF: denied -> requesting...");
     final res = await Permission.notification.request();
-    return res.isGranted;
+    print("NOTIF request result => $res");
+    if (res.isGranted) {
+      print("NOTIF: now granted -> send token");
+      await _generateAndSendFcmToken(ref);
+    }
+    return;
   }
 
   if (status.isPermanentlyDenied) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text("Enable Notifications"),
-        content: const Text(
-          "Notifications are permanently denied. Enable them from App Settings.",
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Cancel"),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              await openAppSettings();
-            },
-            child: const Text("Open Settings"),
-          ),
-        ],
-      ),
-    );
-    return false;
+    print("NOTIF: permanentlyDenied -> open settings dialog");
+    _showNotificationPermissionDialog(context);
+    return;
   }
 
-  return false;
+  print("NOTIF: other status => $status");
+}
+
+Future<void> _generateAndSendFcmToken(WidgetRef ref) async {
+  try {
+    final token = await FirebaseMessaging.instance.getToken();
+    print("FCM TOKEN => $token");
+
+    if (token == null) return;
+
+    await ref
+        .read(saveFcmTokenUsecaseProvider)
+        .call(SaveFcmTokenParams(token: token));
+  } catch (e) {
+    print("FCM: ERROR => $e");
+  }
 }
 
 void _showNotificationPermissionDialog(BuildContext context) {
@@ -85,6 +97,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   final _searchCtrl = TextEditingController();
   String q = "";
   bool _booted = false;
+  bool _socketBooted = false;
 
   @override
   void didChangeDependencies() {
@@ -101,14 +114,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Future<void> onRefresh() async {
     final vm = ref.read(productViewModelProvider.notifier);
 
-    await vm.initHome(); // all products / home data
-    await vm.loadTrending(); // best seller
-    await vm.loadPopular(); // favorites/most bought
-    // await vm.loadRecent();  // if you still use recent
+    await vm.initHome();
+    await vm.loadTrending();
+    await vm.loadPopular();
   }
 
   @override
   void dispose() {
+    ref.read(socketServiceProvider).disconnect();
     _searchCtrl.dispose();
     super.dispose();
   }
@@ -116,8 +129,31 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() async {
-      await requestNotificationPermission(context);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      try {
+        if (!mounted) return;
+
+        // 1) permission + token save
+        await enableNotifications(context, ref);
+
+        // 2) load notifications
+        await ref.read(notificationViewModelProvider.notifier).load();
+        await ref
+            .read(notificationViewModelProvider.notifier)
+            .loadUnreadCount();
+
+        // 3) connect socket
+        final authState = ref.read(AuthViewModelProvider);
+        final userId = authState.user?.userId; // adjust if needed
+
+        if (userId != null && userId.isNotEmpty && !_socketBooted) {
+          _socketBooted = true;
+          ref.read(socketServiceProvider).connect(userId);
+        }
+      } catch (e) {
+        print("❌ initState error: $e");
+      }
     });
   }
 
@@ -175,7 +211,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         )
                       : null,
                   filled: true,
-                  fillColor: Theme.of(context).colorScheme.surfaceVariant,
+                  fillColor: Theme.of(
+                    context,
+                  ).colorScheme.surfaceContainerHighest,
                   contentPadding: const EdgeInsets.symmetric(vertical: 12),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),

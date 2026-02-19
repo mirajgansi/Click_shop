@@ -30,7 +30,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
     final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: cs.background,
+      backgroundColor: cs.surface,
 
       body: state.isLoading
           ? const CartSkeleton(itemCount: 6)
@@ -146,7 +146,7 @@ class _CartItemTile extends StatelessWidget {
             width: 54,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
-              color: cs.surfaceVariant,
+              color: cs.surfaceContainerHighest,
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(12),
@@ -246,7 +246,7 @@ class _QtyControl extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 6),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: cs.surfaceVariant),
+        border: Border.all(color: cs.surfaceContainerHighest),
       ),
       child: Row(
         children: [

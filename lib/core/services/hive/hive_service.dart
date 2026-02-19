@@ -5,7 +5,6 @@ import 'package:click_shop/features/dashboard/data/model/notification_hive_model
 import 'package:click_shop/features/order/data/model/order_hive_model.dart';
 import 'package:click_shop/features/order/data/model/order_item_hive_model.dart';
 import 'package:click_shop/features/driver/data/model/shipping_address_hive_model.dart';
-import 'package:click_shop/features/order/domain/entities/order_entities.dart';
 import 'package:click_shop/features/product/data/model/product_hive_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';

@@ -66,7 +66,7 @@ class ApiEndpoints {
 
   static const String requestPasswordReset = '$auth/request-password-reset';
   static String resetPassword = '$auth/reset-password';
-
+  static String saveFcmToken = '$auth/me/fcm-token';
   static String userById(String id) => '/auth/$id';
   static String userPhoto(String id) => '/auth/update-profile';
 

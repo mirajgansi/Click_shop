@@ -53,7 +53,7 @@ class _ResetCodePageState extends State<ResetCodePage> {
     final email = widget.initialEmail ?? _emailCtrl.text;
 
     return Scaffold(
-      backgroundColor: cs.background,
+      backgroundColor: cs.surface,
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),

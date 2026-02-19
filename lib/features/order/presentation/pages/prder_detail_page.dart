@@ -31,7 +31,7 @@ class _OrderDetailPageState extends ConsumerState<OrderDetailPage> {
     final order = state.selectedOrder;
 
     return Scaffold(
-      backgroundColor: cs.background,
+      backgroundColor: cs.surface,
       appBar: AppBar(
         backgroundColor: cs.surface,
         elevation: 0,
@@ -92,7 +92,7 @@ class _Body extends StatelessWidget {
         ),
         const SizedBox(height: 10),
 
-        ...order.items.map((item) => _ItemTile(item: item)).toList(),
+        ...order.items.map((item) => _ItemTile(item: item)),
 
         const SizedBox(height: 14),
         _TotalsCard(order: order),
@@ -134,7 +134,7 @@ class _HeaderCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             decoration: BoxDecoration(
-              color: cs.surfaceVariant,
+              color: cs.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(999),
               border: Border.all(color: cs.outlineVariant.withOpacity(0.35)),
             ),
@@ -167,7 +167,7 @@ class _StatusCard extends StatelessWidget {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(14),
-        color: cs.surfaceVariant,
+        color: cs.surfaceContainerHighest,
         border: Border.all(color: cs.outlineVariant.withOpacity(0.4)),
       ),
       child: Row(
@@ -331,7 +331,7 @@ class _TotalsCard extends StatelessWidget {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(14),
-        color: cs.surfaceVariant,
+        color: cs.surfaceContainerHighest,
         border: Border.all(color: cs.outlineVariant.withOpacity(0.4)),
       ),
       child: Column(

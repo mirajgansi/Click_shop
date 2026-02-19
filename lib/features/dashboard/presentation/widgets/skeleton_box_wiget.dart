@@ -37,7 +37,7 @@ class _SkeletonBoxState extends State<SkeletonBox>
 
   @override
   Widget build(BuildContext context) {
-    final baseColor = Theme.of(context).colorScheme.surfaceVariant;
+    final baseColor = Theme.of(context).colorScheme.surfaceContainerHighest;
     final highlightColor = Theme.of(context).colorScheme.surface;
 
     return AnimatedBuilder(

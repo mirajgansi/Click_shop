@@ -13,6 +13,7 @@ abstract interface class IAuthRepository {
   Future<Either<Failure, bool>> deleteMe(String password);
 
   Future<Either<Failure, bool>> requestPasswordReset(String email);
+  Future<Either<Failure, bool>> saveFcmToken(String token);
 
   Future<Either<Failure, bool>> resetPassword({
     required String email,

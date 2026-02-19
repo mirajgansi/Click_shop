@@ -77,7 +77,7 @@ class ProductRepository implements IProductRepository {
     String categoryId,
   ) async {
     // helper: read local + convert to entities
-    Future<Either<Failure, List<ProductEntity>>> _getLocal() async {
+    Future<Either<Failure, List<ProductEntity>>> getLocal() async {
       try {
         final hiveModels = await _localDataSource.getProductsByCategory(
           categoryId,
@@ -99,10 +99,10 @@ class ProductRepository implements IProductRepository {
         final entities = ProductApiModel.toEntityList(apiModels);
         return Right(entities);
       } catch (e) {
-        return _getLocal();
+        return getLocal();
       }
     } else {
-      return _getLocal();
+      return getLocal();
     }
   }
 

@@ -350,8 +350,9 @@ class _MyDetailsScreenState extends ConsumerState<MyDetailsScreen> {
                   onPressed: isLoading
                       ? null
                       : () async {
-                          if (!(_formKey.currentState?.validate() ?? false))
+                          if (!(_formKey.currentState?.validate() ?? false)) {
                             return;
+                          }
 
                           final current = authState.user;
                           if (current == null) return;

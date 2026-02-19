@@ -8,6 +8,7 @@ class ItemTile extends StatelessWidget {
   final String? imagePath;
 
   const ItemTile({
+    super.key,
     required this.name,
     required this.qty,
     required this.price,

@@ -1,4 +1,3 @@
-import 'package:click_shop/app/app_color.dart';
 import 'package:click_shop/app/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 

@@ -1,23 +1,26 @@
+import 'package:click_shop/core/providers/socket_service_provider.dart';
 import 'package:click_shop/features/dashboard/presentation/pages/bottom_screen/explore_screen.dart';
 import 'package:click_shop/features/dashboard/presentation/pages/bottom_screen/cart_sreen.dart';
 import 'package:click_shop/features/dashboard/presentation/pages/bottom_screen/home_screen.dart';
 import 'package:click_shop/features/dashboard/presentation/pages/bottom_screen/my_order_screen.dart';
 import 'package:click_shop/features/dashboard/presentation/pages/bottom_screen/profile_screen.dart';
+import 'package:click_shop/features/dashboard/presentation/pages/notification_page.dart';
 import 'package:click_shop/features/dashboard/presentation/view_model/notification_view_model.dart';
-import 'package:click_shop/features/dashboard/presentation/widgets/notification_widget.dart';
+import 'package:click_shop/features/dashboard/presentation/widgets/my_notification_banner.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-class DashboardScreen extends StatefulWidget {
+class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
 
   @override
-  State<DashboardScreen> createState() => _DashboardScreenState();
+  ConsumerState<DashboardScreen> createState() => _DashboardScreenState();
 }
 
-class _DashboardScreenState extends State<DashboardScreen> {
+class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   int _selectedIndex = 0;
 
   final List<String> _titles = [
@@ -53,32 +56,56 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  // Future<void> setupFirebaseNotification(BuildContext context) async {
-  //   final hasPermission = await requestNotificationPermission(context);
-  //   if (!hasPermission) return;
+  @override
+  void initState() {
+    super.initState();
 
-  //   final settings = await FirebaseMessaging.instance.requestPermission(
-  //     alert: true,
-  //     badge: true,
-  //     sound: true,
-  //   );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Socket stream listener (Riverpod)
+      ref.listen<AsyncValue<dynamic>>(socketNotificationStreamProvider, (
+        prev,
+        next,
+      ) {
+        next.whenData((data) {
+          ref
+              .read(notificationViewModelProvider.notifier)
+              .onSocketNotification(data);
 
-  //   if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-  //     print("Notification permission granted");
+          final title = (data is Map && data['title'] != null)
+              ? data['title'].toString()
+              : "New notification";
+          final msg = (data is Map && data['message'] != null)
+              ? data['message'].toString()
+              : "";
 
-  //     final token = await FirebaseMessaging.instance.getToken();
-  //     print("FCM Token: $token");
-
-  //     // TODO: send token to backend
-  //   }
-  // }
+          InAppNotification.show(context, title: title, message: msg);
+        });
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final notif = ref.watch(notificationViewModelProvider);
+    final unread = notif.unreadCount;
+    ref.listen<AsyncValue<dynamic>>(socketNotificationStreamProvider, (
+      prev,
+      next,
+    ) {
+      next.whenData((data) {
+        ref
+            .read(notificationViewModelProvider.notifier)
+            .onSocketNotification(data);
 
+        final title = data['title'] ?? "New notification";
+        final msg = data['message'] ?? "";
+
+        InAppNotification.show(context, title: title, message: msg);
+      });
+    });
     return Scaffold(
-      backgroundColor: cs.background,
+      backgroundColor: cs.surface,
 
       appBar: AppBar(
         automaticallyImplyLeading: false,

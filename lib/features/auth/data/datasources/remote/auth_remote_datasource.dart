@@ -6,7 +6,6 @@ import 'package:click_shop/core/services/storage/token_service.dart';
 import 'package:click_shop/core/services/storage/user_session_service.dart';
 import 'package:click_shop/features/auth/data/datasources/auth_datasources.dart';
 import 'package:click_shop/features/auth/data/models/auth_api_model.dart';
-import 'package:click_shop/features/auth/data/models/auth_hive_model.dart';
 import 'package:click_shop/features/auth/domain/entities/auth_entity.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -213,5 +212,22 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
     }
 
     throw Exception(response.data['message'] ?? "Failed to delete user");
+  }
+
+  @override
+  Future<bool> saveFcmToken(String token) async {
+    print("🔥 REMOTE saveFcmToken() HIT. token=${token.substring(0, 10)}...");
+    print("🔥 JWT used = ${_tokenService.getToken()?.substring(0, 20)}...");
+
+    final res = await _apiClient.post(
+      ApiEndpoints.saveFcmToken,
+      data: {"token": token},
+      options: Options(
+        headers: {'Authorization': 'Bearer ${_tokenService.getToken()}'},
+      ),
+    );
+
+    print("🔥 REMOTE saveFcmToken() RESPONSE: ${res.statusCode} ${res.data}");
+    return res.data["success"] == true;
   }
 }

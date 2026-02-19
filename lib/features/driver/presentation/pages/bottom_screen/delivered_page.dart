@@ -33,7 +33,7 @@ class _DeliveredPageState extends ConsumerState<DeliveredPage> {
         .toList();
 
     return Scaffold(
-      backgroundColor: cs.background,
+      backgroundColor: cs.surface,
       body: RefreshIndicator(
         onRefresh: () =>
             ref.read(driverViewModelProvider.notifier).loadMyOrders(),

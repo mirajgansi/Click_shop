@@ -4,7 +4,7 @@ class SectionCarWidget extends StatelessWidget {
   final String title;
   final Widget child;
 
-  const SectionCarWidget({required this.title, required this.child});
+  const SectionCarWidget({super.key, required this.title, required this.child});
 
   @override
   Widget build(BuildContext context) {

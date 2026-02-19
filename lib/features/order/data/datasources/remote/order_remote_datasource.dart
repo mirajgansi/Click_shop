@@ -25,7 +25,7 @@ class OrderRemoteDatasource implements IOrderRemoteDatasource {
 
   /// 🔐 Auth header (same as cart)
   Future<Options> _authOptions() async {
-    final token = await _tokenService.getToken();
+    final token = _tokenService.getToken();
     return Options(
       headers: {
         "Authorization": "Bearer $token",

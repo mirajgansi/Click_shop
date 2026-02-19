@@ -37,4 +37,5 @@ abstract interface class IAuthRemoteDataSource {
     required String code, // keep String (important!)
     required String newPassword,
   });
+  Future<bool> saveFcmToken(String token);
 }

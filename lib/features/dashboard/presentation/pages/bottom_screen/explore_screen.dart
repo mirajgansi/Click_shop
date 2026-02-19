@@ -54,7 +54,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                 hintText: "Search Store",
                 prefixIcon: const Icon(Icons.search),
                 filled: true,
-                fillColor: cs.surfaceVariant,
+                fillColor: cs.surfaceContainerHighest,
                 contentPadding: const EdgeInsets.symmetric(vertical: 12),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),

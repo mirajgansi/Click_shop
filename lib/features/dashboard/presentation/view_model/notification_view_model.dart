@@ -1,9 +1,13 @@
+import 'package:click_shop/features/dashboard/data/model/notification_api_model.dart';
+import 'package:click_shop/features/dashboard/data/model/notification_hive_model.dart';
 import 'package:click_shop/features/dashboard/domain/usecases/get_my_notification_usecase.dart';
 import 'package:click_shop/features/dashboard/domain/usecases/get_unread_count_usecase.dart';
 import 'package:click_shop/features/dashboard/domain/usecases/mark_all_notification_usecase.dart';
 import 'package:click_shop/features/dashboard/domain/usecases/mark_notification_read_usecase.dart';
 import 'package:click_shop/features/dashboard/presentation/state/notification_state.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:click_shop/features/dashboard/presentation/pages/bottom_screen/home_screen.dart'
+    as notificationRepository;
 
 final notificationViewModelProvider =
     NotifierProvider<NotificationViewModel, NotificationState>(
@@ -120,5 +124,28 @@ class NotificationViewModel extends Notifier<NotificationState> {
   Future<void> refresh() async {
     await load(forceRefresh: true);
     await loadUnreadCount(forceRefresh: true);
+  }
+
+  void onSocketNotification(dynamic data) {
+    try {
+      final map = Map<String, dynamic>.from(data as Map);
+
+      final api = NotificationApiModel.fromJson(map);
+      final n = api.toEntity();
+
+      final exists = state.notifications.any((x) => x.id == n.id);
+      if (exists) return;
+
+      state = state.copyWith(
+        notifications: [n, ...state.notifications],
+        unreadCount: state.unreadCount + (n.isRead ? 0 : 1),
+        error: null,
+      );
+
+      // Optional (recommended): save locally via repository/usecase, NOT here using HiveModel directly
+      // await _saveNotificationUsecase(n);
+    } catch (e) {
+      state = state.copyWith(error: "Invalid socket notification payload");
+    }
   }
 }

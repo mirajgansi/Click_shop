@@ -307,7 +307,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         bool notificationsEnabled = true;
 
         return Container(
-          color: cs.background,
+          color: cs.surface,
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(16),
             child: Column(

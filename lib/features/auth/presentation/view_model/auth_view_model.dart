@@ -8,9 +8,11 @@ import 'package:click_shop/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:click_shop/features/auth/domain/usecases/register_usecase.dart';
 import 'package:click_shop/features/auth/domain/usecases/requeset_password_reset_usecase.dart';
 import 'package:click_shop/features/auth/domain/usecases/reset_password.dart';
+import 'package:click_shop/features/auth/domain/usecases/save_fcm_token_usecase.dart';
 import 'package:click_shop/features/auth/domain/usecases/updateProfile_usecase.dart';
 import 'package:click_shop/features/auth/domain/usecases/update_user_usecase.dart';
 import 'package:click_shop/features/auth/presentation/state/auth_state.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final AuthViewModelProvider = NotifierProvider<AuthViewModel, AuthState>(
@@ -92,12 +94,14 @@ class AuthViewModel extends Notifier<AuthState> {
     final result = await _loginUsecase(
       LoginUsecaseParams(email: email, password: password),
     );
+    await _initAndSendFcmToken();
 
     result.fold(
       (failure) => state = state.copyWith(
         status: AuthStatus.error,
         errorMessage: failure.message,
       ),
+
       (user) {
         state = state.copyWith(status: AuthStatus.authenticated, user: user);
 
@@ -112,6 +116,21 @@ class AuthViewModel extends Notifier<AuthState> {
         }
       },
     );
+  }
+
+  Future<void> _initAndSendFcmToken() async {
+    // Android 13+ runtime permission (optional but recommended)
+    await FirebaseMessaging.instance.requestPermission();
+
+    final token = await FirebaseMessaging.instance.getToken();
+    if (token == null) return;
+
+    // debug
+    print("FCM TOKEN: $token");
+
+    await ref
+        .read(saveFcmTokenUsecaseProvider)
+        .call(SaveFcmTokenParams(token: token));
   }
 
   Future<void> getCurrentUser() async {

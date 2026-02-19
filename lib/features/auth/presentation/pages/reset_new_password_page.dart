@@ -124,8 +124,9 @@ class _ResetNewPasswordPageState extends ConsumerState<ResetNewPasswordPage> {
                     ),
                     validator: (v) {
                       final s = v ?? "";
-                      if (s.length < 8)
+                      if (s.length < 8) {
                         return "Password must be at least 8 characters";
+                      }
                       return null;
                     },
                   ),
@@ -149,8 +150,9 @@ class _ResetNewPasswordPageState extends ConsumerState<ResetNewPasswordPage> {
                       ),
                     ),
                     validator: (v) {
-                      if ((v ?? "") != _passCtrl.text)
+                      if ((v ?? "") != _passCtrl.text) {
                         return "Passwords do not match";
+                      }
                       return null;
                     },
                   ),

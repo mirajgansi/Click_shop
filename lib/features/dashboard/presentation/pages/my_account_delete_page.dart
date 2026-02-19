@@ -35,7 +35,7 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
     final isLoading = authState.status == AuthStatus.loading;
 
     return Scaffold(
-      backgroundColor: cs.background,
+      backgroundColor: cs.surface,
       appBar: AppBar(
         backgroundColor: cs.surface,
         elevation: 0.5,
@@ -59,7 +59,7 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
                 children: [
                   CircleAvatar(
                     radius: 22,
-                    backgroundColor: cs.surfaceVariant,
+                    backgroundColor: cs.surfaceContainerHighest,
                     child: Icon(
                       Icons.person,
                       color: cs.onSurface.withOpacity(0.6),
@@ -125,7 +125,7 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
                     hintText: "Password",
                     hintStyle: TextStyle(color: cs.onSurface.withOpacity(0.45)),
                     filled: true,
-                    fillColor: cs.surfaceVariant,
+                    fillColor: cs.surfaceContainerHighest,
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 14,
                       vertical: 14,
@@ -155,10 +155,12 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
                     ),
                   ),
                   validator: (v) {
-                    if (v == null || v.trim().isEmpty)
+                    if (v == null || v.trim().isEmpty) {
                       return "Password is required";
-                    if (v.trim().length < 6)
+                    }
+                    if (v.trim().length < 6) {
                       return "Password must be at least 6 characters";
+                    }
                     return null;
                   },
                 ),
@@ -193,8 +195,9 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
                   onPressed: isLoading
                       ? null
                       : () async {
-                          if (!(_formKey.currentState?.validate() ?? false))
+                          if (!(_formKey.currentState?.validate() ?? false)) {
                             return;
+                          }
 
                           final ok = await showDialog<bool>(
                             context: context,

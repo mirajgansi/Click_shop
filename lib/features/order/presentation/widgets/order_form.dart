@@ -444,7 +444,7 @@ class _ShippingForm extends StatelessWidget {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(14),
-        color: cs.surfaceVariant,
+        color: cs.surfaceContainerHighest,
         border: Border.all(color: cs.outlineVariant.withOpacity(0.4)),
       ),
       child: Column(

@@ -75,7 +75,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
     }
 
     return Scaffold(
-      backgroundColor: cs.background,
+      backgroundColor: cs.surface,
       appBar: AppBar(
         backgroundColor: cs.surface,
         elevation: 0,
@@ -134,7 +134,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
               margin: const EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16),
-                color: cs.surfaceVariant,
+                color: cs.surfaceContainerHighest,
               ),
               child: Center(
                 child: (product.image.isEmpty)

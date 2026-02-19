@@ -20,7 +20,7 @@ class DriverOrderDetailPage extends ConsumerWidget {
 
     final a = order.shippingAddress;
     return Scaffold(
-      backgroundColor: cs.background,
+      backgroundColor: cs.surface,
       appBar: AppBar(
         backgroundColor: cs.surface,
         foregroundColor: cs.onSurface,
@@ -194,7 +194,7 @@ class DriverOrderDetailPage extends ConsumerWidget {
     if (a == null) return "No address";
 
     final parts = [a.address1, a.address2, a.city, a.zip]
-        .where((e) => e != null && e!.trim().isNotEmpty)
+        .where((e) => e != null && e.trim().isNotEmpty)
         .map((e) => e!.trim())
         .toList();
 

@@ -3,7 +3,6 @@ import 'package:click_shop/core/services/connectivity/network_info.dart';
 import 'package:click_shop/features/order/data/datasources/order_datasource.dart';
 import 'package:click_shop/features/order/data/datasources/local/order_local_datasource.dart';
 import 'package:click_shop/features/order/data/datasources/remote/order_remote_datasource.dart';
-import 'package:click_shop/features/order/data/model/order_api_model.dart';
 import 'package:click_shop/features/order/data/model/order_hive_model.dart';
 import 'package:click_shop/features/order/domain/entities/order_entities.dart';
 import 'package:click_shop/features/order/domain/repositories/order_repository.dart';

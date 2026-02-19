@@ -2,7 +2,6 @@ import 'package:click_shop/core/utils/snackbar_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:motion_toast/motion_toast.dart';
 
 import 'package:click_shop/features/cart/presentation/view_model/cart_view_model.dart';
 

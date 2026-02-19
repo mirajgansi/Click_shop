@@ -26,7 +26,7 @@ class ProductDetailSkeleton extends StatelessWidget {
         box(h: h, w: w, radius: BorderRadius.circular(10));
 
     return Scaffold(
-      backgroundColor: cs.background,
+      backgroundColor: cs.surface,
       appBar: AppBar(
         backgroundColor: cs.surface,
         elevation: 0,
