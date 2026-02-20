@@ -137,6 +137,6 @@ flutter:
 flutter_launcher_icons:
   android: "launcher_icons"
   ios: "AppIcon"
-  image_path: "assets/images/Group.jpg"
+  image_path: "assets/images/happy.png"
   min_sdk_android: 21
   remove_alpha_ios: true

@@ -324,7 +324,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             ? FileImage(File(_selectedMedia.first.path))
                             : (imageUrl != null
                                   ? NetworkImage(imageUrl)
-                                  : const AssetImage('assets/images/Group.jpg')
+                                  : const AssetImage('assets/images/happy.png')
                                         as ImageProvider),
                       ),
                     ),

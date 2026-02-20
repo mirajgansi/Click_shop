@@ -151,12 +151,12 @@ class _CartItemTile extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: imageUrl.isEmpty
-                  ? Image.asset("assets/images/Group.jpg", fit: BoxFit.cover)
+                  ? Image.asset("assets/images/happy.png", fit: BoxFit.cover)
                   : Image.network(
                       _buildImageUrl(imageUrl),
                       fit: BoxFit.cover,
                       errorBuilder: (_, __, ___) => Image.asset(
-                        "assets/images/Group.jpg",
+                        "assets/images/happy.png",
                         fit: BoxFit.cover,
                       ),
                     ),

@@ -59,7 +59,7 @@ class _DriverHomePageState extends State<DriverHomePage> {
         title: Row(
           children: [
             Image.asset(
-              'assets/images/Group.jpg',
+              'assets/images/happy.png',
               width: 40,
               height: 40,
               fit: BoxFit.cover,

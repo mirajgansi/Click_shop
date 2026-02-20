@@ -7,11 +7,9 @@ import 'package:click_shop/features/dashboard/presentation/pages/bottom_screen/p
 import 'package:click_shop/features/dashboard/presentation/pages/notification_page.dart';
 import 'package:click_shop/features/dashboard/presentation/view_model/notification_view_model.dart';
 import 'package:click_shop/features/dashboard/presentation/widgets/my_notification_banner.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
@@ -56,39 +54,34 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     );
   }
 
+  late final ProviderSubscription<AsyncValue<dynamic>> _sub;
+
   @override
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Socket stream listener (Riverpod)
-      ref.listen<AsyncValue<dynamic>>(socketNotificationStreamProvider, (
-        prev,
-        next,
-      ) {
+    _sub = ref.listenManual<AsyncValue<dynamic>>(
+      socketNotificationStreamProvider,
+      (prev, next) {
         next.whenData((data) {
           ref
               .read(notificationViewModelProvider.notifier)
               .onSocketNotification(data);
-
-          final title = (data is Map && data['title'] != null)
-              ? data['title'].toString()
-              : "New notification";
-          final msg = (data is Map && data['message'] != null)
-              ? data['message'].toString()
-              : "";
-
-          InAppNotification.show(context, title: title, message: msg);
         });
-      });
-    });
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _sub.close();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final notif = ref.watch(notificationViewModelProvider);
-    final unread = notif.unreadCount;
+
     ref.listen<AsyncValue<dynamic>>(socketNotificationStreamProvider, (
       prev,
       next,
@@ -98,8 +91,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             .read(notificationViewModelProvider.notifier)
             .onSocketNotification(data);
 
-        final title = data['title'] ?? "New notification";
-        final msg = data['message'] ?? "";
+        final title = (data is Map && data['title'] != null)
+            ? data['title'].toString()
+            : "New notification";
+
+        final msg = (data is Map && data['message'] != null)
+            ? data['message'].toString()
+            : "";
 
         InAppNotification.show(context, title: title, message: msg);
       });
@@ -114,7 +112,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         title: Row(
           children: [
             Image.asset(
-              'assets/images/Group.jpg',
+              'assets/images/happy.png',
               width: 40,
               height: 40,
               fit: BoxFit.cover,
@@ -130,6 +128,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             ),
           ],
         ),
+
         actions: [
           Consumer(
             builder: (context, ref, _) {

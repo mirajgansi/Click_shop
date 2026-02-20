@@ -139,7 +139,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
               child: Center(
                 child: (product.image.isEmpty)
                     ? Image.asset(
-                        "assets/images/Group.jpg",
+                        "assets/images/happy.png",
                         fit: BoxFit.contain,
                       )
                     : Image.network(
