@@ -1,3 +1,4 @@
+import 'package:click_shop/core/navigation/nav_key.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
@@ -47,10 +48,12 @@ class LocalNotificationService {
     await notificationsPlugin.initialize(
       settings: initSettings,
       onDidReceiveNotificationResponse: (NotificationResponse response) {
-        debugPrint("payload: ${response.payload}");
+        final payload = response.payload;
+        if (payload != null && payload.isNotEmpty) {
+          handlePayloadNavigation(payload);
+        }
       },
     );
-
     // Create Android channel (important)
     final androidPlugin = notificationsPlugin
         .resolvePlatformSpecificImplementation<
@@ -90,4 +93,28 @@ class LocalNotificationService {
       payload: payload,
     );
   }
+}
+
+void handleNotificationNavigation(Map<String, dynamic> data) {
+  final type = data['type']?.toString();
+
+  // ✅ orderId is nested inside "data"
+  final nested = data['data'];
+  final orderId = (nested is Map) ? nested['orderId']?.toString() : null;
+
+  if (orderId == null || orderId.isEmpty) return;
+
+  // ✅ types that should open order detail
+  const openOrderTypes = {'order', 'driver_assigned', 'order_status'};
+  if (type != null && openOrderTypes.contains(type)) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      navigatorKey.currentState?.pushNamed('/order-detail', arguments: orderId);
+    });
+  }
+}
+
+void handlePayloadNavigation(String payload) {
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    navigatorKey.currentState?.pushNamed('/order-detail', arguments: payload);
+  });
 }

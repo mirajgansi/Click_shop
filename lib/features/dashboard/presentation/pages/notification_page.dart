@@ -1,5 +1,7 @@
+import 'package:click_shop/core/utils/snackbar_utils.dart';
 import 'package:click_shop/features/dashboard/presentation/view_model/notification_view_model.dart';
 import 'package:click_shop/features/dashboard/presentation/state/notification_state.dart';
+import 'package:click_shop/features/order/presentation/pages/prder_detail_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -67,8 +69,32 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
                   message: n.message,
                   createdAt: n.createdAt,
                   isRead: n.isRead,
-                  onTap: () {
-                    // mark read on tap
+                  onTap: () async {
+                    // 1) Debug: confirm tap is firing
+                    debugPrint("Notification tapped: id=${n.id}");
+
+                    // 2) Get orderId (must exist in your notification model)
+                    final orderId =
+                        n.orderId; // <-- make sure this field exists
+
+                    debugPrint("orderId from notification = $orderId");
+
+                    // 3) Navigate if orderId exists
+                    if (orderId != null && orderId.trim().isNotEmpty) {
+                      // Use rootNavigator in case you're inside tabs/bottom nav
+                      Navigator.of(context, rootNavigator: true).push(
+                        MaterialPageRoute(
+                          builder: (_) => OrderDetailPage(orderId: orderId),
+                        ),
+                      );
+                    } else {
+                      SnackbarUtils.showError(
+                        context,
+                        "No orderId in this notification",
+                      );
+                    }
+
+                    // 4) Mark read (after navigation is fine)
                     ref
                         .read(notificationViewModelProvider.notifier)
                         .markRead(n.id);

@@ -1,6 +1,6 @@
 import 'package:click_shop/features/dashboard/domain/entities/notificaton_entities.dart';
-import 'package:hive/hive.dart';
 import 'package:click_shop/core/constants/hive_table_constants.dart';
+import 'package:hive/hive.dart';
 
 part 'notification_hive_model.g.dart';
 
@@ -24,6 +24,9 @@ class NotificationHiveModel extends HiveObject {
   @HiveField(5)
   final String? type;
 
+  @HiveField(6)
+  final String? orderId;
+
   NotificationHiveModel({
     required this.id,
     required this.title,
@@ -31,8 +34,8 @@ class NotificationHiveModel extends HiveObject {
     required this.isRead,
     required this.createdAt,
     this.type,
+    this.orderId,
   });
-
   NotificationHiveModel copyWith({
     String? id,
     String? title,
@@ -40,6 +43,7 @@ class NotificationHiveModel extends HiveObject {
     bool? isRead,
     String? createdAt,
     String? type,
+    String? orderId,
   }) {
     return NotificationHiveModel(
       id: id ?? this.id,
@@ -48,6 +52,7 @@ class NotificationHiveModel extends HiveObject {
       isRead: isRead ?? this.isRead,
       createdAt: createdAt ?? this.createdAt,
       type: type ?? this.type,
+      orderId: orderId ?? this.orderId,
     );
   }
 
@@ -59,6 +64,7 @@ class NotificationHiveModel extends HiveObject {
       isRead: entity.isRead,
       createdAt: entity.createdAt,
       type: entity.type,
+      orderId: entity.orderId,
     );
   }
 
@@ -70,12 +76,7 @@ class NotificationHiveModel extends HiveObject {
       isRead: isRead,
       createdAt: createdAt,
       type: type,
+      orderId: orderId,
     );
-  }
-
-  static List<NotificationEntity> toEntityList(
-    List<NotificationHiveModel> hiveModels,
-  ) {
-    return hiveModels.map((model) => model.toEntity()).toList();
   }
 }

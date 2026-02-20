@@ -5,6 +5,19 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'notification_api_model.g.dart';
 
 @JsonSerializable()
+class NotificationMeta {
+  final String? orderId;
+  final String? url;
+
+  NotificationMeta({this.orderId, this.url});
+
+  factory NotificationMeta.fromJson(Map<String, dynamic> json) =>
+      _$NotificationMetaFromJson(json);
+
+  Map<String, dynamic> toJson() => _$NotificationMetaToJson(this);
+}
+
+@JsonSerializable()
 class NotificationApiModel {
   @JsonKey(name: '_id')
   final String id;
@@ -12,13 +25,17 @@ class NotificationApiModel {
   final String title;
   final String message;
 
-  @JsonKey(name: 'read') //  FIX HERE
+  @JsonKey(name: 'read')
   final bool isRead;
 
   final String? type;
 
   @JsonKey(name: 'createdAt')
   final String createdAt;
+
+  // ✅ this matches API: "data": { orderId, url }
+  @JsonKey(name: 'data')
+  final NotificationMeta? meta;
 
   NotificationApiModel({
     required this.id,
@@ -27,11 +44,13 @@ class NotificationApiModel {
     required this.isRead,
     required this.createdAt,
     this.type,
+    this.meta,
   });
-  Map<String, dynamic> toJson() => _$NotificationApiModelToJson(this);
 
   factory NotificationApiModel.fromJson(Map<String, dynamic> json) =>
       _$NotificationApiModelFromJson(json);
+
+  Map<String, dynamic> toJson() => _$NotificationApiModelToJson(this);
 
   NotificationEntity toEntity() {
     return NotificationEntity(
@@ -41,17 +60,7 @@ class NotificationApiModel {
       isRead: isRead,
       createdAt: createdAt,
       type: type,
-    );
-  }
-
-  factory NotificationApiModel.fromEntity(NotificationEntity entity) {
-    return NotificationApiModel(
-      id: entity.id,
-      title: entity.title,
-      message: entity.message,
-      isRead: entity.isRead,
-      createdAt: entity.createdAt,
-      type: entity.type,
+      orderId: meta?.orderId, // ✅ HERE
     );
   }
 
@@ -63,12 +72,7 @@ class NotificationApiModel {
       isRead: isRead,
       createdAt: createdAt,
       type: type,
+      orderId: meta?.orderId, // ✅ HERE
     );
-  }
-
-  static List<NotificationEntity> toEntityList(
-    List<NotificationApiModel> models,
-  ) {
-    return models.map((m) => m.toEntity()).toList();
   }
 }

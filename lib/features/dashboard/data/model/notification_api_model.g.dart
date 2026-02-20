@@ -6,6 +6,18 @@ part of 'notification_api_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
+NotificationMeta _$NotificationMetaFromJson(Map<String, dynamic> json) =>
+    NotificationMeta(
+      orderId: json['orderId'] as String?,
+      url: json['url'] as String?,
+    );
+
+Map<String, dynamic> _$NotificationMetaToJson(NotificationMeta instance) =>
+    <String, dynamic>{
+      'orderId': instance.orderId,
+      'url': instance.url,
+    };
+
 NotificationApiModel _$NotificationApiModelFromJson(
         Map<String, dynamic> json) =>
     NotificationApiModel(
@@ -15,6 +27,9 @@ NotificationApiModel _$NotificationApiModelFromJson(
       isRead: json['read'] as bool,
       createdAt: json['createdAt'] as String,
       type: json['type'] as String?,
+      meta: json['data'] == null
+          ? null
+          : NotificationMeta.fromJson(json['data'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$NotificationApiModelToJson(
@@ -26,4 +41,5 @@ Map<String, dynamic> _$NotificationApiModelToJson(
       'read': instance.isRead,
       'type': instance.type,
       'createdAt': instance.createdAt,
+      'data': instance.meta,
     };
