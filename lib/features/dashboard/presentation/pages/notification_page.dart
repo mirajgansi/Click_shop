@@ -91,12 +91,6 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
         ),
         actions: [
           IconButton(
-            tooltip: "Refresh",
-            onPressed: () =>
-                ref.read(notificationViewModelProvider.notifier).refresh(),
-            icon: const Icon(Icons.refresh),
-          ),
-          IconButton(
             tooltip: "Mark all read",
             onPressed: state.notifications.isEmpty
                 ? null

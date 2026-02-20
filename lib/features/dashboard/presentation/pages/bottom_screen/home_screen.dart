@@ -3,9 +3,9 @@ import 'package:click_shop/core/constants/app_categories.dart';
 import 'package:click_shop/core/providers/socket_service_provider.dart';
 import 'package:click_shop/features/auth/domain/usecases/save_fcm_token_usecase.dart';
 import 'package:click_shop/features/auth/presentation/view_model/auth_view_model.dart';
+import 'package:click_shop/features/dashboard/presentation/providers/notification_settings_provider.dart';
 import 'package:click_shop/features/dashboard/presentation/view_model/notification_view_model.dart';
 import 'package:click_shop/features/dashboard/presentation/widgets/my_card_widgets.dart';
-import 'package:click_shop/features/dashboard/presentation/widgets/my_notification_banner.dart';
 import 'package:click_shop/features/dashboard/presentation/widgets/skeleton_product_card_widget.dart';
 import 'package:click_shop/features/product/domain/entities/product_entity.dart';
 import 'package:click_shop/features/product/presentation/pages/product_category_screen.dart';
@@ -25,38 +25,29 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 Future<void> enableNotifications(BuildContext context, WidgetRef ref) async {
   final status = await Permission.notification.status;
-  print("NOTIF status => $status");
 
   if (status.isGranted) {
-    print("NOTIF: granted -> send token");
     await _generateAndSendFcmToken(ref);
     return;
   }
 
   if (status.isDenied) {
-    print("NOTIF: denied -> requesting...");
     final res = await Permission.notification.request();
-    print("NOTIF request result => $res");
     if (res.isGranted) {
-      print("NOTIF: now granted -> send token");
       await _generateAndSendFcmToken(ref);
     }
     return;
   }
 
   if (status.isPermanentlyDenied) {
-    print("NOTIF: permanentlyDenied -> open settings dialog");
     _showNotificationPermissionDialog(context);
     return;
   }
-
-  print("NOTIF: other status => $status");
 }
 
 Future<void> _generateAndSendFcmToken(WidgetRef ref) async {
   try {
     final token = await FirebaseMessaging.instance.getToken();
-    print("FCM TOKEN => $token");
 
     if (token == null) return;
 
@@ -126,36 +117,41 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     super.dispose();
   }
 
-  @override
-  void initState() {
-    super.initState();
+  // @override
+  // void initState() {
+  //   super.initState();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      try {
-        if (!mounted) return;
+  //   WidgetsBinding.instance.addPostFrameCallback((_) async {
+  //     try {
+  //       if (!mounted) return;
 
-        // 1) permission + token save
-        await enableNotifications(context, ref);
+  //       // ✅ 0) read user toggle (from Notification Settings page)
+  //       final enabled = ref.read(notificationEnabledProvider);
 
-        // 2) load notifications
-        await ref.read(notificationViewModelProvider.notifier).load();
-        await ref
-            .read(notificationViewModelProvider.notifier)
-            .loadUnreadCount();
+  //       // ✅ 1) permission + token save (only if enabled)
+  //       if (enabled) {
+  //         await enableNotifications(context, ref);
+  //       }
 
-        // 3) connect socket
-        final authState = ref.read(AuthViewModelProvider);
-        final userId = authState.user?.userId; // adjust if needed
+  //       // ✅ 2) load notifications (you can keep this, or also gate it)
+  //       await ref.read(notificationViewModelProvider.notifier).load();
+  //       await ref
+  //           .read(notificationViewModelProvider.notifier)
+  //           .loadUnreadCount();
 
-        if (userId != null && userId.isNotEmpty && !_socketBooted) {
-          _socketBooted = true;
-          ref.read(socketServiceProvider).connect(userId);
-        }
-      } catch (e) {
-        print("❌ initState error: $e");
-      }
-    });
-  }
+  //       // ✅ 3) connect socket
+  //       final authState = ref.read(AuthViewModelProvider);
+  //       final userId = authState.user?.userId; // adjust if needed
+
+  //       if (userId != null && userId.isNotEmpty && !_socketBooted) {
+  //         _socketBooted = true;
+  //         ref.read(socketServiceProvider).connect(userId);
+  //       }
+  //     } catch (e) {
+  //       print("❌ initState error: $e");
+  //     }
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {

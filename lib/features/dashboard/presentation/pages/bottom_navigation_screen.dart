@@ -5,6 +5,7 @@ import 'package:click_shop/features/dashboard/presentation/pages/bottom_screen/h
 import 'package:click_shop/features/dashboard/presentation/pages/bottom_screen/my_order_screen.dart';
 import 'package:click_shop/features/dashboard/presentation/pages/bottom_screen/profile_screen.dart';
 import 'package:click_shop/features/dashboard/presentation/pages/notification_page.dart';
+import 'package:click_shop/features/dashboard/presentation/providers/notification_settings_provider.dart';
 import 'package:click_shop/features/dashboard/presentation/view_model/notification_view_model.dart';
 import 'package:click_shop/features/dashboard/presentation/widgets/my_notification_banner.dart';
 import 'package:flutter/material.dart';
@@ -60,16 +61,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   void initState() {
     super.initState();
 
-    _sub = ref.listenManual<AsyncValue<dynamic>>(
-      socketNotificationStreamProvider,
-      (prev, next) {
-        next.whenData((data) {
-          ref
-              .read(notificationViewModelProvider.notifier)
-              .onSocketNotification(data);
-        });
-      },
-    );
+    // _sub =
   }
 
   @override
@@ -82,24 +74,30 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
 
-    ref.listen<AsyncValue<dynamic>>(socketNotificationStreamProvider, (
+    ref.listenManual<AsyncValue<dynamic>>(socketNotificationStreamProvider, (
       prev,
       next,
     ) {
       next.whenData((data) {
+        // update state
         ref
             .read(notificationViewModelProvider.notifier)
             .onSocketNotification(data);
 
-        final title = (data is Map && data['title'] != null)
-            ? data['title'].toString()
-            : "New notification";
+        final enabled = ref.read(notificationEnabledProvider);
 
-        final msg = (data is Map && data['message'] != null)
-            ? data['message'].toString()
-            : "";
+        // show toast only when OFF
+        if (!enabled && mounted) {
+          final title = (data is Map && data['title'] != null)
+              ? data['title'].toString()
+              : "New notification";
 
-        InAppNotification.show(context, title: title, message: msg);
+          final msg = (data is Map && data['message'] != null)
+              ? data['message'].toString()
+              : "";
+
+          InAppNotification.showGlobal(title: title, message: msg);
+        }
       });
     });
     return Scaffold(

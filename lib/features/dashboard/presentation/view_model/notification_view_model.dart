@@ -1,10 +1,14 @@
+import 'package:click_shop/core/navigation/nav_key.dart';
 import 'package:click_shop/core/services/notifications/local_notification_service.dart';
 import 'package:click_shop/features/dashboard/data/model/notification_api_model.dart';
 import 'package:click_shop/features/dashboard/domain/usecases/get_my_notification_usecase.dart';
 import 'package:click_shop/features/dashboard/domain/usecases/get_unread_count_usecase.dart';
 import 'package:click_shop/features/dashboard/domain/usecases/mark_all_notification_usecase.dart';
 import 'package:click_shop/features/dashboard/domain/usecases/mark_notification_read_usecase.dart';
+import 'package:click_shop/features/dashboard/presentation/providers/notification_settings_provider.dart';
 import 'package:click_shop/features/dashboard/presentation/state/notification_state.dart';
+import 'package:click_shop/features/dashboard/presentation/widgets/my_notification_banner.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final notificationViewModelProvider =
@@ -134,19 +138,28 @@ class NotificationViewModel extends Notifier<NotificationState> {
       final exists = state.notifications.any((x) => x.id == n.id);
       if (exists) return;
 
-      LocalNotificationService.instance.showNotification(
-        title: n.title,
-        body: n.message,
-        payload: n.id,
-      );
+      final enabled = ref.read(notificationEnabledProvider);
+
+      if (enabled) {
+        LocalNotificationService.instance.showNotification(
+          title: n.title,
+          body: n.message,
+          payload: n.id,
+        );
+      } else {
+        final ctx = navigatorKey.currentContext;
+        if (ctx != null) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            InAppNotification.showGlobal(title: n.title, message: n.message);
+          });
+        }
+      }
+
       state = state.copyWith(
         notifications: [n, ...state.notifications],
         unreadCount: state.unreadCount + (n.isRead ? 0 : 1),
         error: null,
       );
-
-      // Optional (recommended): save locally via repository/usecase, NOT here using HiveModel directly
-      // await _saveNotificationUsecase(n);
     } catch (e) {
       state = state.copyWith(error: "Invalid socket notification payload");
     }

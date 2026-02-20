@@ -9,6 +9,16 @@ class LocalNotificationService {
       FlutterLocalNotificationsPlugin();
 
   bool _isInitialized = false;
+  bool _enabled = true;
+
+  void setEnabled(bool value) async {
+    _enabled = value;
+
+    if (!value) {
+      // Cancel any existing notifications
+      await notificationsPlugin.cancelAll();
+    }
+  }
 
   static const AndroidNotificationChannel _channel = AndroidNotificationChannel(
     'channel_id',
@@ -56,6 +66,8 @@ class LocalNotificationService {
     required String body,
     String? payload,
   }) async {
+    if (!_enabled) return;
+
     await initNotification();
 
     const details = NotificationDetails(

@@ -1,26 +1,40 @@
+import 'package:click_shop/core/navigation/nav_key.dart';
 import 'package:flutter/material.dart';
 
 class InAppNotification {
-  static void show(
-    BuildContext context, {
-    required String title,
-    required String message,
-  }) {
-    final overlay = Overlay.of(context);
-    late OverlayEntry entry;
+  static OverlayEntry? _entry;
 
+  static void showGlobal({required String title, required String message}) {
+    final overlay = navigatorKey.currentState?.overlay;
+    if (overlay == null) return;
+
+    _entry?.remove();
+    _entry = null;
+
+    late OverlayEntry entry;
     entry = OverlayEntry(
-      builder: (context) => _AnimatedNotification(
-        title: title,
-        message: message,
-        onDismiss: () => entry.remove(),
+      builder: (_) => Stack(
+        children: [
+          _AnimatedNotification(
+            title: title,
+            message: message,
+            onDismiss: () {
+              entry.remove();
+              if (_entry == entry) _entry = null;
+            },
+          ),
+        ],
       ),
     );
 
+    _entry = entry;
     overlay.insert(entry);
 
     Future.delayed(const Duration(seconds: 4), () {
-      if (entry.mounted) entry.remove();
+      if (entry.mounted) {
+        entry.remove();
+        if (_entry == entry) _entry = null;
+      }
     });
   }
 }
@@ -70,46 +84,61 @@ class _AnimatedNotificationState extends State<_AnimatedNotification>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+
     return Positioned(
       top: MediaQuery.of(context).padding.top + 10,
       left: 16,
       right: 16,
       child: SlideTransition(
         position: _animation,
-        child: Material(
-          elevation: 10,
-          borderRadius: BorderRadius.circular(16),
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              color: Colors.white,
+        child: GestureDetector(
+          onTap: widget.onDismiss,
+          child: Material(
+            elevation: 8,
+            borderRadius: BorderRadius.circular(16),
+            color: cs.surface, // ✅ dynamic surface color
+            shadowColor: Colors.black.withOpacity(
+              theme.brightness == Brightness.dark ? 0.4 : 0.15,
             ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Icon(Icons.notifications, color: Colors.blue),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        widget.title,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        widget.message,
-                        style: const TextStyle(fontSize: 13),
-                      ),
-                    ],
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: cs.outlineVariant.withOpacity(0.4)),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    Icons.notifications,
+                    color: cs.primary, // ✅ theme primary color
                   ),
-                ),
-              ],
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.title,
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: cs.onSurface,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          widget.message,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: cs.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
