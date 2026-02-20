@@ -80,6 +80,7 @@ Future<void> main() async {
   await Firebase.initializeApp();
 
   final sharedPrefs = await SharedPreferences.getInstance();
+  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
   await LocalNotificationService.instance.initNotification();
   await setupFCM();

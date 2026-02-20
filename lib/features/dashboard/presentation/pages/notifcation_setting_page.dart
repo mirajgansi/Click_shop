@@ -1,13 +1,42 @@
 import 'package:click_shop/core/services/notifications/local_notification_service.dart';
+import 'package:click_shop/features/auth/domain/usecases/save_fcm_token_usecase.dart';
 import 'package:click_shop/features/dashboard/presentation/providers/notification_settings_provider.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class NotificationSettingsPage extends ConsumerWidget {
   const NotificationSettingsPage({super.key});
 
+  // ✅ Called when user toggles ON
   Future<void> _enable(BuildContext context, WidgetRef ref) async {
+    // 1) Permission handler check (Android 13+, also ok for iOS)
+    final status = await Permission.notification.status;
+
+    if (status.isPermanentlyDenied) {
+      if (context.mounted) _showNotificationPermissionDialog(context);
+      ref.read(notificationEnabledProvider.notifier).state = false;
+      LocalNotificationService.instance.setEnabled(false);
+      return;
+    }
+
+    if (!status.isGranted) {
+      final res = await Permission.notification.request();
+      if (!res.isGranted) {
+        ref.read(notificationEnabledProvider.notifier).state = false;
+        LocalNotificationService.instance.setEnabled(false);
+
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Permission not granted")),
+          );
+        }
+        return;
+      }
+    }
+
+    // 2) iOS permission via Firebase Messaging (safe to call on Android too)
     final settings = await FirebaseMessaging.instance.requestPermission(
       alert: true,
       badge: true,
@@ -19,37 +48,79 @@ class NotificationSettingsPage extends ConsumerWidget {
         settings.authorizationStatus == AuthorizationStatus.provisional;
 
     if (!ok) {
+      ref.read(notificationEnabledProvider.notifier).state = false;
+      LocalNotificationService.instance.setEnabled(false);
+
       if (context.mounted) {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(const SnackBar(content: Text("Permission not granted")));
       }
-      ref.read(notificationEnabledProvider.notifier).state = false;
       return;
     }
+
+    // 3) Get token and send to backend
+    await _generateAndSendFcmToken(ref);
+
+    // 4) Enable app-side notifications
+    ref.read(notificationEnabledProvider.notifier).state = true;
     LocalNotificationService.instance.setEnabled(true);
 
-    ref.read(notificationEnabledProvider.notifier).state = true;
     if (context.mounted) {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text("Notifications enabled")));
     }
-    LocalNotificationService.instance.setEnabled(true);
   }
 
+  // ✅ Called when user toggles OFF
   Future<void> _disable(BuildContext context, WidgetRef ref) async {
-    // Optional (if you use topics)
-    // await FirebaseMessaging.instance.unsubscribeFromTopic("general");
-
     ref.read(notificationEnabledProvider.notifier).state = false;
+    LocalNotificationService.instance.setEnabled(false);
 
     if (context.mounted) {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text("Notifications disabled")));
     }
-    LocalNotificationService.instance.setEnabled(false);
+  }
+
+  Future<void> _generateAndSendFcmToken(WidgetRef ref) async {
+    try {
+      final token = await FirebaseMessaging.instance.getToken();
+      if (token == null) return;
+
+      await ref
+          .read(saveFcmTokenUsecaseProvider)
+          .call(SaveFcmTokenParams(token: token));
+    } catch (e) {
+      debugPrint("FCM: ERROR => $e");
+    }
+  }
+
+  void _showNotificationPermissionDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Enable Notifications"),
+        content: const Text(
+          "Notifications are permanently denied. Please enable them from App Settings.",
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              await openAppSettings();
+            },
+            child: const Text("Open Settings"),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
