@@ -1,3 +1,4 @@
+import 'package:click_shop/core/config/api_endpoints.dart';
 import 'package:flutter/material.dart';
 
 class ItemTile extends StatelessWidget {
@@ -15,6 +16,9 @@ class ItemTile extends StatelessWidget {
     required this.total,
     this.imagePath,
   });
+  String _fullImageUrl(String path) {
+    return ApiEndpoints.buildFileUrl(path);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,8 +63,4 @@ class ItemTile extends StatelessWidget {
   }
 
   // Update base URL if needed
-  String _fullImageUrl(String path) {
-    if (path.startsWith("http")) return path;
-    return "http://10.0.2.2:5050$path";
-  }
 }

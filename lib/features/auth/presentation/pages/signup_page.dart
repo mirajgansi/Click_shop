@@ -115,7 +115,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                           if (!isTablet)
                             Center(
                               child: Image.asset(
-                                'assets/images/Group.jpg',
+                                'assets/images/happy.png',
                                 width: 60,
                                 height: 60,
                                 fit: BoxFit.cover,

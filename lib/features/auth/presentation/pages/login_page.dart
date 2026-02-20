@@ -1,4 +1,3 @@
-import 'package:click_shop/app/app_color.dart';
 import 'package:click_shop/app/routes/app_routes.dart';
 import 'package:click_shop/app/theme/app_colors.dart';
 import 'package:click_shop/core/utils/snackbar_utils.dart';
@@ -122,7 +121,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         if (!isTablet)
                           Center(
                             child: Image.asset(
-                              'assets/images/Group.jpg',
+                              'assets/images/happy.png',
                               width: 60,
                               height: 60,
                               fit: BoxFit.cover,
