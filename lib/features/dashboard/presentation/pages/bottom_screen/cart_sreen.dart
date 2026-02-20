@@ -32,45 +32,68 @@ class _CartScreenState extends ConsumerState<CartScreen> {
     return Scaffold(
       backgroundColor: cs.surface,
 
-      body: state.isLoading
-          ? const CartSkeleton(itemCount: 6)
-          : state.error != null
-          ? Center(child: Text(state.error!))
-          : state.cartProducts.isEmpty
-          ? const Center(child: Text("Your cart is empty"))
-          : ListView.separated(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 110),
-              itemCount: state.cartProducts.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 12),
-              itemBuilder: (context, index) {
-                final item = state.cartProducts[index];
-                final qty = item.quantity ?? 1;
+      body: RefreshIndicator(
+        onRefresh: () => ref.read(cartViewModelProvider.notifier).getCart(),
+        child: state.isLoading
+            ? ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                children: const [CartSkeleton(itemCount: 6)],
+              )
+            : state.error != null
+            ? ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 200),
+                    child: Center(child: Text(state.error!)),
+                  ),
+                ],
+              )
+            : state.cartProducts.isEmpty
+            ? ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                children: const [
+                  Padding(
+                    padding: EdgeInsets.only(top: 200),
+                    child: Center(child: Text("Your cart is empty")),
+                  ),
+                ],
+              )
+            : ListView.separated(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 110),
+                itemCount: state.cartProducts.length,
+                separatorBuilder: (_, __) => const SizedBox(height: 12),
+                itemBuilder: (context, index) {
+                  final item = state.cartProducts[index];
+                  final qty = item.quantity ?? 1;
 
-                return _CartItemTile(
-                  imageUrl: item.image,
-                  title: item.name,
-                  inStock: item.inStock > 0,
-                  qty: qty,
-                  price: item.price,
-                  onRemove: () async {
-                    await ref
-                        .read(cartViewModelProvider.notifier)
-                        .deleteFromCart(item.id ?? "");
-                  },
-                  onPlus: () {
-                    ref
-                        .read(cartViewModelProvider.notifier)
-                        .changeQty(itemId: item.id ?? "", newQty: qty + 1);
-                  },
-                  onMinus: () {
-                    if (qty <= 1) return;
-                    ref
-                        .read(cartViewModelProvider.notifier)
-                        .changeQty(itemId: item.id ?? "", newQty: qty - 1);
-                  },
-                );
-              },
-            ),
+                  return _CartItemTile(
+                    imageUrl: item.image,
+                    title: item.name,
+                    inStock: item.inStock > 0,
+                    qty: qty,
+                    price: item.price,
+                    onRemove: () async {
+                      await ref
+                          .read(cartViewModelProvider.notifier)
+                          .deleteFromCart(item.id ?? "");
+                    },
+                    onPlus: () {
+                      ref
+                          .read(cartViewModelProvider.notifier)
+                          .changeQty(itemId: item.id ?? "", newQty: qty + 1);
+                    },
+                    onMinus: () {
+                      if (qty <= 1) return;
+                      ref
+                          .read(cartViewModelProvider.notifier)
+                          .changeQty(itemId: item.id ?? "", newQty: qty - 1);
+                    },
+                  );
+                },
+              ),
+      ),
 
       bottomNavigationBar: state.cartProducts.isEmpty
           ? null
@@ -82,14 +105,20 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                       .read(cartViewModelProvider.notifier)
                       .totalPrice
                       .toDouble(),
-                  onCheckout: () {
-                    showCheckoutSheet(
+                  onCheckout: () async {
+                    final ok = await showCheckoutSheet(
                       context: context,
                       ref: ref,
                       total: ref
                           .read(cartViewModelProvider.notifier)
                           .totalPrice,
                     );
+
+                    if (!mounted) return;
+
+                    if (ok == true) {
+                      await ref.read(cartViewModelProvider.notifier).getCart();
+                    }
                   },
                 ),
               ),

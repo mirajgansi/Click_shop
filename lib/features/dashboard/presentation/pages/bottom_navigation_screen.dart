@@ -61,7 +61,35 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   void initState() {
     super.initState();
 
-    // _sub =
+    _sub = ref.listenManual<AsyncValue<dynamic>>(
+      socketNotificationStreamProvider,
+      (prev, next) {
+        next.whenData((data) {
+          // If this widget is gone, do nothing
+          if (!mounted) return;
+
+          // update state
+          ref
+              .read(notificationViewModelProvider.notifier)
+              .onSocketNotification(data);
+
+          final enabled = ref.read(notificationEnabledProvider);
+
+          // show toast only when OFF
+          if (!enabled) {
+            final title = (data is Map && data['title'] != null)
+                ? data['title'].toString()
+                : "New notification";
+
+            final msg = (data is Map && data['message'] != null)
+                ? data['message'].toString()
+                : "";
+
+            InAppNotification.showGlobal(title: title, message: msg);
+          }
+        });
+      },
+    );
   }
 
   @override
@@ -74,50 +102,24 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
 
-    ref.listenManual<AsyncValue<dynamic>>(socketNotificationStreamProvider, (
-      prev,
-      next,
-    ) {
-      next.whenData((data) {
-        // update state
-        ref
-            .read(notificationViewModelProvider.notifier)
-            .onSocketNotification(data);
-
-        final enabled = ref.read(notificationEnabledProvider);
-
-        // show toast only when OFF
-        if (!enabled && mounted) {
-          final title = (data is Map && data['title'] != null)
-              ? data['title'].toString()
-              : "New notification";
-
-          final msg = (data is Map && data['message'] != null)
-              ? data['message'].toString()
-              : "";
-
-          InAppNotification.showGlobal(title: title, message: msg);
-        }
-      });
-    });
     return Scaffold(
       backgroundColor: cs.surface,
-
       appBar: AppBar(
         automaticallyImplyLeading: false,
         elevation: 0,
         backgroundColor: cs.surface,
         title: Row(
           children: [
-            Image.asset(
-              'assets/images/happy.png',
-              width: 40,
-              height: 40,
-              fit: BoxFit.cover,
-            ),
+            Image.asset('assets/images/happy.png', width: 40, height: 40),
             const SizedBox(width: 10),
             Text(
-              _titles[_selectedIndex],
+              [
+                "Home",
+                "Explore",
+                "My Cart",
+                "My Orders",
+                "Account",
+              ][_selectedIndex],
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w800,
@@ -126,7 +128,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             ),
           ],
         ),
-
         actions: [
           Consumer(
             builder: (context, ref, _) {
@@ -141,6 +142,8 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                     ),
                   );
 
+                  if (!mounted) return; // ✅ important
+
                   ref
                       .read(notificationViewModelProvider.notifier)
                       .loadUnreadCount();
@@ -149,7 +152,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                   clipBehavior: Clip.none,
                   children: [
                     const Icon(Icons.notifications),
-
                     if (state.unreadCount > 0)
                       Positioned(
                         right: -4,
@@ -180,65 +182,32 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           ),
         ],
       ),
-
-      body: lstBottomScreen[_selectedIndex],
-
+      body: [
+        const HomeScreen(),
+        const ExploreScreen(),
+        const CartScreen(),
+        const MyOrdersPage(),
+        const ProfileScreen(),
+      ][_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: _selectedIndex,
-
-        // ✅ Use theme colors
         backgroundColor: cs.surface,
         selectedItemColor: cs.primary,
         unselectedItemColor: cs.onSurface.withOpacity(0.6),
-
-        onTap: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
-
-        items: [
-          _svgNavItem(
-            asset: 'assets/icons/home.svg',
-            label: 'Home',
-            index: 0,
-            color: _selectedIndex == 0
-                ? cs.primary
-                : cs.onSurface.withOpacity(0.6),
+        onTap: (index) => setState(() => _selectedIndex = index),
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+          BottomNavigationBarItem(icon: Icon(Icons.explore), label: "Explore"),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shopping_cart),
+            label: "Cart",
           ),
-          _svgNavItem(
-            asset: 'assets/icons/explore.svg',
-            label: 'Explore',
-            index: 1,
-            color: _selectedIndex == 1
-                ? cs.primary
-                : cs.onSurface.withOpacity(0.6),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.local_shipping),
+            label: "Order",
           ),
-          _svgNavItem(
-            asset: 'assets/icons/cart.svg',
-            label: 'Cart',
-            index: 2,
-            color: _selectedIndex == 2
-                ? cs.primary
-                : cs.onSurface.withOpacity(0.6),
-          ),
-          _svgNavItem(
-            asset: 'assets/icons/delivery.svg',
-            label: 'Order',
-            index: 3,
-            color: _selectedIndex == 3
-                ? cs.primary
-                : cs.onSurface.withOpacity(0.6),
-          ),
-          _svgNavItem(
-            asset: 'assets/icons/account.svg',
-            label: 'Account',
-            index: 4,
-            color: _selectedIndex == 4
-                ? cs.primary
-                : cs.onSurface.withOpacity(0.6),
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Account"),
         ],
       ),
     );

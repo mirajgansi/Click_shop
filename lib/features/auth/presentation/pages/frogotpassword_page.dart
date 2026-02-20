@@ -1,3 +1,4 @@
+import 'package:click_shop/core/utils/snackbar_utils.dart';
 import 'package:click_shop/features/auth/presentation/pages/reset_code_page.dart';
 import 'package:click_shop/features/auth/presentation/state/auth_state.dart';
 import 'package:click_shop/features/auth/presentation/view_model/auth_view_model.dart';
@@ -74,8 +75,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                   : () async {
                       final email = emailController.text.trim();
                       if (email.isEmpty || !email.contains('@')) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Enter a valid email')),
+                        SnackbarUtils.showError(
+                          context,
+                          "Please enter a valid email",
                         );
                         return;
                       }
@@ -86,10 +88,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
                       if (!context.mounted) return;
 
                       if (st.status == AuthStatus.loaded) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Reset code sent to your email'),
-                          ),
+                        SnackbarUtils.showSuccess(
+                          context,
+                          "Reset code sent to your email",
                         );
 
                         Navigator.push(

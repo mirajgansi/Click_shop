@@ -26,6 +26,7 @@ abstract interface class IAuthRemoteDataSource {
   Future<AuthApiModel> updateProfileImage(File image);
   Future<AuthApiModel> updateUser(AuthEntity user);
   Future<bool> deleteMe(String password);
+  Future<bool> verifyResetCode({required String email, required String code});
 
   /// POST /auth/request-password-reset
   Future<bool> requestPasswordReset(String email);

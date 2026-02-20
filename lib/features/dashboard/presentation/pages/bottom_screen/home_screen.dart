@@ -1,6 +1,7 @@
 import 'package:click_shop/app/routes/app_routes.dart';
 import 'package:click_shop/core/constants/app_categories.dart';
 import 'package:click_shop/core/providers/socket_service_provider.dart';
+import 'package:click_shop/core/services/connectivity/socket_service.dart';
 import 'package:click_shop/features/auth/domain/usecases/save_fcm_token_usecase.dart';
 import 'package:click_shop/features/auth/presentation/view_model/auth_view_model.dart';
 import 'package:click_shop/features/dashboard/presentation/providers/notification_settings_provider.dart';
@@ -110,9 +111,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     await vm.loadPopular();
   }
 
+  late final SocketService _socket;
+
+  @override
+  void initState() {
+    super.initState();
+    _socket = ref.read(socketServiceProvider);
+  }
+
   @override
   void dispose() {
-    ref.read(socketServiceProvider).disconnect();
+    _socket.disconnect();
     _searchCtrl.dispose();
     super.dispose();
   }

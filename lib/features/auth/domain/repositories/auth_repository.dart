@@ -20,4 +20,8 @@ abstract interface class IAuthRepository {
     required String code, // keep as String (to preserve leading zeros)
     required String newPassword,
   });
+  Future<Either<Failure, bool>> verifyResetCode({
+    required String email,
+    required String code,
+  });
 }

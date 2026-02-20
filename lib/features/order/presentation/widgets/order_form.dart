@@ -6,13 +6,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 // import your providers / models
 import 'package:click_shop/features/order/presentation/view_model/order_view_model.dart';
 
-Future<void> showCheckoutSheet({
+Future<bool?> showCheckoutSheet({
   required BuildContext context,
   required WidgetRef ref,
   required num total,
   Map<String, dynamic>? initialShippingJson,
-}) async {
-  await showModalBottomSheet(
+}) {
+  return showModalBottomSheet<bool>(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
@@ -98,22 +98,23 @@ class _CheckoutBottomSheetState extends ConsumerState<_CheckoutBottomSheet> {
   Future<void> _loadCurrentUserAndPrefill() async {
     final result = await ref.read(getCurrentUserUsecaseProvider)();
 
+    if (!mounted) return;
+
     result.fold((_) {}, (user) {
-      // ✅ only set if empty so user can still edit
+      if (!mounted) return;
+
       if (nameCtrl.text.trim().isEmpty) {
         nameCtrl.text = user.username ?? "";
       }
       if (phoneCtrl.text.trim().isEmpty) {
         phoneCtrl.text = user.phoneNumber ?? "";
       }
-
-      // If you store location as one field
-      if (cityCtrl.text.trim().isEmpty) {
-        cityCtrl.text = user.location ?? "";
+      if (address1Ctrl.text.trim().isEmpty) {
+        address1Ctrl.text = user.location ?? "";
       }
 
       setState(() {
-        showShippingForm = true; // optional
+        showShippingForm = true;
       });
     });
   }
@@ -171,7 +172,7 @@ class _CheckoutBottomSheetState extends ConsumerState<_CheckoutBottomSheet> {
                         ),
                         const Spacer(),
                         InkWell(
-                          onTap: () => Navigator.pop(context),
+                          onTap: () => Navigator.pop(context, true),
                           child: Icon(
                             Icons.close,
                             size: 20,

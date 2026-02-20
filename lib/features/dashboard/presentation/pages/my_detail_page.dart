@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:click_shop/app/theme/app_colors.dart';
 import 'package:click_shop/app/theme/theme_extensions.dart';
 import 'package:click_shop/core/config/api_endpoints.dart';
+import 'package:click_shop/core/utils/snackbar_utils.dart';
 import 'package:click_shop/features/auth/presentation/view_model/auth_view_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -383,12 +384,16 @@ class _MyDetailsScreenState extends ConsumerState<MyDetailsScreen> {
 
                           final newState = ref.read(AuthViewModelProvider);
                           if (newState.status != AuthStatus.error) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text("Profile updated successfully"),
-                              ),
+                            SnackbarUtils.showSuccess(
+                              context,
+                              "Profile updated successfully",
                             );
                             Navigator.pop(context);
+                          } else {
+                            SnackbarUtils.showError(
+                              context,
+                              newState.errorMessage ?? "Update failed",
+                            );
                           }
                         },
                 ),

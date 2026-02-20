@@ -191,16 +191,25 @@ class AuthRepository implements IAuthRepository {
 
   @override
   Future<Either<Failure, String>> updateProfileImage(String? image) async {
-    //remote mma matra image upload hunu paryo locally hudaina
     if (await _networkInfo.isConnected) {
       try {
         if (image == null) {
           return const Left(ApiFailure(message: "Image path is required"));
         }
+
         final updatedModel = await _authRemoteDataSource.updateProfileImage(
           File(image),
         );
-        return Right(updatedModel.toEntity().toString());
+
+        // ✅ return ONLY image path
+        final img = updatedModel.toEntity().image;
+        if (img == null || img.isEmpty) {
+          return const Left(
+            ApiFailure(message: "No image returned from server"),
+          );
+        }
+
+        return Right(img);
       } on DioException catch (e) {
         return Left(
           ApiFailure(
@@ -365,5 +374,34 @@ class AuthRepository implements IAuthRepository {
     }
 
     return const Left(LocalDatabaseFailure(message: "No internet"));
+  }
+
+  @override
+  Future<Either<Failure, bool>> verifyResetCode({
+    required String email,
+    required String code,
+  }) async {
+    if (await _networkInfo.isConnected) {
+      try {
+        final ok = await _authRemoteDataSource.verifyResetCode(
+          email: email,
+          code: code,
+        );
+        return Right(ok);
+      } on DioException catch (e) {
+        return Left(
+          ApiFailure(
+            message: e.response?.data['message'] ?? 'Invalid code',
+            statusCode: e.response?.statusCode,
+          ),
+        );
+      } catch (e) {
+        return Left(ApiFailure(message: e.toString()));
+      }
+    } else {
+      return const Left(
+        LocalDatabaseFailure(message: "No internet connection"),
+      );
+    }
   }
 }

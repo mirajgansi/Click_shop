@@ -355,16 +355,20 @@ class _CancelButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
-
     final state = ref.watch(orderViewModelProvider);
-    final canCancel = order.status.name == "pending";
+
+    final currentOrder = state.selectedOrder ?? order;
+    final canCancel = currentOrder.status.name.toLowerCase() == "pending";
 
     return SizedBox(
       height: 52,
       width: double.infinity,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: canCancel ? cs.error : cs.outlineVariant,
+          backgroundColor: canCancel ? cs.error : cs.surfaceVariant,
+          foregroundColor: canCancel ? cs.onError : cs.onSurfaceVariant,
+          disabledBackgroundColor: cs.onSurfaceVariant,
+          disabledForegroundColor: cs.surfaceVariant,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -374,12 +378,9 @@ class _CancelButton extends ConsumerWidget {
             ? null
             : () async {
                 if (!canCancel) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        "You can only cancel when the order is pending.",
-                      ),
-                    ),
+                  SnackbarUtils.showError(
+                    context,
+                    "Orders can’t be cancelled after shipping.",
                   );
                   return;
                 }
@@ -406,40 +407,37 @@ class _CancelButton extends ConsumerWidget {
 
                 if (confirm != true) return;
 
-                await ref
-                    .read(orderViewModelProvider.notifier)
-                    .cancelMyOrder(order.id);
-
-                final st = ref.read(orderViewModelProvider);
-
-                if (st.errorMessage != null) {
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(SnackBar(content: Text(st.errorMessage!)));
-                  return;
+                try {
+                  await ref
+                      .read(orderViewModelProvider.notifier)
+                      .cancelMyOrder(currentOrder.id);
+                } finally {
+                  await ref
+                      .read(orderViewModelProvider.notifier)
+                      .getOrderById(currentOrder.id);
                 }
 
-                SnackbarUtils.showSuccess(context, "Order Cancelled");
+                if (!context.mounted) return;
 
-                await ref
-                    .read(orderViewModelProvider.notifier)
-                    .getOrderById(order.id);
+                final st = ref.read(orderViewModelProvider);
+                if (st.errorMessage != null) {
+                  SnackbarUtils.showError(context, st.errorMessage!);
+                } else {
+                  SnackbarUtils.showSuccess(context, "Order Cancelled");
+                }
               },
         child: state.isLoading
-            ? const SizedBox(
+            ? SizedBox(
                 width: 22,
                 height: 22,
                 child: CircularProgressIndicator(
                   strokeWidth: 2,
-                  color: Colors.white,
+                  color: canCancel ? cs.onError : cs.onSurface,
                 ),
               )
             : Text(
-                canCancel ? "Cancel Order" : "Cannot Cancel",
-                style: const TextStyle(
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white,
-                ),
+                canCancel ? "Cancel Order" : "Locked",
+                style: const TextStyle(fontWeight: FontWeight.w800),
               ),
       ),
     );

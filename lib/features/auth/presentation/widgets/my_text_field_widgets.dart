@@ -40,6 +40,7 @@ class _MyTextFieldWidgetsState extends State<MyTextFieldWidgets> {
       decoration: InputDecoration(
         hintText: widget.hintText,
         hintStyle: TextStyle(color: cs.onSurface.withOpacity(0.45)),
+
         labelText: widget.text,
         labelStyle: TextStyle(
           fontSize: 16,
@@ -47,19 +48,26 @@ class _MyTextFieldWidgetsState extends State<MyTextFieldWidgets> {
           fontWeight: FontWeight.normal,
         ),
 
-        enabledBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: cs.outlineVariant.withOpacity(0.8)),
+        // 👇 THIS MAKES FULL OUTLINE BOX
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: cs.outlineVariant, width: 1),
         ),
 
-        focusedBorder: UnderlineInputBorder(
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: cs.primary, width: 2),
         ),
 
-        errorBorder: UnderlineInputBorder(
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: cs.error, width: 2),
         ),
 
-        focusedErrorBorder: UnderlineInputBorder(
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: cs.error, width: 2),
         ),
 

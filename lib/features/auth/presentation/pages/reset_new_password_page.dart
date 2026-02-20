@@ -1,3 +1,4 @@
+import 'package:click_shop/core/utils/snackbar_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -47,15 +48,12 @@ class _ResetNewPasswordPageState extends ConsumerState<ResetNewPasswordPage> {
 
     if (state.status == AuthStatus.loaded) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Password reset successful")),
-      );
+      SnackbarUtils.showSuccess(context, "Password reset successfully");
+
       Navigator.pushNamedAndRemoveUntil(context, "/login", (_) => false);
     } else if (state.status == AuthStatus.error) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(state.errorMessage ?? "Reset failed")),
-      );
+      SnackbarUtils.showError(context, state.errorMessage ?? "Reset failed");
     }
   }
 
@@ -65,7 +63,7 @@ class _ResetNewPasswordPageState extends ConsumerState<ResetNewPasswordPage> {
     final loading = state.status == AuthStatus.loading;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F7FB),
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
@@ -73,7 +71,7 @@ class _ResetNewPasswordPageState extends ConsumerState<ResetNewPasswordPage> {
             constraints: const BoxConstraints(maxWidth: 420),
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.background,
               borderRadius: BorderRadius.circular(22),
               boxShadow: const [
                 BoxShadow(
@@ -95,7 +93,11 @@ class _ResetNewPasswordPageState extends ConsumerState<ResetNewPasswordPage> {
                   const SizedBox(height: 6),
                   Text(
                     "Create a new password for ${widget.email}",
-                    style: const TextStyle(color: Colors.black54),
+                    style: TextStyle(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withOpacity(0.7),
+                    ),
                   ),
                   const SizedBox(height: 18),
 
@@ -163,7 +165,10 @@ class _ResetNewPasswordPageState extends ConsumerState<ResetNewPasswordPage> {
                     height: 46,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.black,
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        foregroundColor: Theme.of(
+                          context,
+                        ).colorScheme.onPrimary,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
                         ),
@@ -177,7 +182,12 @@ class _ResetNewPasswordPageState extends ConsumerState<ResetNewPasswordPage> {
                   Center(
                     child: TextButton(
                       onPressed: () => Navigator.pop(context),
-                      child: const Text("Back"),
+                      child: Text(
+                        "Back",
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      ),
                     ),
                   ),
                 ],

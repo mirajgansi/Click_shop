@@ -11,6 +11,7 @@ import 'package:click_shop/features/auth/domain/usecases/reset_password.dart';
 import 'package:click_shop/features/auth/domain/usecases/save_fcm_token_usecase.dart';
 import 'package:click_shop/features/auth/domain/usecases/updateProfile_usecase.dart';
 import 'package:click_shop/features/auth/domain/usecases/update_user_usecase.dart';
+import 'package:click_shop/features/auth/domain/usecases/verify_coode_usecase.dart';
 import 'package:click_shop/features/auth/presentation/state/auth_state.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -29,6 +30,7 @@ class AuthViewModel extends Notifier<AuthState> {
   late final DeleteMeUsecase _deleteMeUsecase;
   late final RequestPasswordResetUsecase _requestPasswordResetUsecase;
   late final ResetPasswordUsecase _resetPasswordUsecase;
+  late final VerifyResetCodeUsecase _verifyResetCodeUsecase;
   @override
   AuthState build() {
     _registerUsecase = ref.read(registerUsecaseProvider);
@@ -38,6 +40,7 @@ class AuthViewModel extends Notifier<AuthState> {
     _logoutUsecase = ref.read(logoutUsecaseProvider);
     _updateUserUsecase = ref.read(updateUserUsecaseProvider);
     _deleteMeUsecase = ref.read(deleteMeUsecaseProvider);
+    _verifyResetCodeUsecase = ref.read(verifyResetCodeUsecaseProvider);
     _requestPasswordResetUsecase = ref.read(
       requestPasswordResetUsecaseProvider,
     );
@@ -282,6 +285,31 @@ class AuthViewModel extends Notifier<AuthState> {
         status: AuthStatus.unauthenticated,
         user: null,
       ),
+    );
+  }
+
+  Future<bool> verifyResetCode({
+    required String email,
+    required String code,
+  }) async {
+    state = state.copyWith(status: AuthStatus.loading, errorMessage: null);
+
+    final result = await _verifyResetCodeUsecase(
+      VerifyResetCodeParams(email: email, code: code),
+    );
+
+    return result.fold(
+      (failure) {
+        state = state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: failure.message,
+        );
+        return false;
+      },
+      (ok) {
+        state = state.copyWith(status: AuthStatus.loaded);
+        return ok;
+      },
     );
   }
 }

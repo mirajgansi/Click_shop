@@ -4,8 +4,14 @@ import 'package:flutter/services.dart';
 class OtpInput extends StatefulWidget {
   final int length;
   final ValueChanged<String> onChanged;
+  final bool hasError;
 
-  const OtpInput({super.key, this.length = 6, required this.onChanged});
+  const OtpInput({
+    super.key,
+    this.length = 6,
+    required this.onChanged,
+    required this.hasError,
+  });
 
   @override
   State<OtpInput> createState() => _OtpInputState();

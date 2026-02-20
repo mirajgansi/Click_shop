@@ -1,4 +1,5 @@
 import 'package:click_shop/core/config/api_endpoints.dart';
+import 'package:click_shop/core/utils/snackbar_utils.dart';
 import 'package:click_shop/features/cart/domain/usecases/add_cart_product_usecase.dart';
 import 'package:click_shop/features/dashboard/presentation/widgets/my_stock_badge_widget.dart';
 import 'package:click_shop/features/product/presentation/view_model/product_view_model.dart';
@@ -31,16 +32,6 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
           .read(productViewModelProvider.notifier)
           .incrementView(widget.productId);
     });
-  }
-
-  void _toast(String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(msg),
-        duration: const Duration(seconds: 2),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
   }
 
   String _fmtDate(DateTime? date) {
@@ -83,12 +74,12 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
           icon: Icon(Icons.arrow_back, color: cs.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.share_outlined, color: cs.onSurface),
-            onPressed: () => _toast("Share coming soon"),
-          ),
-        ],
+        // actions: [
+        //   IconButton(
+        //     icon: Icon(Icons.share_outlined, color: cs.onSurface),
+        //     onPressed: () => _toast("Share coming soon"),
+        //   ),
+        // ],
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(16),
@@ -113,8 +104,8 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                   );
 
               result.fold(
-                (failure) => _toast(failure.message),
-                (_) => _toast("Added to basket"),
+                (failure) => SnackbarUtils.showError(context, failure.message),
+                (_) => SnackbarUtils.showSuccess(context, "Added to basket"),
               );
             },
             child: const Text(

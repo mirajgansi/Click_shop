@@ -1,5 +1,5 @@
 import 'package:click_shop/features/dashboard/presentation/widgets/cart_sekeleton_widget.dart';
-import 'package:click_shop/features/order/presentation/pages/prder_detail_page.dart';
+import 'package:click_shop/features/order/presentation/pages/order_detail_page.dart';
 import 'package:click_shop/features/order/presentation/widgets/order_card_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

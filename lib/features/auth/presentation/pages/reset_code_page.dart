@@ -1,20 +1,24 @@
 import 'package:click_shop/features/auth/presentation/pages/reset_new_password_page.dart';
+import 'package:click_shop/features/auth/presentation/view_model/auth_view_model.dart';
 import 'package:click_shop/features/auth/presentation/widgets/otp_widgets.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ResetCodePage extends StatefulWidget {
+class ResetCodePage extends ConsumerStatefulWidget {
+  // ✅
   final String? initialEmail;
-
   const ResetCodePage({super.key, this.initialEmail});
 
   @override
-  State<ResetCodePage> createState() => _ResetCodePageState();
+  ConsumerState<ResetCodePage> createState() => _ResetCodePageState(); // ✅
 }
 
-class _ResetCodePageState extends State<ResetCodePage> {
+class _ResetCodePageState extends ConsumerState<ResetCodePage> {
   final _formKey = GlobalKey<FormState>();
   final _emailCtrl = TextEditingController();
+
   String _code = "";
+  String? _codeError; // ✅ inline error
 
   @override
   void initState() {
@@ -22,27 +26,41 @@ class _ResetCodePageState extends State<ResetCodePage> {
     _emailCtrl.text = widget.initialEmail ?? "";
   }
 
-  @override
-  void dispose() {
-    _emailCtrl.dispose();
-    super.dispose();
-  }
+  Future<void> _next() async {
+    FocusScope.of(context).unfocus();
 
-  void _next() {
-    if (!_formKey.currentState!.validate()) return;
+    final email = _emailCtrl.text.trim();
+    final code = _code.trim();
 
-    if (!RegExp(r'^\d{6}$').hasMatch(_code)) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Code must be 6 digits")));
+    if (code.isEmpty) {
+      setState(() => _codeError = "Code is required");
       return;
     }
 
+    if (!RegExp(r'^\d{6}$').hasMatch(code)) {
+      setState(() => _codeError = "Code must be 6 digits");
+      return;
+    }
+
+    setState(() => _codeError = null);
+
+    // ✅ CALL BACKEND VERIFY
+    final ok = await ref
+        .read(AuthViewModelProvider.notifier)
+        .verifyResetCode(email: email, code: code);
+
+    if (!ok) {
+      final msg =
+          ref.read(AuthViewModelProvider).errorMessage ?? "Invalid reset code";
+      setState(() => _codeError = msg);
+      return; // ✅ STOP, DON'T NAVIGATE
+    }
+
+    if (!mounted) return;
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) =>
-            ResetNewPasswordPage(email: _emailCtrl.text.trim(), code: _code),
+        builder: (_) => ResetNewPasswordPage(email: email, code: code),
       ),
     );
   }
@@ -121,8 +139,27 @@ class _ResetCodePageState extends State<ResetCodePage> {
                   ),
                   const SizedBox(height: 10),
 
-                  OtpInput(length: 6, onChanged: (v) => _code = v),
-
+                  OtpInput(
+                    length: 6,
+                    hasError: _codeError != null,
+                    onChanged: (v) {
+                      setState(() {
+                        _code = v;
+                        _codeError = null;
+                      });
+                    },
+                  ),
+                  if (_codeError != null) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      _codeError!,
+                      style: TextStyle(
+                        color: cs.error,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 10),
                   Center(
                     child: Text(

@@ -63,6 +63,7 @@ class ApiEndpoints {
 
   static const String updateProfile = '$auth/update-profile';
   static const String deleteMe = '$auth/me';
+  static String verifyResetCode = '$auth/verify-reset-code';
 
   static const String requestPasswordReset = '$auth/request-password-reset';
   static String resetPassword = '$auth/reset-password';
@@ -116,7 +117,7 @@ class ApiEndpoints {
   static const String createOrder = orders; // POST /api/orders
   static const String myOrders = "$orders/me"; // GET  /api/orders/me
   static String orderById(String id) => "$orders/$id"; // GET /api/orders/:id
-  static String cancelOrder(String id) => "$orders/orders/$id/cancel";
+  static String cancelOrder(String id) => "$orders/$id/cancel";
 
   static const String driverOrders = "$orders/driver/my-orders";
 

@@ -1,7 +1,7 @@
 import 'package:click_shop/core/utils/snackbar_utils.dart';
 import 'package:click_shop/features/dashboard/presentation/view_model/notification_view_model.dart';
 import 'package:click_shop/features/dashboard/presentation/state/notification_state.dart';
-import 'package:click_shop/features/order/presentation/pages/prder_detail_page.dart';
+import 'package:click_shop/features/order/presentation/pages/order_detail_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

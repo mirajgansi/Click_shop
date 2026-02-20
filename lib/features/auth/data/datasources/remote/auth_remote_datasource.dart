@@ -230,4 +230,19 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
     print("🔥 REMOTE saveFcmToken() RESPONSE: ${res.statusCode} ${res.data}");
     return res.data["success"] == true;
   }
+
+  @override
+  Future<bool> verifyResetCode({
+    required String email,
+    required String code,
+  }) async {
+    final res = await _apiClient.post(
+      ApiEndpoints.verifyResetCode,
+      data: {"email": email, "code": code},
+    );
+
+    print("🔥 verifyResetCode RESPONSE: ${res.statusCode} ${res.data}");
+
+    return res.data["success"] == true;
+  }
 }

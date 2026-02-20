@@ -41,9 +41,8 @@ class ProductViewModel extends Notifier<ProductState> {
     return ProductState.initial();
   }
 
-  // ✅ Call this whenever HomeScreen wants initial load
   Future<void> initHome() async {
-    debugPrint("🔥 initHome called");
+    debugPrint("initHome called");
     await Future.wait([
       loadProducts(),
       loadRecent(),
@@ -66,7 +65,7 @@ class ProductViewModel extends Notifier<ProductState> {
       ),
     );
 
-    debugPrint("✅ allProducts SET: ${state.allProducts.length}");
+    debugPrint(" allProducts SET: ${state.allProducts.length}");
   }
 
   Future<void> loadRecent() async {
@@ -85,7 +84,7 @@ class ProductViewModel extends Notifier<ProductState> {
       ),
     );
 
-    debugPrint("✅ RECENT SET: ${state.recentProducts.length}");
+    debugPrint("RECENT SET: ${state.recentProducts.length}");
   }
 
   Future<void> loadTrending() async {
@@ -104,7 +103,7 @@ class ProductViewModel extends Notifier<ProductState> {
       ),
     );
 
-    debugPrint("✅ TRENDING SET: ${state.trendingProducts.length}");
+    debugPrint(" TRENDING SET: ${state.trendingProducts.length}");
   }
 
   Future<void> loadPopular() async {
@@ -123,7 +122,7 @@ class ProductViewModel extends Notifier<ProductState> {
       ),
     );
 
-    debugPrint("✅ POPULAR SET: ${state.popularProducts.length}");
+    debugPrint("POPULAR SET: ${state.popularProducts.length}");
   }
 
   Future<void> incrementView(String productId) async {
