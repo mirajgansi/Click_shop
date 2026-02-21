@@ -26,6 +26,8 @@ class NotificationHiveModel extends HiveObject {
 
   @HiveField(6)
   final String? orderId;
+  @HiveField(7)
+  final String? productId;
 
   NotificationHiveModel({
     required this.id,
@@ -35,6 +37,7 @@ class NotificationHiveModel extends HiveObject {
     required this.createdAt,
     this.type,
     this.orderId,
+    this.productId,
   });
   NotificationHiveModel copyWith({
     String? id,
@@ -44,6 +47,7 @@ class NotificationHiveModel extends HiveObject {
     String? createdAt,
     String? type,
     String? orderId,
+    String? productId,
   }) {
     return NotificationHiveModel(
       id: id ?? this.id,
@@ -53,6 +57,7 @@ class NotificationHiveModel extends HiveObject {
       createdAt: createdAt ?? this.createdAt,
       type: type ?? this.type,
       orderId: orderId ?? this.orderId,
+      productId: productId ?? this.productId,
     );
   }
 
@@ -65,6 +70,7 @@ class NotificationHiveModel extends HiveObject {
       createdAt: entity.createdAt,
       type: entity.type,
       orderId: entity.orderId,
+      productId: entity.productId,
     );
   }
 
@@ -77,6 +83,7 @@ class NotificationHiveModel extends HiveObject {
       createdAt: createdAt,
       type: type,
       orderId: orderId,
+      productId: productId,
     );
   }
 }

@@ -34,12 +34,6 @@ class ProductDetailSkeleton extends StatelessWidget {
           icon: Icon(Icons.arrow_back, color: cs.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.share_outlined, color: cs.onSurface),
-            onPressed: null,
-          ),
-        ],
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(16),

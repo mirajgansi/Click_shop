@@ -8,8 +8,9 @@ part 'notification_api_model.g.dart';
 class NotificationMeta {
   final String? orderId;
   final String? url;
+  final String? productId;
 
-  NotificationMeta({this.orderId, this.url});
+  NotificationMeta({this.orderId, this.url, this.productId});
 
   factory NotificationMeta.fromJson(Map<String, dynamic> json) =>
       _$NotificationMetaFromJson(json);
@@ -33,7 +34,6 @@ class NotificationApiModel {
   @JsonKey(name: 'createdAt')
   final String createdAt;
 
-  // ✅ this matches API: "data": { orderId, url }
   @JsonKey(name: 'data')
   final NotificationMeta? meta;
 
@@ -60,7 +60,8 @@ class NotificationApiModel {
       isRead: isRead,
       createdAt: createdAt,
       type: type,
-      orderId: meta?.orderId, // ✅ HERE
+      orderId: meta?.orderId,
+      productId: meta?.productId,
     );
   }
 
@@ -72,7 +73,8 @@ class NotificationApiModel {
       isRead: isRead,
       createdAt: createdAt,
       type: type,
-      orderId: meta?.orderId, // ✅ HERE
+      orderId: meta?.orderId,
+      productId: meta?.productId,
     );
   }
 }

@@ -3,6 +3,7 @@ import 'package:click_shop/core/utils/snackbar_utils.dart';
 import 'package:click_shop/features/cart/domain/usecases/add_cart_product_usecase.dart';
 import 'package:click_shop/features/dashboard/presentation/widgets/my_stock_badge_widget.dart';
 import 'package:click_shop/features/product/presentation/view_model/product_view_model.dart';
+import 'package:click_shop/features/product/presentation/widgets/my_prodcut_gallery.dart';
 import 'package:click_shop/features/product/presentation/widgets/product_detail_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,6 +19,15 @@ class ProductDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
+  int _imgIndex = 0;
+  final PageController _pageController = PageController();
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
   int quantity = 1;
   @override
   void initState() {
@@ -119,24 +129,13 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // IMAGE
-            Container(
-              height: 240,
-              margin: const EdgeInsets.symmetric(horizontal: 16),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                color: cs.surfaceContainerHighest,
-              ),
-              child: Center(
-                child: (product.image.isEmpty)
-                    ? Image.asset(
-                        "assets/images/happy.png",
-                        fit: BoxFit.contain,
-                      )
-                    : Image.network(
-                        ApiEndpoints.buildFileUrl(product.image),
-                        fit: BoxFit.contain,
-                      ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: ProductGallery(
+                image: product.image,
+                images: product.images,
+                height: 240,
+                onIndexChanged: (i) => setState(() => _imgIndex = i),
               ),
             ),
             const SizedBox(height: 16),

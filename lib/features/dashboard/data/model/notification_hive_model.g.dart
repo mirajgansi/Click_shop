@@ -24,13 +24,14 @@ class NotificationHiveModelAdapter extends TypeAdapter<NotificationHiveModel> {
       createdAt: fields[4] as String,
       type: fields[5] as String?,
       orderId: fields[6] as String?,
+      productId: fields[7] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, NotificationHiveModel obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(8)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -44,7 +45,9 @@ class NotificationHiveModelAdapter extends TypeAdapter<NotificationHiveModel> {
       ..writeByte(5)
       ..write(obj.type)
       ..writeByte(6)
-      ..write(obj.orderId);
+      ..write(obj.orderId)
+      ..writeByte(7)
+      ..write(obj.productId);
   }
 
   @override

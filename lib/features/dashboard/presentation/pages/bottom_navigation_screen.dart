@@ -196,18 +196,37 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
         selectedItemColor: cs.primary,
         unselectedItemColor: cs.onSurface.withOpacity(0.6),
         onTap: (index) => setState(() => _selectedIndex = index),
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-          BottomNavigationBarItem(icon: Icon(Icons.explore), label: "Explore"),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart),
-            label: "Cart",
+        items: [
+          _svgNavItem(
+            asset: 'assets/icons/home.svg',
+            label: 'Home',
+            index: 0,
+            color: _selectedIndex == 0 ? const Color(0xFF53B175) : Colors.black,
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.local_shipping),
-            label: "Order",
+          _svgNavItem(
+            asset: 'assets/icons/explore.svg',
+            label: 'Explore',
+            index: 1,
+            color: _selectedIndex == 1 ? const Color(0xFF53B175) : Colors.black,
           ),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Account"),
+          _svgNavItem(
+            asset: 'assets/icons/cart.svg',
+            label: 'Cart',
+            index: 2,
+            color: _selectedIndex == 2 ? const Color(0xFF53B175) : Colors.black,
+          ),
+          _svgNavItem(
+            asset: 'assets/icons/delivery.svg',
+            label: 'Order',
+            index: 3,
+            color: _selectedIndex == 3 ? const Color(0xFF53B175) : Colors.black,
+          ),
+          _svgNavItem(
+            asset: 'assets/icons/account.svg',
+            label: 'Account',
+            index: 4,
+            color: _selectedIndex == 4 ? const Color(0xFF53B175) : Colors.black,
+          ),
         ],
       ),
     );
