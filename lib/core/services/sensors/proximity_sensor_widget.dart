@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:proximity_sensor/proximity_sensor.dart';
 
 class ProximitySensorWidget extends StatefulWidget {
-  final Future<void> Function() onNear; // async callback
+  final Future<void> Function() onNear;
   final bool enabled;
   final Duration cooldown;
   final Widget child;
