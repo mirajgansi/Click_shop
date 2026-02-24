@@ -365,10 +365,10 @@ class _CancelButton extends ConsumerWidget {
       width: double.infinity,
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: canCancel ? cs.error : cs.surfaceVariant,
+          backgroundColor: canCancel ? cs.error : cs.surfaceContainerHighest,
           foregroundColor: canCancel ? cs.onError : cs.onSurfaceVariant,
           disabledBackgroundColor: cs.onSurfaceVariant,
-          disabledForegroundColor: cs.surfaceVariant,
+          disabledForegroundColor: cs.surfaceContainerHighest,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),

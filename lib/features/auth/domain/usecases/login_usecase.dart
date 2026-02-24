@@ -31,10 +31,6 @@ class LoginUsecase
 
   @override
   Future<Either<Failure, AuthEntity>> call(LoginUsecaseParams params) {
-    final authEntity = AuthEntity(
-      email: params.email,
-      password: params.password,
-    );
     return _authRepository.login(params.email, params.password);
   }
 }

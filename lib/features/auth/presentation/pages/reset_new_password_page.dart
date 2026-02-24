@@ -71,7 +71,7 @@ class _ResetNewPasswordPageState extends ConsumerState<ResetNewPasswordPage> {
             constraints: const BoxConstraints(maxWidth: 420),
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.background,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(22),
               boxShadow: const [
                 BoxShadow(

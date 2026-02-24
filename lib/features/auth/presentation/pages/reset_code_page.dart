@@ -44,7 +44,6 @@ class _ResetCodePageState extends ConsumerState<ResetCodePage> {
 
     setState(() => _codeError = null);
 
-    // ✅ CALL BACKEND VERIFY
     final ok = await ref
         .read(AuthViewModelProvider.notifier)
         .verifyResetCode(email: email, code: code);
@@ -53,7 +52,7 @@ class _ResetCodePageState extends ConsumerState<ResetCodePage> {
       final msg =
           ref.read(AuthViewModelProvider).errorMessage ?? "Invalid reset code";
       setState(() => _codeError = msg);
-      return; // ✅ STOP, DON'T NAVIGATE
+      return;
     }
 
     if (!mounted) return;

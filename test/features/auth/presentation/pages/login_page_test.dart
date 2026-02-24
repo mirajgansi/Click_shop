@@ -1,63 +1,70 @@
-// import 'package:dartz/dartz.dart';
-// import 'package:flutter_test/flutter_test.dart';
-// import 'package:mocktail/mocktail.dart';
+import 'package:click_shop/core/error/failures.dart';
+import 'package:click_shop/features/auth/domain/entities/auth_entity.dart';
+import 'package:click_shop/features/auth/domain/repositories/auth_repository.dart';
+import 'package:click_shop/features/auth/domain/usecases/login_usecase.dart';
+import 'package:dartz/dartz.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
 
-// import 'package:click_shop/features/auth/domain/entities/auth_entity.dart';
-// import 'package:click_shop/features/auth/domain/repositories/auth_repository.dart';
-// import 'package:click_shop/features/auth/domain/usecases/login_usecase.dart';
-// import 'package:click_shop/core/error/failures.dart';
+class MockAuthRepository extends Mock implements IAuthRepository {}
 
-// class MockAuthRepository extends Mock implements IAuthRepository {}
+void main() {
+  late LoginUsecase usecase;
+  late MockAuthRepository mockRepository;
 
-// void main() {
-//   late LoginUsecase usecase;
-//   late MockAuthRepository mockRepository;
+  const email = 'test@mail.com';
+  const password = 'password123';
 
-//   setUp(() {
-//     mockRepository = MockAuthRepository();
-//     usecase = LoginUsecase(authRepository: mockRepository);
-//   });
+  setUp(() {
+    mockRepository = MockAuthRepository();
+    usecase = LoginUsecase(authRepository: mockRepository);
+  });
 
-//   setUpAll(() {
-//     registerFallbackValue(
-//       const AuthEntity(email: 'fallback@mail.com', password: '123456'),
-//     );
-//   });
+  test('returns user when login is successful', () async {
+    // Arrange
+    final user = AuthEntity(userId: '123', email: email, password: password);
 
-//   const email = 'test@mail.com';
-//   const password = 'password123';
+    when(
+      () => mockRepository.login(email, password),
+    ).thenAnswer((_) async => Right(user));
 
-//   test('returns user with id when login is successful', () async {
-//     final user = AuthEntity(userId: '123', email: email, password: password);
+    // Act
+    final result = await usecase(
+      LoginUsecaseParams(email: email, password: password),
+    );
 
-//     when(
-//       () => mockRepository.login(email, password),
-//     ).thenAnswer((_) async => Right(user));
+    // Assert (don’t compare Right(user) directly unless AuthEntity has ==)
+    result.fold((l) => fail('Expected Right(user), got Left($l)'), (r) {
+      expect(r.userId, '123');
+      expect(r.email, email);
+    });
 
-//     final result = await usecase(
-//       LoginUsecaseParams(email: email, password: password),
-//     );
+    verify(() => mockRepository.login(email, password)).called(1);
+    verifyNoMoreInteractions(mockRepository);
+  });
 
-//     expect(result, Right(user));
-//     expect(result.getOrElse(() => user).userId, '123');
-//   });
+  test('returns Failure when login fails', () async {
+    // Arrange
+    final failure = ApiFailure(message: 'Invalid credentials', statusCode: 401);
 
-//   test('should return Failure when login fails', () async {
-//     // Arrange
-//     final failure = ApiFailure(message: 'Invalid credentials', statusCode: 401);
+    when(
+      () => mockRepository.login(email, password),
+    ).thenAnswer((_) async => Left(failure));
 
-//     when(
-//       () => mockRepository.login(any(), any()),
-//     ).thenAnswer((_) async => Left(failure));
+    // Act
+    final result = await usecase(
+      LoginUsecaseParams(email: email, password: password),
+    );
 
-//     // Act
-//     final result = await usecase(
-//       LoginUsecaseParams(email: email, password: password),
-//     );
+    // Assert
+    result.fold((l) {
+      expect(l, isA<ApiFailure>());
+      final f = l as ApiFailure;
+      expect(f.message, 'Invalid credentials');
+      expect(f.statusCode, 401);
+    }, (r) => fail('Expected Left(failure), got Right($r)'));
 
-//     // Assert
-//     expect(result, Left(failure));
-//     verify(() => mockRepository.login(any(), any())).called(1);
-//     verifyNoMoreInteractions(mockRepository);
-//   });
-// }
+    verify(() => mockRepository.login(email, password)).called(1);
+    verifyNoMoreInteractions(mockRepository);
+  });
+}

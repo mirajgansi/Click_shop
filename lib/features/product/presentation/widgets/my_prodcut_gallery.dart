@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 class ProductGallery extends StatefulWidget {
   const ProductGallery({
+    super.key,
     required this.image,
     required this.images,
     required this.height,

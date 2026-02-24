@@ -16,18 +16,18 @@ class DriverState {
     this.stats = const DriverOrderStats(totalAssigned: 0, totalDelivered: 0),
     this.errorMessage,
   });
-
   DriverState copyWith({
     DriverStatus? status,
     List<OrderEntity>? orders,
     DriverOrderStats? stats,
     String? errorMessage,
+    bool clearError = false,
   }) {
     return DriverState(
       status: status ?? this.status,
       orders: orders ?? this.orders,
       stats: stats ?? this.stats,
-      errorMessage: errorMessage,
+      errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
     );
   }
 }

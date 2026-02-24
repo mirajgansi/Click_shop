@@ -122,6 +122,6 @@ class DriverViewModel extends Notifier<DriverState> {
   }
 
   void clearError() {
-    state = state.copyWith(errorMessage: null);
+    state = state.copyWith(clearError: true);
   }
 }

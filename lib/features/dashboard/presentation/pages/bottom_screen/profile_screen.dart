@@ -2,11 +2,7 @@ import 'dart:io';
 
 import 'package:click_shop/app/theme/theme_extensions.dart';
 import 'package:click_shop/core/config/api_endpoints.dart';
-import 'package:click_shop/core/error/failures.dart';
 import 'package:click_shop/core/services/storage/user_session_service.dart';
-import 'package:click_shop/core/utils/snackbar_utils.dart';
-import 'package:click_shop/features/auth/domain/entities/auth_entity.dart';
-import 'package:click_shop/features/auth/domain/usecases/get_currentuacase.dart';
 import 'package:click_shop/features/auth/presentation/state/auth_state.dart';
 import 'package:click_shop/features/auth/presentation/view_model/auth_view_model.dart';
 import 'package:click_shop/features/auth/presentation/widgets/my_button_widgets.dart';
@@ -15,9 +11,7 @@ import 'package:click_shop/features/dashboard/presentation/pages/my_detail_page.
 import 'package:click_shop/features/dashboard/presentation/pages/notifcation_setting_page.dart';
 import 'package:click_shop/features/dashboard/presentation/pages/theme_setting_page.dart';
 import 'package:click_shop/features/dashboard/presentation/widgets/my_menu_items_widgets.dart';
-import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';

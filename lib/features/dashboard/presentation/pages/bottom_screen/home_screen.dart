@@ -3,9 +3,6 @@ import 'package:click_shop/core/constants/app_categories.dart';
 import 'package:click_shop/core/providers/socket_service_provider.dart';
 import 'package:click_shop/core/services/connectivity/socket_service.dart';
 import 'package:click_shop/features/auth/domain/usecases/save_fcm_token_usecase.dart';
-import 'package:click_shop/features/auth/presentation/view_model/auth_view_model.dart';
-import 'package:click_shop/features/dashboard/presentation/providers/notification_settings_provider.dart';
-import 'package:click_shop/features/dashboard/presentation/view_model/notification_view_model.dart';
 import 'package:click_shop/features/dashboard/presentation/widgets/my_card_widgets.dart';
 import 'package:click_shop/features/dashboard/presentation/widgets/skeleton_product_card_widget.dart';
 import 'package:click_shop/features/product/domain/entities/product_entity.dart';
@@ -89,7 +86,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   final _searchCtrl = TextEditingController();
   String q = "";
   bool _booted = false;
-  bool _socketBooted = false;
+  final bool _socketBooted = false;
 
   @override
   void didChangeDependencies() {
@@ -125,42 +122,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     _searchCtrl.dispose();
     super.dispose();
   }
-
-  // @override
-  // void initState() {
-  //   super.initState();
-
-  //   WidgetsBinding.instance.addPostFrameCallback((_) async {
-  //     try {
-  //       if (!mounted) return;
-
-  //       // ✅ 0) read user toggle (from Notification Settings page)
-  //       final enabled = ref.read(notificationEnabledProvider);
-
-  //       // ✅ 1) permission + token save (only if enabled)
-  //       if (enabled) {
-  //         await enableNotifications(context, ref);
-  //       }
-
-  //       // ✅ 2) load notifications (you can keep this, or also gate it)
-  //       await ref.read(notificationViewModelProvider.notifier).load();
-  //       await ref
-  //           .read(notificationViewModelProvider.notifier)
-  //           .loadUnreadCount();
-
-  //       // ✅ 3) connect socket
-  //       final authState = ref.read(AuthViewModelProvider);
-  //       final userId = authState.user?.userId; // adjust if needed
-
-  //       if (userId != null && userId.isNotEmpty && !_socketBooted) {
-  //         _socketBooted = true;
-  //         ref.read(socketServiceProvider).connect(userId);
-  //       }
-  //     } catch (e) {
-  //       print("❌ initState error: $e");
-  //     }
-  //   });
-  // }
 
   @override
   Widget build(BuildContext context) {
