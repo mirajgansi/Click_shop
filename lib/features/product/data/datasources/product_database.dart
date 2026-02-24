@@ -30,7 +30,6 @@ abstract interface class IProductLocalDatabase {
   Future<void> cachePopular(List<ProductHiveModel> items);
   Future<void> cacheTopRated(List<ProductHiveModel> items);
 
-  /// NEW cache
   Future<void> cacheOutOfStock(List<ProductHiveModel> items);
 }
 

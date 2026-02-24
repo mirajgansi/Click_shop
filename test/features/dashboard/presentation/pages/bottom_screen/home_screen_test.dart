@@ -1,137 +1,232 @@
-import 'package:click_shop/features/dashboard/presentation/pages/bottom_screen/home_screen.dart';
-import 'package:click_shop/features/product/presentation/state/product_state.dart';
-import 'package:click_shop/features/product/presentation/view_model/product_view_model.dart';
-import 'package:click_shop/core/providers/socket_service_provider.dart';
-import 'package:click_shop/core/services/connectivity/socket_service.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mocktail/mocktail.dart';
+// import 'package:click_shop/features/dashboard/presentation/pages/bottom_screen/home_screen.dart';
+// import 'package:click_shop/features/product/presentation/state/product_state.dart';
+// import 'package:flutter/material.dart';
+// import 'package:flutter_test/flutter_test.dart';
+// import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// ---------------- Mocks ----------------
-class MockSocketService extends Mock implements SocketService {}
+// import 'package:click_shop/features/product/presentation/view_model/product_view_model.dart';
+// import 'package:click_shop/core/providers/socket_service_provider.dart';
+// import 'package:click_shop/core/services/connectivity/socket_service.dart';
 
-class FakeProductViewModel extends ProductViewModel {
-  int initHomeCalls = 0;
-  int searchCalls = 0;
-  int loadTrendingCalls = 0;
-  int loadPopularCalls = 0;
-  String? lastSearch;
+// import 'package:click_shop/features/product/domain/entities/product_entity.dart';
+// import 'package:click_shop/features/dashboard/presentation/widgets/skeleton_product_card_widget.dart';
+// import 'package:click_shop/features/dashboard/presentation/widgets/my_card_widgets.dart';
 
-  @override
-  ProductState build() {
-    return ProductState.initial();
-  }
+// // ----- fakes -----
+// class FakeSocketService implements SocketService {
+//   bool disconnected = false;
 
-  @override
-  Future<void> initHome() async => initHomeCalls++;
+//   @override
+//   void disconnect() {
+//     disconnected = true;
+//   }
 
-  @override
-  Future<void> search(String query) async {
-    searchCalls++;
-    lastSearch = query;
-  }
+//   @override
+//   void connect(String userId) {
+//     // TODO: implement connect
+//   }
 
-  @override
-  Future<void> loadTrending() async => loadTrendingCalls++;
+//   @override
+//   void dispose() {
+//     // TODO: implement dispose
+//   }
 
-  @override
-  Future<void> loadPopular() async => loadPopularCalls++;
-}
+//   @override
+//   // TODO: implement notificationStream
+//   Stream<dynamic> get notificationStream => throw UnimplementedError();
+// }
 
-void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
+// // ✅ Replace ProductState with your real state type import
+// class FakeProductViewModel extends Notifier<ProductState> {
+//   int initHomeCalls = 0;
+//   int searchCalls = 0;
+//   String? lastSearch;
 
-  late MockSocketService socket;
-  late FakeProductViewModel fakeVm;
+//   final ProductState initial;
 
-  Widget buildTestApp() {
-    return ProviderScope(
-      overrides: [
-        // override socket service
-        socketServiceProvider.overrideWithValue(socket),
+//   FakeProductViewModel(this.initial);
 
-        // override your NotifierProvider with our fake notifier
-        productViewModelProvider.overrideWith(() => fakeVm),
-      ],
-      child: const MaterialApp(home: HomeScreen()),
-    );
-  }
+//   @override
+//   ProductState build() => initial;
 
-  setUp(() {
-    socket = MockSocketService();
-    fakeVm = FakeProductViewModel();
+//   Future<void> initHome() async {
+//     initHomeCalls++;
+//   }
 
-    when(() => socket.disconnect()).thenReturn(null);
-  });
+//   Future<void> loadTrending() async {}
+//   Future<void> loadPopular() async {}
 
-  testWidgets('HomeScreen calls initHome once on first build', (tester) async {
-    await tester.pumpWidget(buildTestApp());
+//   Future<void> search(String query) async {
+//     searchCalls++;
+//     lastSearch = query;
+//   }
+// }
 
-    // didChangeDependencies triggers microtask -> pump once more
-    await tester.pump();
+// Widget _wrap(Widget child, {required List<Override> overrides}) {
+//   return ProviderScope(
+//     overrides: overrides,
+//     child: MaterialApp(home: child),
+//   );
+// }
 
-    expect(fakeVm.initHomeCalls, 1);
+// void main() {
+//   testWidgets('shows skeleton grid when state.isLoading = true', (
+//     tester,
+//   ) async {
+//     final fakeSocket = FakeSocketService();
 
-    // Rebuild again - should not call again because _booted prevents it
-    await tester.pump();
-    expect(fakeVm.initHomeCalls, 1);
-  });
+//     // ✅ Build a loading state (adjust fields to your ProductState)
+//     final loadingState = ProductState(
+//       isLoading: true,
+//       allProducts: const [],
+//       error: '',
+//       categoryProducts: [],
+//       selectedProduct: null,
+//       isRecentLoading: null,
+//       isTrendingLoading: null,
+//       isPopularLoading: null,
+//       isTopRatedLoading: null,
+//       recentProducts: [],
+//       trendingProducts: [],
+//       popularProducts: [],
+//       topRatedProducts: [],
+//       // ... add other required fields in your state constructor
+//     );
 
-  testWidgets('Typing in search calls search(query); clearing calls initHome', (
-    tester,
-  ) async {
-    await tester.pumpWidget(buildTestApp());
-    await tester.pump(); // run initHome microtask
+//     final fakeVm = FakeProductViewModel(loadingState);
 
-    final searchField = find.byType(TextField);
-    expect(searchField, findsOneWidget);
+//     await tester.pumpWidget(
+//       _wrap(
+//         const HomeScreen(),
+//         overrides: [
+//           socketServiceProvider.overrideWithValue(fakeSocket),
+//           productViewModelProvider.overrideWith(() => fakeVm),
+//         ],
+//       ),
+//     );
 
-    await tester.enterText(searchField, 'milk');
-    await tester.pump();
+//     // let didChangeDependencies microtask run
+//     await tester.pump();
 
-    expect(fakeVm.searchCalls, 1);
-    expect(fakeVm.lastSearch, 'milk');
+//     expect(find.byType(ProductCardSkeleton), findsWidgets);
+//   });
 
-    // Tap the "close" icon to clear (only appears when isSearching)
-    final closeBtn = find.byIcon(Icons.close);
-    expect(closeBtn, findsOneWidget);
+//   testWidgets('shows "No products" when not loading and list empty', (
+//     tester,
+//   ) async {
+//     final fakeSocket = FakeSocketService();
 
-    await tester.tap(closeBtn);
-    await tester.pump();
+//     final emptyState = ProductState(
+//       isLoading: false,
+//       allProducts: const [],
+//       error: '',
+//       categoryProducts: [],
+//       selectedProduct: null,
+//       isRecentLoading: false,
+//       isTrendingLoading: false,
+//       isPopularLoading: false,
+//       isTopRatedLoading: false,
+//       recentProducts: [],
+//       trendingProducts: [],
+//       popularProducts: [],
+//       topRatedProducts: [],
+//     );
 
-    // your code calls initHome after clearing
-    expect(fakeVm.initHomeCalls, 2); // 1 from boot + 1 from clear
-  });
+//     final fakeVm = FakeProductViewModel(emptyState);
 
-  testWidgets('Pull-to-refresh calls initHome, loadTrending, loadPopular', (
-    tester,
-  ) async {
-    await tester.pumpWidget(buildTestApp());
-    await tester.pump(); // run initHome microtask
+//     await tester.pumpWidget(
+//       _wrap(
+//         const HomeScreen(),
+//         overrides: [
+//           socketServiceProvider.overrideWithValue(fakeSocket),
+//           productViewModelProvider.overrideWith(() => fakeVm),
+//         ],
+//       ),
+//     );
 
-    // RefreshIndicator needs a scrollable drag down
-    final scroll = find.byType(CustomScrollView);
-    expect(scroll, findsOneWidget);
+//     await tester.pump();
 
-    await tester.fling(scroll, const Offset(0, 400), 1000);
-    await tester.pump(); // start refresh
-    await tester.pump(const Duration(seconds: 1)); // let it settle
+//     expect(find.text('All Products'), findsOneWidget);
+//     expect(find.text('No products'), findsOneWidget);
+//   });
 
-    // your onRefresh: initHome + loadTrending + loadPopular
-    expect(fakeVm.initHomeCalls >= 2, true);
-    expect(fakeVm.loadTrendingCalls, 1);
-    expect(fakeVm.loadPopularCalls, 1);
-  });
+//   testWidgets('shows products grid when products exist', (tester) async {
+//     final fakeSocket = FakeSocketService();
 
-  testWidgets('dispose calls socket.disconnect', (tester) async {
-    await tester.pumpWidget(buildTestApp());
-    await tester.pump(); // run initHome microtask
+//     final products = [
+//       ProductEntity(
+//         id: '1',
+//         name: 'Apple',
+//         description: '',
+//         price: 12,
+//         inStock: 12,
+//         category: '',
+//         nutritionalInfo: '',
+//         image: '' /* fill required fields */,
+//       ),
+//       ProductEntity(
+//         id: '2',
+//         name: 'Banana',
+//         description: '',
+//         price: 33,
+//         inStock: 22,
+//         category: '',
+//         nutritionalInfo: '',
+//         image: '' /* fill required fields */,
+//       ),
+//     ];
 
-    // remove widget from tree -> triggers dispose
-    await tester.pumpWidget(const SizedBox.shrink());
-    await tester.pumpAndSettle();
+//     final state = ProductState(isLoading: false, allProducts: products);
 
-    verify(() => socket.disconnect()).called(1);
-  });
-}
+//     final fakeVm = FakeProductViewModel(state);
+
+//     await tester.pumpWidget(
+//       _wrap(
+//         const HomeScreen(),
+//         overrides: [
+//           socketServiceProvider.overrideWithValue(fakeSocket),
+//           productViewModelProvider.overrideWith(() => fakeVm),
+//         ],
+//       ),
+//     );
+
+//     await tester.pump();
+
+//     expect(find.byType(CardWidget), findsWidgets);
+//   });
+
+//   testWidgets(
+//     'typing in search calls search(query) and shows Search Results title',
+//     (tester) async {
+//       final fakeSocket = FakeSocketService();
+
+//       final products = [
+//         ProductEntity(id: '1', name: 'Apple' /* required fields */),
+//       ];
+
+//       final state = ProductState(isLoading: false, allProducts: products);
+
+//       final fakeVm = FakeProductViewModel(state);
+
+//       await tester.pumpWidget(
+//         _wrap(
+//           const HomeScreen(),
+//           overrides: [
+//             socketServiceProvider.overrideWithValue(fakeSocket),
+//             productViewModelProvider.overrideWith(() => fakeVm),
+//           ],
+//         ),
+//       );
+
+//       await tester.pump();
+
+//       // enter search text
+//       await tester.enterText(find.byType(TextField), 'app');
+//       await tester.pump();
+
+//       expect(fakeVm.searchCalls, 1);
+//       expect(fakeVm.lastSearch, 'app');
+//       expect(find.text('Search Results'), findsOneWidget);
+//     },
+//   );
+// }

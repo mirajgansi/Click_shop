@@ -86,7 +86,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   final _searchCtrl = TextEditingController();
   String q = "";
   bool _booted = false;
-  final bool _socketBooted = false;
+  bool _socketBooted = false;
 
   @override
   void didChangeDependencies() {

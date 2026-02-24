@@ -12,7 +12,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final productRepositoryProvider = Provider<IProductRepository>((ref) {
   final localDatasource = ref.read(ProductLocalDatasourceProvider);
-  final remoteDatasource = ref.read(ProductRemoteDatabaseProvider);
+  final remoteDatasource = ref.read(productRemoteDatabaseProvider);
   final networkInfo = ref.read(NetworkInfoProvider);
 
   return ProductRepository(

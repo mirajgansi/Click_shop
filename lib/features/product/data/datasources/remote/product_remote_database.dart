@@ -7,7 +7,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final ProductRemoteDatabaseProvider = Provider<IProductRemoteDatabase>((ref) {
+final productRemoteDatabaseProvider = Provider<IProductRemoteDatabase>((ref) {
   return ProductRemoteDatabase(
     apiClient: ref.read(apiClientProvider),
     tokenService: ref.read(tokenServiceProvider),
