@@ -4,6 +4,65 @@ import 'package:click_shop/features/product/domain/entities/product_entity.dart'
 part 'product_api_model.g.dart';
 
 @JsonSerializable()
+class RatingApiModel {
+  final String userId;
+
+  // accept int/double
+  @JsonKey(fromJson: _toDouble)
+  final double rating;
+
+  RatingApiModel({required this.userId, required this.rating});
+
+  factory RatingApiModel.fromJson(Map<String, dynamic> json) =>
+      _$RatingApiModelFromJson(json);
+
+  Map<String, dynamic> toJson() => _$RatingApiModelToJson(this);
+
+  static double _toDouble(dynamic v) {
+    if (v == null) return 0.0;
+    if (v is num) return v.toDouble();
+    return double.tryParse(v.toString()) ?? 0.0;
+  }
+}
+
+@JsonSerializable()
+class CommentApiModel {
+  @JsonKey(fromJson: _userIdFromJson)
+  final String userId;
+
+  @JsonKey(readValue: _readUsername, defaultValue: '')
+  final String username;
+
+  final String comment;
+  final DateTime? createdAt;
+
+  CommentApiModel({
+    required this.userId,
+    required this.username,
+    required this.comment,
+    this.createdAt,
+  });
+
+  factory CommentApiModel.fromJson(Map<String, dynamic> json) =>
+      _$CommentApiModelFromJson(json);
+
+  Map<String, dynamic> toJson() => _$CommentApiModelToJson(this);
+
+  static String _userIdFromJson(dynamic v) {
+    if (v == null) return '';
+    if (v is String) return v;
+    if (v is Map) return (v['_id'] ?? '').toString();
+    return v.toString();
+  }
+
+  static Object? _readUsername(Map json, String key) {
+    final u = json['userId'];
+    if (u is Map) return u['username'] ?? '';
+    return json['username'] ?? '';
+  }
+}
+
+@JsonSerializable()
 class ProductApiModel {
   @JsonKey(name: '_id')
   final String? id;
@@ -11,37 +70,44 @@ class ProductApiModel {
   final String name;
   final String description;
 
-  // backend: nutritionalInfo
   @JsonKey(name: 'nutritionalInfo')
   final String nutritionalInfo;
 
   final String category;
 
-  // backend can send int/double/string sometimes -> handle safely
-  @JsonKey()
+  @JsonKey(fromJson: _toDouble)
   final double price;
 
   @JsonKey(defaultValue: 0)
   final int inStock;
 
-  // backend: image
   final String image;
 
-  // backend: images (optional)
   @JsonKey(defaultValue: <String>[])
   final List<String> images;
 
-  // optional user-visible fields
   final String? manufacturer;
 
-  @JsonKey()
   final DateTime? manufactureDate;
-
-  @JsonKey()
   final DateTime? expireDate;
 
   @JsonKey(defaultValue: 1)
   final int quantity;
+
+  @JsonKey(defaultValue: 0)
+  final double averageRating;
+
+  @JsonKey(defaultValue: 0)
+  final int reviewCount;
+
+  @JsonKey(defaultValue: <String>[])
+  final List<String> favorites;
+
+  @JsonKey(defaultValue: <CommentApiModel>[])
+  final List<CommentApiModel> comments;
+
+  @JsonKey(defaultValue: <RatingApiModel>[])
+  final List<RatingApiModel> ratings;
 
   ProductApiModel({
     this.id,
@@ -57,14 +123,17 @@ class ProductApiModel {
     this.manufactureDate,
     this.expireDate,
     this.quantity = 1,
+    this.averageRating = 0,
+    this.reviewCount = 0,
+    this.favorites = const <String>[],
+    this.comments = const <CommentApiModel>[],
+    this.ratings = const <RatingApiModel>[],
   });
 
   factory ProductApiModel.fromJson(Map<String, dynamic> json) =>
       _$ProductApiModelFromJson(json);
 
   Map<String, dynamic> toJson() => _$ProductApiModelToJson(this);
-
-  // -------------------- Mapping --------------------
 
   ProductEntity toEntity() {
     return ProductEntity(
@@ -81,6 +150,19 @@ class ProductApiModel {
       manufactureDate: manufactureDate,
       expireDate: expireDate,
       quantity: quantity,
+      averageRating: averageRating,
+      reviewCount: reviewCount,
+      favorites: favorites,
+      comments: comments
+          .map(
+            (c) => ProductCommentEntity(
+              userId: c.userId,
+              comment: c.comment,
+              createdAt: c.createdAt,
+              username: c.username,
+            ),
+          )
+          .toList(),
     );
   }
 
@@ -99,33 +181,31 @@ class ProductApiModel {
       manufactureDate: entity.manufactureDate,
       expireDate: entity.expireDate,
       quantity: entity.quantity ?? 1,
+      averageRating: entity.averageRating ?? 0,
+      reviewCount: entity.reviewCount ?? 0,
+      favorites: entity.favorites,
+      comments: entity.comments
+          .map(
+            (c) => CommentApiModel(
+              userId: c.userId,
+              comment: c.comment,
+              createdAt: c.createdAt,
+              username: c.username,
+            ),
+          )
+          .toList(),
+      // ratings usually not needed to send from app -> keep empty
+      ratings: const [],
     );
   }
 
   static List<ProductEntity> toEntityList(List<ProductApiModel> models) {
     return models.map((model) => model.toEntity()).toList();
   }
+
+  static double _toDouble(dynamic v) {
+    if (v == null) return 0.0;
+    if (v is num) return v.toDouble();
+    return double.tryParse(v.toString()) ?? 0.0;
+  }
 }
-
-// -------------------- Helpers --------------------
-
-// double _toDouble(dynamic v) {
-//   if (v == null) return 0.0;
-//   if (v is num) return v.toDouble();
-//   return double.tryParse(v.toString()) ?? 0.0;
-// }
-
-// int _toInt(dynamic v) {
-//   if (v == null) return 0;
-//   if (v is int) return v;
-//   if (v is num) return v.toInt();
-//   return int.tryParse(v.toString()) ?? 0;
-// }
-
-// DateTime? _toDateTimeNullable(dynamic v) {
-//   if (v == null) return null;
-//   if (v is DateTime) return v;
-//   return DateTime.tryParse(v.toString());
-// }
-
-// dynamic _dateTimeToJsonNullable(DateTime? v) => v?.toIso8601String();

@@ -30,13 +30,17 @@ class ProductHiveModelAdapter extends TypeAdapter<ProductHiveModel> {
       manufactureDateIso: fields[10] as String?,
       expireDateIso: fields[11] as String?,
       quantity: fields[12] as int?,
+      averageRating: fields[13] as double?,
+      reviewCount: fields[14] as int?,
+      favorites: (fields[15] as List).cast<String>(),
+      comments: (fields[16] as List).cast<String>(),
     );
   }
 
   @override
   void write(BinaryWriter writer, ProductHiveModel obj) {
     writer
-      ..writeByte(13)
+      ..writeByte(17)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -62,7 +66,15 @@ class ProductHiveModelAdapter extends TypeAdapter<ProductHiveModel> {
       ..writeByte(11)
       ..write(obj.expireDateIso)
       ..writeByte(12)
-      ..write(obj.quantity);
+      ..write(obj.quantity)
+      ..writeByte(13)
+      ..write(obj.averageRating)
+      ..writeByte(14)
+      ..write(obj.reviewCount)
+      ..writeByte(15)
+      ..write(obj.favorites)
+      ..writeByte(16)
+      ..write(obj.comments);
   }
 
   @override

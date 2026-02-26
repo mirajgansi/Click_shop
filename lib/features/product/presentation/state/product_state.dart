@@ -18,6 +18,13 @@ class ProductState {
   final List<ProductEntity> popularProducts;
   final List<ProductEntity> topRatedProducts;
 
+  final bool isProductActionLoading;
+
+  final List<ProductEntity> favoriteProducts;
+
+  final bool isCommentsLoading;
+  final List<ProductCommentEntity> comments;
+
   const ProductState({
     required this.isLoading,
     required this.error,
@@ -32,6 +39,11 @@ class ProductState {
     required this.trendingProducts,
     required this.popularProducts,
     required this.topRatedProducts,
+
+    required this.isProductActionLoading,
+    required this.favoriteProducts,
+    required this.isCommentsLoading,
+    required this.comments,
   });
 
   factory ProductState.initial() => const ProductState(
@@ -48,6 +60,10 @@ class ProductState {
     trendingProducts: [],
     popularProducts: [],
     topRatedProducts: [],
+    isProductActionLoading: false,
+    favoriteProducts: [],
+    isCommentsLoading: false,
+    comments: [],
   );
 
   ProductState copyWith({
@@ -68,12 +84,19 @@ class ProductState {
     List<ProductEntity>? popularProducts,
     List<ProductEntity>? topRatedProducts,
 
+    bool? isProductActionLoading,
+    List<ProductEntity>? favoriteProducts,
+
+    bool? isCommentsLoading,
+    List<ProductCommentEntity>? comments,
+
     bool clearError = false,
     bool clearSelectedProduct = false,
   }) {
     return ProductState(
       isLoading: isLoading ?? this.isLoading,
       error: clearError ? null : (error ?? this.error),
+
       allProducts: allProducts ?? this.allProducts,
       categoryProducts: categoryProducts ?? this.categoryProducts,
       selectedProduct: clearSelectedProduct
@@ -89,6 +112,14 @@ class ProductState {
       trendingProducts: trendingProducts ?? this.trendingProducts,
       popularProducts: popularProducts ?? this.popularProducts,
       topRatedProducts: topRatedProducts ?? this.topRatedProducts,
+
+      isProductActionLoading:
+          isProductActionLoading ?? this.isProductActionLoading,
+
+      favoriteProducts: favoriteProducts ?? this.favoriteProducts,
+
+      isCommentsLoading: isCommentsLoading ?? this.isCommentsLoading,
+      comments: comments ?? this.comments,
     );
   }
 }

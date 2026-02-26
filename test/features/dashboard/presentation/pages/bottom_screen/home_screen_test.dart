@@ -111,6 +111,10 @@ void main() {
         trendingProducts: [],
         popularProducts: [],
         topRatedProducts: [],
+        isProductActionLoading: false,
+        favoriteProducts: [],
+        isCommentsLoading: false,
+        comments: [],
       ),
     );
 
@@ -139,6 +143,10 @@ void main() {
         trendingProducts: [],
         popularProducts: [],
         topRatedProducts: [],
+        isProductActionLoading: false,
+        favoriteProducts: [],
+        isCommentsLoading: false,
+        comments: [],
       ),
     );
 
@@ -167,6 +175,10 @@ void main() {
         trendingProducts: [],
         popularProducts: [],
         topRatedProducts: [],
+        isProductActionLoading: false,
+        favoriteProducts: [],
+        isCommentsLoading: false,
+        comments: [],
       ),
     );
     await pumpHome(tester, vm);
@@ -198,6 +210,10 @@ void main() {
         trendingProducts: [],
         popularProducts: [],
         topRatedProducts: [],
+        isProductActionLoading: false,
+        favoriteProducts: [],
+        isCommentsLoading: false,
+        comments: [],
       ),
     );
 
@@ -236,6 +252,10 @@ void main() {
         trendingProducts: [],
         popularProducts: [],
         topRatedProducts: [],
+        isProductActionLoading: false,
+        favoriteProducts: [],
+        isCommentsLoading: false,
+        comments: [],
       ),
     );
 

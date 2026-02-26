@@ -3,15 +3,17 @@ import 'package:click_shop/core/widgets/my_cart_button_widget.dart';
 import 'package:click_shop/features/dashboard/presentation/widgets/my_stock_badge_widget.dart';
 import 'package:click_shop/features/product/presentation/pages/product_screen.dart';
 import 'package:click_shop/features/product/domain/entities/product_entity.dart';
+import 'package:click_shop/features/product/presentation/widgets/my_favriotes_button_wwidget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class CardWidget extends StatelessWidget {
+class CardWidget extends ConsumerWidget {
   final ProductEntity product;
 
   const CardWidget({super.key, required this.product});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final cs = Theme.of(context).colorScheme;
 
     return GestureDetector(
@@ -47,6 +49,15 @@ class CardWidget extends StatelessWidget {
                         ),
                       ),
                     ),
+                    Positioned(
+                      top: 10,
+                      right: 10,
+                      child: ProductFavoriteButton(
+                        productId: product.id ?? "",
+                        favorites: product.favorites,
+                      ),
+                    ),
+
                     Positioned(
                       bottom: 4,
                       right: 4,

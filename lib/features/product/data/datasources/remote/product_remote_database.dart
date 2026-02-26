@@ -24,6 +24,13 @@ class ProductRemoteDatabase implements IProductRemoteDatabase {
   }) : _apiClient = apiClient,
        _tokenService = tokenService;
 
+  Future<Map<String, String>> _authHeaders() async {
+    final token = await _tokenService
+        .getToken(); // adjust if your method name differs
+    if (token == null || token.isEmpty) return {};
+    return {"Authorization": "Bearer $token"};
+  }
+
   // Helper to parse list safely
   List<ProductApiModel> _parseProductList(dynamic data) {
     final list =
@@ -216,5 +223,117 @@ class ProductRemoteDatabase implements IProductRemoteDatabase {
   Future<List<ProductApiModel>> getOutOfStock() {
     // TODO: implement getOutOfStock
     throw UnimplementedError();
+  }
+
+  @override
+  Future<ProductApiModel> rateProduct({
+    required String productId,
+    required double rating,
+  }) async {
+    try {
+      final headers = await _authHeaders();
+
+      final res = await _apiClient.post(
+        ApiEndpoints.rateProduct(productId),
+        data: {"rating": rating},
+        options: Options(headers: headers),
+      );
+
+      final data = res.data["data"] ?? res.data;
+      return ProductApiModel.fromJson(data);
+    } on DioException catch (e) {
+      throw Exception(e.response?.data?["message"] ?? "Failed to rate product");
+    } catch (e) {
+      throw Exception("Unexpected error while rating product");
+    }
+  }
+
+  @override
+  Future<ProductApiModel> toggleFavorite({required String productId}) async {
+    try {
+      final headers = await _authHeaders();
+
+      final res = await _apiClient.post(
+        ApiEndpoints.toggleFavorite(productId),
+        options: Options(headers: headers),
+      );
+
+      final data = res.data["data"] ?? res.data;
+      return ProductApiModel.fromJson(data);
+    } on DioException catch (e) {
+      throw Exception(
+        e.response?.data?["message"] ?? "Failed to update favorite",
+      );
+    } catch (e) {
+      throw Exception("Unexpected error while updating favorite");
+    }
+  }
+
+  @override
+  Future<ProductApiModel> addComment({
+    required String productId,
+    required String comment,
+  }) async {
+    try {
+      final headers = await _authHeaders();
+
+      final res = await _apiClient.post(
+        ApiEndpoints.addComment(productId),
+        data: {"comment": comment},
+        options: Options(headers: headers),
+      );
+
+      final data = res.data["data"] ?? res.data;
+      return ProductApiModel.fromJson(data);
+    } on DioException catch (e) {
+      throw Exception(e.response?.data?["message"] ?? "Failed to add comment");
+    } catch (e) {
+      throw Exception("Unexpected error while adding comment");
+    }
+  }
+
+  @override
+  Future<List<ProductApiModel>> getMyFavorites() async {
+    try {
+      final headers = await _authHeaders();
+
+      final res = await _apiClient.get(
+        ApiEndpoints.myFavorites(),
+        options: Options(headers: headers),
+      );
+
+      final list = (res.data["data"] ?? res.data) as List;
+      return list
+          .map((e) => ProductApiModel.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } on DioException catch (e) {
+      throw Exception(
+        e.response?.data?["message"] ?? "Failed to fetch favorites",
+      );
+    } catch (e) {
+      throw Exception("Unexpected error while fetching favorites");
+    }
+  }
+
+  @override
+  Future<List<CommentApiModel>> getProductComments({
+    required String productId,
+  }) async {
+    try {
+      final res = await _apiClient.get(
+        ApiEndpoints.getProductComments(productId),
+      );
+
+      final list = (res.data["data"] ?? res.data) as List;
+      return list
+          .map((e) => CommentApiModel.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } on DioException catch (e) {
+      throw Exception(
+        e.response?.data?["message"] ?? "Failed to fetch comments",
+      );
+    } catch (e) {
+      throw Exception("Unexpected error while fetching comments");
+    }
   }
 }

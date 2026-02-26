@@ -3,17 +3,17 @@ import 'package:click_shop/features/product/domain/entities/product_entity.dart'
 import 'package:dartz/dartz.dart';
 
 abstract interface class IProductRepository {
-  // admin (if used in your app)
+  // admin
   Future<Either<Failure, bool>> createProduct(ProductEntity productEntity);
   Future<Either<Failure, bool>> updateProduct(ProductEntity productEntity);
-  Future<Either<Failure, bool>> delteProduct(String productId);
+  Future<Either<Failure, bool>> deleteProduct(String productId);
 
   // public
   Future<Either<Failure, List<ProductEntity>>> getAllproduct();
   Future<Either<Failure, ProductEntity>> getProductbyId(String productId);
 
   Future<Either<Failure, List<ProductEntity>>> getProductsByCategory(
-    String category, // was categoryId
+    String category,
   );
 
   Future<Either<Failure, List<ProductEntity>>> searchProducts({
@@ -28,4 +28,25 @@ abstract interface class IProductRepository {
   Future<Either<Failure, List<ProductEntity>>> getTopRatedProducts();
   Future<Either<Failure, List<ProductEntity>>> getOutOfStockProducts();
   Future<Either<Failure, bool>> incrementViewCount(String productId);
+
+  // ⭐ rating
+  Future<Either<Failure, ProductEntity>> rateProduct({
+    required String productId,
+    required double rating,
+  });
+
+  Future<Either<Failure, ProductEntity>> toggleFavorite({
+    required String productId,
+  });
+
+  Future<Either<Failure, List<ProductEntity>>> getMyFavorites();
+
+  Future<Either<Failure, ProductEntity>> addComment({
+    required String productId,
+    required String comment,
+  });
+
+  Future<Either<Failure, List<ProductCommentEntity>>> getProductComments({
+    required String productId,
+  });
 }

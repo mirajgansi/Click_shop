@@ -7,43 +7,33 @@ part 'product_hive_model.g.dart';
 
 @HiveType(typeId: HiveTableConstants.productTypeId)
 class ProductHiveModel extends HiveObject {
-  // Backend: _id
   @HiveField(0)
   final String? id;
 
-  // Backend: name
   @HiveField(1)
   final String name;
 
-  // Backend: nutritionalInfo
   @HiveField(2)
   final String nutritionalInfo;
 
-  // Backend: category
   @HiveField(3)
   final String category;
 
-  // Backend: description
   @HiveField(4)
   final String description;
 
-  // Backend: price (number)
   @HiveField(5)
   final double price;
 
-  // Backend: image (main image)
   @HiveField(6)
   final String image;
 
-  // Backend: inStock
   @HiveField(7)
   final int inStock;
 
-  // Backend: images (optional)
   @HiveField(8)
   final List<String> images;
 
-  // Optional user-visible fields
   @HiveField(9)
   final String? manufacturer;
 
@@ -56,6 +46,17 @@ class ProductHiveModel extends HiveObject {
   @HiveField(12)
   final int? quantity;
 
+  @HiveField(13)
+  final double? averageRating;
+
+  @HiveField(14)
+  final int? reviewCount;
+
+  @HiveField(15)
+  final List<String> favorites;
+
+  @HiveField(16)
+  final List<String> comments;
   ProductHiveModel({
     this.id,
     required this.name,
@@ -70,31 +71,12 @@ class ProductHiveModel extends HiveObject {
     this.manufactureDateIso,
     this.expireDateIso,
     this.quantity,
-  });
 
-  /// JSON -> HiveModel (API response)
-  // factory ProductHiveModel.fromJson(Map<String, dynamic> json) {
-  //   return ProductHiveModel(
-  //     id: (json['_id'] ?? json['id'])?.toString(),
-  //     name: (json['name'] ?? '').toString(),
-  //     nutritionalInfo: (json['nutritionalInfo'] ?? '').toString(),
-  //     category: (json['category'] ?? '').toString(),
-  //     description: (json['description'] ?? '').toString(),
-  //     price: (json['price'] is num)
-  //         ? (json['price'] as num).toDouble()
-  //         : double.tryParse(json['price']?.toString() ?? '0') ?? 0,
-  //     inStock: (json['inStock'] is num)
-  //         ? (json['inStock'] as num).toInt()
-  //         : int.tryParse(json['inStock']?.toString() ?? '0') ?? 0,
-  //     image: (json['image'] ?? '').toString(),
-  //     images: (json['images'] is List)
-  //         ? (json['images'] as List).map((e) => e.toString()).toList()
-  //         : const [],
-  //     manufacturer: json['manufacturer']?.toString(),
-  //     manufactureDateIso: json['manufactureDate']?.toString(),
-  //     expireDateIso: json['expireDate']?.toString(),
-  //   );
-  // }
+    this.averageRating,
+    this.reviewCount,
+    this.favorites = const [],
+    this.comments = const [],
+  });
 
   /// HiveModel -> Entity
   ProductEntity toEntity() {
@@ -116,6 +98,21 @@ class ProductHiveModel extends HiveObject {
           ? null
           : DateTime.tryParse(expireDateIso!),
       quantity: quantity,
+
+      averageRating: averageRating,
+      reviewCount: reviewCount,
+      favorites: favorites,
+
+      // offline comments -> userId unknown
+      comments: comments
+          .map(
+            (text) => ProductCommentEntity(
+              userId: "offline",
+              comment: text,
+              username: '',
+            ),
+          )
+          .toList(),
     );
   }
 
@@ -135,14 +132,21 @@ class ProductHiveModel extends HiveObject {
       manufactureDateIso: entity.manufactureDate?.toIso8601String(),
       expireDateIso: entity.expireDate?.toIso8601String(),
       quantity: entity.quantity ?? 1,
+
+      averageRating: entity.averageRating ?? 0,
+      reviewCount: entity.reviewCount ?? 0,
+      favorites: entity.favorites,
+
+      // store only comment text
+      comments: entity.comments.map((c) => c.comment).toList(),
     );
   }
-  // To entity list
+
   static List<ProductEntity> toEntityList(List<ProductHiveModel> hiveModels) {
     return hiveModels.map((model) => model.toEntity()).toList();
   }
 
-  /// Entity -> HiveModel
+  /// API Model -> Hive Model
   factory ProductHiveModel.fromApiModel(ProductApiModel apiModel) {
     return ProductHiveModel(
       id: apiModel.id,
@@ -158,6 +162,12 @@ class ProductHiveModel extends HiveObject {
       manufactureDateIso: apiModel.manufactureDate?.toIso8601String(),
       expireDateIso: apiModel.expireDate?.toIso8601String(),
       quantity: apiModel.quantity,
+
+      averageRating: apiModel.averageRating,
+      reviewCount: apiModel.reviewCount,
+      favorites: apiModel.favorites,
+
+      comments: apiModel.comments.map((c) => c.comment).toList(),
     );
   }
 

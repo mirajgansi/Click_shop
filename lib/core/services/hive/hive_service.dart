@@ -182,6 +182,13 @@ class HiveService {
     return true;
   }
 
+  Future<List<String>> getProductCommentsFromCache(String productId) async {
+    final product = _productBox.get(productId);
+    if (product == null) return [];
+
+    return product.comments;
+  }
+
   Future<bool> deleteProduct(String productId) async {
     final exists = _productBox.containsKey(productId);
     if (!exists) return false;
@@ -239,7 +246,6 @@ class HiveService {
         .toList();
   }
 
-  // ==================== CART ====================
   Box<CartHiveModel> get _cartBox =>
       Hive.box<CartHiveModel>(HiveTableConstants.cartTable);
 
@@ -342,6 +348,12 @@ class HiveService {
         await _productBox.put(id, p);
       }
     }
+  }
+
+  Future<List<ProductHiveModel>> getMyFavoritesFromCache(String userId) async {
+    return _productBox.values
+        .where((p) => p.favorites.contains(userId))
+        .toList();
   }
 
   Future<void> updateCartQty({

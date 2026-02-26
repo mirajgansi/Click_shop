@@ -18,7 +18,7 @@ class ProdcutLocalDatabase implements IProductLocalDatabase {
   Future<List<ProductHiveModel>> getAllproduct() async {
     try {
       return await _hiveService.getAllProducts();
-    } catch (e) {
+    } catch (_) {
       return [];
     }
   }
@@ -27,7 +27,7 @@ class ProdcutLocalDatabase implements IProductLocalDatabase {
   Future<ProductHiveModel?> getProductbyId(String productId) async {
     try {
       return await _hiveService.getProductById(productId);
-    } catch (e) {
+    } catch (_) {
       return null;
     }
   }
@@ -39,21 +39,19 @@ class ProdcutLocalDatabase implements IProductLocalDatabase {
     try {
       final all = await getAllproduct();
       final cat = categoryId.trim().toLowerCase();
-
       return all.where((p) => p.category.trim().toLowerCase() == cat).toList();
-    } catch (e) {
+    } catch (_) {
       return [];
     }
   }
 
+  // ---------------- CACHING HELPERS ----------------
+
   @override
-  Future<bool> cacheAll(List<ProductHiveModel> items) async {
+  Future<void> cacheAll(List<ProductHiveModel> items) async {
     try {
       await _hiveService.cacheAllProdcuts(items);
-      return true;
-    } catch (e) {
-      return false;
-    }
+    } catch (_) {}
   }
 
   @override
@@ -63,19 +61,19 @@ class ProdcutLocalDatabase implements IProductLocalDatabase {
   ) async {
     try {
       await _hiveService.cacheAllProdcuts(items);
-    } catch (e) {}
+    } catch (_) {}
   }
 
   @override
   Future<void> cacheRecent(List<ProductHiveModel> items) async {
     try {
-      await _hiveService.cacheAllProdcuts(items); // store product objects
+      await _hiveService.cacheAllProdcuts(items);
       final ids = items
           .map((e) => e.id)
           .whereType<String>()
           .where((e) => e.isNotEmpty)
           .toList();
-      await _hiveService.cacheRecentIds(ids); // store section ids
+      await _hiveService.cacheRecentIds(ids);
     } catch (_) {}
   }
 
@@ -104,6 +102,26 @@ class ProdcutLocalDatabase implements IProductLocalDatabase {
       await _hiveService.cachePopularIds(ids);
     } catch (_) {}
   }
+
+  // ✅ implement top-rated cache same style
+  @override
+  Future<void> cacheTopRated(List<ProductHiveModel> items) async {
+    try {
+      // easiest: just cache products (optional: make a topRatedIdsBox like others)
+      await _hiveService.cacheAllProdcuts(items);
+    } catch (_) {}
+  }
+
+  // ✅ implement out-of-stock cache (simple)
+  @override
+  Future<void> cacheOutOfStock(List<ProductHiveModel> items) async {
+    try {
+      // simplest: cache products only
+      await _hiveService.cacheAllProdcuts(items);
+    } catch (_) {}
+  }
+
+  // ---------------- GET SECTIONS FROM CACHE ----------------
 
   @override
   Future<List<ProductHiveModel>> getRecent() async {
@@ -138,27 +156,60 @@ class ProdcutLocalDatabase implements IProductLocalDatabase {
   @override
   Future<List<ProductHiveModel>> getTopRated() async {
     try {
-      return await _hiveService.getAllProducts();
+      final all = await _hiveService.getAllProducts();
+
+      all.sort((a, b) {
+        final ar = a.averageRating ?? 0.0;
+        final br = b.averageRating ?? 0.0;
+        return br.compareTo(ar);
+      });
+
+      return all;
     } catch (_) {
       return [];
     }
   }
 
   @override
-  Future<void> cacheOutOfStock(List<ProductHiveModel> items) {
-    // TODO: implement cacheOutOfStock
-    throw UnimplementedError();
+  Future<List<ProductHiveModel>> getOutOfStock() async {
+    try {
+      final all = await _hiveService.getAllProducts();
+      return all.where((p) => p.inStock <= 0).toList();
+    } catch (_) {
+      return [];
+    }
   }
 
   @override
-  Future<List<ProductHiveModel>> getOutOfStock() {
-    // TODO: implement getOutOfStock
-    throw UnimplementedError();
+  Future<void> upsertProduct(ProductHiveModel product) async {
+    try {
+      await _hiveService.updateProduct(product);
+      final id = product.id;
+      if (id != null && id.isNotEmpty) {
+        final existing = await _hiveService.getProductById(id);
+        if (existing == null) {
+          await _hiveService.createProduct(product);
+        }
+      }
+    } catch (_) {}
   }
 
   @override
-  Future<void> cacheTopRated(List<ProductHiveModel> items) {
-    // TODO: implement cacheTopRated
-    throw UnimplementedError();
+  Future<List<ProductHiveModel>> getMyFavoritesFromCache(String userId) async {
+    try {
+      return await _hiveService.getMyFavoritesFromCache(userId);
+    } catch (_) {
+      return [];
+    }
+  }
+
+  @override
+  Future<List<String>> getProductCommentsFromCache(String productId) async {
+    try {
+      final p = await _hiveService.getProductById(productId);
+      return p?.comments ?? const [];
+    } catch (_) {
+      return [];
+    }
   }
 }

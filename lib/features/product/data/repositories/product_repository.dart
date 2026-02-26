@@ -339,4 +339,189 @@ class ProductRepository implements IProductRepository {
       return const Right(false);
     }
   }
+
+  // -------------------- RATING / FAVORITE / COMMENTS --------------------
+
+  @override
+  Future<Either<Failure, ProductEntity>> rateProduct({
+    required String productId,
+    required double rating,
+  }) async {
+    if (await _networkInfo.isConnected) {
+      try {
+        final updated = await _remoteDataSource.rateProduct(
+          productId: productId,
+          rating: rating,
+        );
+
+        // cache updated product
+        await _localDataSource.upsertProduct(
+          ProductHiveModel.fromApiModel(updated),
+        );
+
+        return Right(updated.toEntity());
+      } catch (e) {
+        return Left(ApiFailure(message: e.toString()));
+      }
+    } else {
+      return const Left(ApiFailure(message: 'No internet connection'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, ProductEntity>> toggleFavorite({
+    required String productId,
+  }) async {
+    if (await _networkInfo.isConnected) {
+      try {
+        final updated = await _remoteDataSource.toggleFavorite(
+          productId: productId,
+        );
+
+        // cache updated product
+        await _localDataSource.upsertProduct(
+          ProductHiveModel.fromApiModel(updated),
+        );
+
+        return Right(updated.toEntity());
+      } catch (e) {
+        return Left(ApiFailure(message: e.toString()));
+      }
+    } else {
+      return const Left(ApiFailure(message: 'No internet connection'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, ProductEntity>> addComment({
+    required String productId,
+    required String comment,
+  }) async {
+    if (await _networkInfo.isConnected) {
+      try {
+        final updated = await _remoteDataSource.addComment(
+          productId: productId,
+          comment: comment,
+        );
+
+        // cache updated product (includes updated comments usually)
+        await _localDataSource.upsertProduct(
+          ProductHiveModel.fromApiModel(updated),
+        );
+
+        // (optional) cache comments separately if you maintain a comments box
+        // await _localDataSource.cacheProductComments(
+        //   productId,
+        //   updated.toEntity().comments,
+        // );
+
+        return Right(updated.toEntity());
+      } catch (e) {
+        return Left(ApiFailure(message: e.toString()));
+      }
+    } else {
+      return const Left(ApiFailure(message: 'No internet connection'));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<ProductEntity>>> getMyFavorites() async {
+    if (await _networkInfo.isConnected) {
+      try {
+        final models = await _remoteDataSource.getMyFavorites();
+        final entities = ProductApiModel.toEntityList(models);
+
+        // optional cache
+        final hiveModels = ProductHiveModel.fromApiModelList(models);
+        // you need to implement cacheMyFavorites(userId, items) OR ignore caching
+        // await _localDataSource.cacheMyFavorites(userId, hiveModels);
+
+        return Right(entities);
+      } catch (e) {
+        return Left(ApiFailure(message: e.toString()));
+      }
+    } else {
+      // Offline fallback: return cached favorites if you store by userId.
+      // But repository doesn't have userId here, so either:
+      // 1) change method to getMyFavorites(String userId)
+      // 2) store "currentUserId" somewhere else
+      return const Left(
+        LocalDatabaseFailure(message: 'Offline favorites need userId cache'),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<ProductCommentEntity>>> getProductComments({
+    required String productId,
+  }) async {
+    if (await _networkInfo.isConnected) {
+      try {
+        final commentModels = await _remoteDataSource.getProductComments(
+          productId: productId,
+        );
+
+        final comments = commentModels
+            .map(
+              (c) => ProductCommentEntity(
+                userId: c.userId,
+                comment: c.comment,
+                createdAt: c.createdAt,
+                username: c.username,
+              ),
+            )
+            .toList();
+
+        return Right(comments);
+      } catch (e) {
+        try {
+          final cached = await _localDataSource.getProductCommentsFromCache(
+            productId,
+          ); // List<String>
+
+          final mapped = cached
+              .map(
+                (text) => ProductCommentEntity(
+                  userId: '',
+                  comment: text,
+                  createdAt: null,
+                  username: "",
+                ),
+              )
+              .toList();
+
+          return Right(mapped);
+        } catch (e2) {
+          return Left(ApiFailure(message: e.toString()));
+        }
+      }
+    } else {
+      try {
+        final cached = await _localDataSource.getProductCommentsFromCache(
+          productId,
+        ); // List<String>
+
+        final mapped = cached
+            .map(
+              (text) => ProductCommentEntity(
+                userId: '',
+                comment: text,
+                createdAt: null,
+                username: "",
+              ),
+            )
+            .toList();
+
+        return Right(mapped);
+      } catch (e) {
+        return Left(LocalDatabaseFailure(message: e.toString()));
+      }
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> deleteProduct(String productId) {
+    // TODO: implement deleteProduct
+    throw UnimplementedError();
+  }
 }

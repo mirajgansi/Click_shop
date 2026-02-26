@@ -80,6 +80,15 @@ class ApiEndpoints {
   static String getByCategory(String category) =>
       "$products/category/$category"; // GET /api/products/category/:category
 
+  static String rateProduct(String id) => "$products/$id/rate";
+
+  static String toggleFavorite(String id) => "$products/$id/favorite";
+
+  static String addComment(String id) => "$products/$id/comment";
+
+  static String myFavorites() => "$products/favorites/me";
+
+  static String getProductComments(String id) => "$products/$id/comments";
   static String recent() => "$products/recent"; // GET /api/products/recent
   static String trending() =>
       "$products/trending"; // GET /api/products/trending

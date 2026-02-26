@@ -1,5 +1,23 @@
 import 'package:equatable/equatable.dart';
 
+class ProductCommentEntity extends Equatable {
+  final String userId;
+  final String comment;
+  final String username;
+  final DateTime? createdAt;
+
+  const ProductCommentEntity({
+    required this.userId,
+    required this.username,
+
+    required this.comment,
+    this.createdAt,
+  });
+
+  @override
+  List<Object?> get props => [userId, username, comment, createdAt];
+}
+
 class ProductEntity extends Equatable {
   final String? id;
   final String name;
@@ -10,7 +28,7 @@ class ProductEntity extends Equatable {
   final String nutritionalInfo;
   final String image;
   final List<String> images;
-
+  final double? myRating;
   final String? manufacturer;
   final DateTime? manufactureDate;
   final DateTime? expireDate;
@@ -19,6 +37,10 @@ class ProductEntity extends Equatable {
 
   final double? averageRating;
   final int? reviewCount;
+
+  final List<String> favorites;
+  final List<ProductCommentEntity> comments;
+
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -39,8 +61,13 @@ class ProductEntity extends Equatable {
 
     this.averageRating,
     this.reviewCount,
+
+    this.favorites = const [],
+    this.comments = const [],
+
     this.createdAt,
     this.updatedAt,
+    this.myRating,
   });
 
   ProductEntity copyWith({
@@ -57,6 +84,14 @@ class ProductEntity extends Equatable {
     DateTime? manufactureDate,
     DateTime? expireDate,
     int? quantity,
+
+    double? averageRating,
+    int? reviewCount,
+    List<String>? favorites,
+    List<ProductCommentEntity>? comments,
+
+    DateTime? createdAt,
+    DateTime? updatedAt,
   }) {
     return ProductEntity(
       id: id ?? this.id,
@@ -72,6 +107,14 @@ class ProductEntity extends Equatable {
       manufactureDate: manufactureDate ?? this.manufactureDate,
       expireDate: expireDate ?? this.expireDate,
       quantity: quantity ?? this.quantity,
+
+      averageRating: averageRating ?? this.averageRating,
+      reviewCount: reviewCount ?? this.reviewCount,
+      favorites: favorites ?? this.favorites,
+      comments: comments ?? this.comments,
+
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 
@@ -92,6 +135,8 @@ class ProductEntity extends Equatable {
     quantity,
     averageRating,
     reviewCount,
+    favorites,
+    comments,
     createdAt,
     updatedAt,
   ];

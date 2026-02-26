@@ -1,8 +1,12 @@
 import 'package:click_shop/core/utils/snackbar_utils.dart';
+import 'package:click_shop/features/auth/presentation/view_model/auth_view_model.dart';
 import 'package:click_shop/features/cart/domain/usecases/add_cart_product_usecase.dart';
 import 'package:click_shop/features/dashboard/presentation/widgets/my_stock_badge_widget.dart';
 import 'package:click_shop/features/product/presentation/view_model/product_view_model.dart';
+import 'package:click_shop/features/product/presentation/widgets/my_favriotes_button_wwidget.dart';
 import 'package:click_shop/features/product/presentation/widgets/my_prodcut_gallery.dart';
+import 'package:click_shop/features/product/presentation/widgets/my_product_comment.dart';
+import 'package:click_shop/features/product/presentation/widgets/my_rating_widget.dart';
 import 'package:click_shop/features/product/presentation/widgets/product_detail_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -33,13 +37,12 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
     super.initState();
 
     Future.microtask(() async {
-      await ref
-          .read(productViewModelProvider.notifier)
-          .getProductById(widget.productId);
+      final vm = ref.read(productViewModelProvider.notifier);
 
-      ref
-          .read(productViewModelProvider.notifier)
-          .incrementView(widget.productId);
+      await vm.getProductById(widget.productId);
+      await vm.loadComments(widget.productId);
+
+      vm.incrementView(widget.productId);
     });
   }
 
@@ -74,6 +77,10 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
       return const Scaffold(body: Center(child: Text("Product not found")));
     }
 
+    final authState = ref.watch(AuthViewModelProvider);
+    final userId = authState.user?.userId;
+    final isFav = userId != null && product.favorites.contains(userId);
+
     return Scaffold(
       backgroundColor: cs.surface,
       appBar: AppBar(
@@ -83,12 +90,6 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
           icon: Icon(Icons.arrow_back, color: cs.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
-        // actions: [
-        //   IconButton(
-        //     icon: Icon(Icons.share_outlined, color: cs.onSurface),
-        //     onPressed: () => _toast("Share coming soon"),
-        //   ),
-        // ],
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(16),
@@ -102,6 +103,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                 borderRadius: BorderRadius.circular(14),
               ),
             ),
+
             onPressed: () async {
               final result = await ref
                   .read(addToCartUsecaseProvider)
@@ -130,11 +132,24 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: ProductGallery(
-                image: product.image,
-                images: product.images,
-                height: 240,
-                onIndexChanged: (i) => setState(() => _imgIndex = i),
+              child: Stack(
+                children: [
+                  ProductGallery(
+                    image: product.image,
+                    images: product.images,
+                    height: 240,
+                    onIndexChanged: (i) => setState(() => _imgIndex = i),
+                  ),
+
+                  Positioned(
+                    bottom: 10,
+                    right: 10,
+                    child: ProductFavoriteButton(
+                      productId: product.id ?? widget.productId,
+                      favorites: product.favorites,
+                    ),
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 16),
@@ -271,7 +286,26 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 8),
 
+                  ProductRatingWidget(
+                    productId: product.id ?? widget.productId,
+                    avgRating: product.averageRating ?? 0,
+                  ),
+
+                  Text(
+                    "${product.reviewCount ?? 0} reviews",
+                    style: TextStyle(
+                      color: cs.onSurface.withOpacity(0.6),
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const Divider(),
+                  sectionTitle("Comments"),
+                  const SizedBox(height: 8),
+                  ProductCommentSection(
+                    productId: product.id ?? widget.productId,
+                  ),
                   const SizedBox(height: 80),
                 ],
               ),
@@ -335,7 +369,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
       subtitle: value != null
           ? Text(
               value,
-              maxLines: 2, // 🔥 THIS TRUNCATES
+              maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(color: Colors.grey),
             )
