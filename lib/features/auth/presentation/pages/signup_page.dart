@@ -83,7 +83,8 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     });
 
     return Scaffold(
-      //auth satate
+      backgroundColor: cs.surfaceContainerHighest,
+
       appBar: AppBar(),
       body: LayoutBuilder(
         builder: (context, constraints) {

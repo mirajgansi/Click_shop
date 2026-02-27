@@ -118,29 +118,65 @@ class _DriverDashboardPageState extends ConsumerState<DriverDashboardPage> {
 
                 const SizedBox(height: 20),
 
-                GridView.count(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                  childAspectRatio: 1.6,
-                  children: [
-                    StatCard(
-                      title: "Total Assigned",
-                      value: state.stats.totalAssigned.toString(),
-                      icon: Icons.local_shipping,
-                      baseColor: Colors.amber,
-                    ),
-                    StatCard(
-                      title: "Total Delivered",
-                      value: state.stats.totalDelivered.toString(),
-                      icon: Icons.check_circle,
-                      baseColor: Colors.green,
-                    ),
-                  ],
-                ),
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final w = constraints.maxWidth;
 
+                    int crossAxisCount;
+                    double ratio;
+
+                    if (w >= 1200) {
+                      crossAxisCount = 4;
+                      ratio = 1.9;
+                    } else if (w >= 900) {
+                      crossAxisCount = 3;
+                      ratio = 1.8;
+                    } else if (w >= 600) {
+                      crossAxisCount = 3;
+                      ratio = 1.7;
+                    } else {
+                      crossAxisCount = 2;
+                      ratio = 1.6;
+                    }
+
+                    return GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: 2,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: crossAxisCount,
+                        crossAxisSpacing: 12,
+                        mainAxisSpacing: 12,
+                        childAspectRatio: ratio,
+                      ),
+                      itemBuilder: (context, index) {
+                        final cards = [
+                          StatCard(
+                            title: "Total Assigned",
+                            value: state.stats.totalAssigned.toString(),
+                            icon: Icons.local_shipping,
+                            baseColor: Colors.amber,
+                          ),
+                          StatCard(
+                            title: "Total Delivered",
+                            value: state.stats.totalDelivered.toString(),
+                            icon: Icons.check_circle,
+                            baseColor: Colors.green,
+                          ),
+                        ];
+
+                        // ✅ On tablet/desktop, keep cards from stretching too wide
+                        return Align(
+                          alignment: Alignment.topCenter,
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 360),
+                            child: cards[index],
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
                 const SizedBox(height: 28),
 
                 Text(

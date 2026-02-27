@@ -28,100 +28,117 @@ class _CartScreenState extends ConsumerState<CartScreen> {
     final state = ref.watch(cartViewModelProvider);
     final cs = Theme.of(context).colorScheme;
 
+    // Height reserved for the checkout button area
+    final bottomSpace = MediaQuery.of(context).padding.bottom + 90;
+
+    Widget content;
+
+    if (state.isLoading) {
+      content = ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: const [CartSkeleton(itemCount: 6)],
+      );
+    } else if (state.error != null) {
+      content = ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 200),
+            child: Center(child: Text(state.error!)),
+          ),
+        ],
+      );
+    } else if (state.cartProducts.isEmpty) {
+      content = ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: const [
+          Padding(
+            padding: EdgeInsets.only(top: 200),
+            child: Center(child: Text("Your cart is empty")),
+          ),
+        ],
+      );
+    } else {
+      content = ListView.separated(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: EdgeInsets.fromLTRB(16, 8, 16, bottomSpace),
+        itemCount: state.cartProducts.length,
+        separatorBuilder: (_, __) => const SizedBox(height: 12),
+        itemBuilder: (context, index) {
+          final item = state.cartProducts[index];
+          final qty = item.quantity ?? 1;
+
+          return _CartItemTile(
+            imageUrl: item.image ?? "", // ✅ avoid null crash
+            title: item.name,
+            inStock: item.inStock > 0,
+            qty: qty,
+            price: item.price,
+            onRemove: () async {
+              await ref
+                  .read(cartViewModelProvider.notifier)
+                  .deleteFromCart(item.id ?? "");
+            },
+            onPlus: () {
+              ref
+                  .read(cartViewModelProvider.notifier)
+                  .changeQty(itemId: item.id ?? "", newQty: qty + 1);
+            },
+            onMinus: () {
+              if (qty <= 1) return;
+              ref
+                  .read(cartViewModelProvider.notifier)
+                  .changeQty(itemId: item.id ?? "", newQty: qty - 1);
+            },
+          );
+        },
+      );
+    }
+
     return Scaffold(
       backgroundColor: cs.surface,
+      body: Stack(
+        children: [
+          RefreshIndicator(
+            onRefresh: () => ref.read(cartViewModelProvider.notifier).getCart(),
+            child: content,
+          ),
 
-      body: RefreshIndicator(
-        onRefresh: () => ref.read(cartViewModelProvider.notifier).getCart(),
-        child: state.isLoading
-            ? ListView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                children: const [CartSkeleton(itemCount: 6)],
-              )
-            : state.error != null
-            ? ListView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 200),
-                    child: Center(child: Text(state.error!)),
+          // ✅ Checkout button pinned to bottom (works in tablet + nested nav)
+          if (state.cartProducts.isNotEmpty)
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                  child: CheckoutButton(
+                    total: ref
+                        .read(cartViewModelProvider.notifier)
+                        .totalPrice
+                        .toDouble(),
+                    onCheckout: () async {
+                      final ok = await showCheckoutSheet(
+                        context: context,
+                        ref: ref,
+                        total: ref
+                            .read(cartViewModelProvider.notifier)
+                            .totalPrice,
+                      );
+
+                      if (!mounted) return;
+
+                      if (ok == true) {
+                        await ref
+                            .read(cartViewModelProvider.notifier)
+                            .getCart();
+                      }
+                    },
                   ),
-                ],
-              )
-            : state.cartProducts.isEmpty
-            ? ListView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                children: const [
-                  Padding(
-                    padding: EdgeInsets.only(top: 200),
-                    child: Center(child: Text("Your cart is empty")),
-                  ),
-                ],
-              )
-            : ListView.separated(
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 110),
-                itemCount: state.cartProducts.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 12),
-                itemBuilder: (context, index) {
-                  final item = state.cartProducts[index];
-                  final qty = item.quantity ?? 1;
-
-                  return _CartItemTile(
-                    imageUrl: item.image,
-                    title: item.name,
-                    inStock: item.inStock > 0,
-                    qty: qty,
-                    price: item.price,
-                    onRemove: () async {
-                      await ref
-                          .read(cartViewModelProvider.notifier)
-                          .deleteFromCart(item.id ?? "");
-                    },
-                    onPlus: () {
-                      ref
-                          .read(cartViewModelProvider.notifier)
-                          .changeQty(itemId: item.id ?? "", newQty: qty + 1);
-                    },
-                    onMinus: () {
-                      if (qty <= 1) return;
-                      ref
-                          .read(cartViewModelProvider.notifier)
-                          .changeQty(itemId: item.id ?? "", newQty: qty - 1);
-                    },
-                  );
-                },
-              ),
-      ),
-
-      bottomNavigationBar: state.cartProducts.isEmpty
-          ? null
-          : SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                child: CheckoutButton(
-                  total: ref
-                      .read(cartViewModelProvider.notifier)
-                      .totalPrice
-                      .toDouble(),
-                  onCheckout: () async {
-                    final ok = await showCheckoutSheet(
-                      context: context,
-                      ref: ref,
-                      total: ref
-                          .read(cartViewModelProvider.notifier)
-                          .totalPrice,
-                    );
-
-                    if (!mounted) return;
-
-                    if (ok == true) {
-                      await ref.read(cartViewModelProvider.notifier).getCart();
-                    }
-                  },
                 ),
               ),
             ),
+        ],
+      ),
     );
   }
 }

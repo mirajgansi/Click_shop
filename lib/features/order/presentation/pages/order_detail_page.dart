@@ -44,21 +44,31 @@ class _OrderDetailPageState extends ConsumerState<OrderDetailPage> {
         ),
         iconTheme: IconThemeData(color: cs.onSurface),
       ),
-      body: state.isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : state.errorMessage != null
-          ? Center(child: Text(state.errorMessage!))
-          : order == null
-          ? const Center(child: Text("Order not found"))
-          : _Body(order: order),
-      bottomNavigationBar: order == null
-          ? null
-          : SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                child: _CancelButton(order: order),
+      body: Stack(
+        children: [
+          // ✅ Main content
+          Positioned.fill(
+            child: state.isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : state.errorMessage != null
+                ? Center(child: Text(state.errorMessage!))
+                : order == null
+                ? const Center(child: Text("Order not found"))
+                : _Body(order: order),
+          ),
+
+          if (order != null)
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 16), // ✅ small
+                  child: _CancelButton(order: order),
+                ),
               ),
             ),
+        ],
+      ),
     );
   }
 }
@@ -360,86 +370,101 @@ class _CancelButton extends ConsumerWidget {
     final currentOrder = state.selectedOrder ?? order;
     final canCancel = currentOrder.status.name.toLowerCase() == "pending";
 
-    return SizedBox(
-      height: 52,
-      width: double.infinity,
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: canCancel ? cs.error : cs.surfaceContainerHighest,
-          foregroundColor: canCancel ? cs.onError : cs.onSurfaceVariant,
-          disabledBackgroundColor: cs.onSurfaceVariant,
-          disabledForegroundColor: cs.surfaceContainerHighest,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          elevation: 0,
-        ),
-        onPressed: state.isLoading
-            ? null
-            : () async {
-                if (!canCancel) {
-                  SnackbarUtils.showError(
-                    context,
-                    "Orders can’t be cancelled after shipping.",
-                  );
-                  return;
-                }
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isTablet = constraints.maxWidth >= 600;
 
-                final confirm = await showDialog<bool>(
-                  context: context,
-                  builder: (_) => AlertDialog(
-                    title: const Text("Cancel Order?"),
-                    content: const Text(
-                      "Are you sure you want to cancel this order?",
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context, false),
-                        child: const Text("No"),
-                      ),
-                      TextButton(
-                        onPressed: () => Navigator.pop(context, true),
-                        child: const Text("Yes, cancel"),
-                      ),
-                    ],
-                  ),
-                );
+        final double maxWidth = isTablet ? 520 : double.infinity;
+        final double height = isTablet ? 58 : 52;
 
-                if (confirm != true) return;
-
-                try {
-                  await ref
-                      .read(orderViewModelProvider.notifier)
-                      .cancelMyOrder(currentOrder.id);
-                } finally {
-                  await ref
-                      .read(orderViewModelProvider.notifier)
-                      .getOrderById(currentOrder.id);
-                }
-
-                if (!context.mounted) return;
-
-                final st = ref.read(orderViewModelProvider);
-                if (st.errorMessage != null) {
-                  SnackbarUtils.showError(context, st.errorMessage!);
-                } else {
-                  SnackbarUtils.showSuccess(context, "Order Cancelled");
-                }
-              },
-        child: state.isLoading
-            ? SizedBox(
-                width: 22,
-                height: 22,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: canCancel ? cs.onError : cs.onSurface,
+        return ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: maxWidth),
+          child: SizedBox(
+            width: double.infinity,
+            height: height,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: canCancel
+                    ? cs.error
+                    : cs.surfaceContainerHighest,
+                foregroundColor: canCancel ? cs.onError : cs.onSurfaceVariant,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
                 ),
-              )
-            : Text(
-                canCancel ? "Cancel Order" : "Locked",
-                style: const TextStyle(fontWeight: FontWeight.w800),
+                elevation: 0,
               ),
-      ),
+              onPressed: state.isLoading
+                  ? null
+                  : () async {
+                      if (!canCancel) {
+                        SnackbarUtils.showError(
+                          context,
+                          "Orders can’t be cancelled after shipping.",
+                        );
+                        return;
+                      }
+
+                      final confirm = await showDialog<bool>(
+                        context: context,
+                        builder: (_) => AlertDialog(
+                          title: const Text("Cancel Order?"),
+                          content: const Text(
+                            "Are you sure you want to cancel this order?",
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, false),
+                              child: const Text("No"),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, true),
+                              child: const Text("Yes, cancel"),
+                            ),
+                          ],
+                        ),
+                      );
+
+                      if (confirm != true) return;
+
+                      try {
+                        await ref
+                            .read(orderViewModelProvider.notifier)
+                            .cancelMyOrder(currentOrder.id);
+                      } finally {
+                        await ref
+                            .read(orderViewModelProvider.notifier)
+                            .getOrderById(currentOrder.id);
+                      }
+
+                      if (!context.mounted) return;
+
+                      final st = ref.read(orderViewModelProvider);
+                      if (st.errorMessage != null) {
+                        SnackbarUtils.showError(context, st.errorMessage!);
+                      } else {
+                        SnackbarUtils.showSuccess(context, "Order Cancelled");
+                      }
+                    },
+              child: state.isLoading
+                  ? SizedBox(
+                      width: 22,
+                      height: 22,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: canCancel ? cs.onError : cs.onSurface,
+                      ),
+                    )
+                  : Text(
+                      canCancel ? "Cancel Order" : "Locked",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: isTablet ? 16 : 14,
+                      ),
+                    ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

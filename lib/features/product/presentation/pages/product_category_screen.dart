@@ -26,19 +26,28 @@ class _CategoryProductsPageState extends ConsumerState<CategoryProductsPage> {
     });
   }
 
+  /// Responsive grid config (same idea as HomeScreen)
+  (int, double) _gridSpec(double width) {
+    if (width >= 1200) return (6, 0.95);
+    if (width >= 900) return (5, 0.90);
+    if (width >= 600) return (4, 0.85);
+    return (2, 0.72);
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(productViewModelProvider);
     final products = state.categoryProducts;
 
+    final width = MediaQuery.of(context).size.width;
+    final (crossAxisCount, aspectRatio) = _gridSpec(width);
+
     return Scaffold(
       appBar: AppBar(title: Text(widget.title ?? "Category")),
       body: state.isLoading
           ? ProductGridSkeleton(
-              crossAxisCount: MediaQuery.of(context).size.width >= 600 ? 3 : 2,
-              childAspectRatio: MediaQuery.of(context).size.width >= 600
-                  ? 2
-                  : 0.7,
+              crossAxisCount: crossAxisCount,
+              childAspectRatio: aspectRatio,
             )
           : state.error != null
           ? Center(child: Text(state.error!))
@@ -48,14 +57,10 @@ class _CategoryProductsPageState extends ConsumerState<CategoryProductsPage> {
               padding: const EdgeInsets.all(12),
               itemCount: products.length,
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: MediaQuery.of(context).size.width >= 600
-                    ? 3
-                    : 2,
+                crossAxisCount: crossAxisCount,
                 crossAxisSpacing: 20,
                 mainAxisSpacing: 12,
-                childAspectRatio: MediaQuery.of(context).size.width >= 600
-                    ? 2
-                    : 0.7,
+                childAspectRatio: aspectRatio,
               ),
               itemBuilder: (context, i) {
                 return CardWidget(product: products[i]);

@@ -44,6 +44,15 @@ class SnackbarUtils {
     required Color backgroundColor,
     required IconData icon,
   }) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    // 👇 Responsive width logic
+    final isTablet = screenWidth >= 600;
+    final double horizontalMargin = isTablet
+        ? (screenWidth - 500) /
+              2 // centered max width 500
+        : 16;
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -65,7 +74,7 @@ class SnackbarUtils {
         backgroundColor: backgroundColor,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        margin: const EdgeInsets.all(16),
+        margin: EdgeInsets.fromLTRB(horizontalMargin, 0, horizontalMargin, 16),
         duration: const Duration(seconds: 2),
       ),
     );

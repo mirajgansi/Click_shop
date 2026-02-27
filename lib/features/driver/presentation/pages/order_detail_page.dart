@@ -163,47 +163,68 @@ class DriverOrderDetailPage extends ConsumerWidget {
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 10),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton.icon(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: cs.primary,
-                            foregroundColor: Colors.white,
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          icon: const Icon(Icons.check),
-                          label: const Text("Mark as Delivered"),
-                          onPressed: () async {
-                            final ok =
-                                await DriverOrderDialogs.confirmDelivered(
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final isTablet = constraints.maxWidth >= 600;
+
+                      final double maxWidth = isTablet ? 520 : double.infinity;
+                      final double height = isTablet ? 58 : 50;
+                      final double fontSize = isTablet ? 16 : 14;
+                      final double iconSize = isTablet ? 20 : 18;
+
+                      return Center(
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(maxWidth: maxWidth),
+                          child: SizedBox(
+                            width: double.infinity,
+                            height: height,
+                            child: ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: cs.primary,
+                                foregroundColor: Colors.white,
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              icon: Icon(Icons.check, size: iconSize),
+                              label: Text(
+                                "Mark as Delivered",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: fontSize,
+                                ),
+                              ),
+                              onPressed: () async {
+                                final ok =
+                                    await DriverOrderDialogs.confirmDelivered(
+                                      context,
+                                    );
+                                if (!ok) return;
+
+                                final vm = ref.read(
+                                  driverViewModelProvider.notifier,
+                                );
+
+                                await vm.updateOrderStatus(
+                                  orderId: order.id,
+                                  status: "delivered",
+                                  refreshAfter: true,
+                                );
+
+                                if (!context.mounted) return;
+                                await DriverOrderDialogs.showDeliverySuccess(
                                   context,
                                 );
-                            if (!ok) return;
 
-                            final vm = ref.read(
-                              driverViewModelProvider.notifier,
-                            );
-
-                            await vm.updateOrderStatus(
-                              orderId: order.id,
-                              status: "delivered",
-                              refreshAfter: true,
-                            );
-
-                            await DriverOrderDialogs.showDeliverySuccess(
-                              context,
-                            );
-                          },
+                                if (!context.mounted) return;
+                                Navigator.pop(context);
+                              },
+                            ),
+                          ),
                         ),
-                      ),
-                    ],
+                      );
+                    },
                   ),
                 ),
               ),

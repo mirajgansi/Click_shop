@@ -54,21 +54,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     AppRoutes.push(context, const SignupScreen());
   }
 
-  void _handleForgotPassword() {
-    // TODO: Implement forgot password
-    SnackbarUtils.showInfo(context, 'Forgot password feature coming soon');
-  }
-
-  void _handleGoogleSignIn() {
-    // TODO: Implement Google Sign In
-    SnackbarUtils.showInfo(context, 'Google Sign In coming soon');
-  }
-
-  void _handleAppleSignIn() {
-    // TODO: Implement Apple Sign In
-    SnackbarUtils.showInfo(context, 'Apple Sign In coming soon');
-  }
-
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
@@ -88,7 +73,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     });
 
     return Scaffold(
-      appBar: AppBar(automaticallyImplyLeading: false),
+      backgroundColor: cs.surfaceContainerHighest,
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        backgroundColor: cs.surfaceContainerHighest,
+        elevation: 0,
+      ),
       body: LayoutBuilder(
         builder: (context, constraints) {
           bool isTablet = constraints.maxWidth > 600;
@@ -98,7 +88,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
               if (isTablet)
                 Expanded(
                   child: Container(
-                    color: cs.surfaceContainerHighest,
+                    color: cs.surface,
                     child: Center(
                       child: Image.asset(
                         'assets/images/8140 1.jpg',
@@ -209,72 +199,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                             Expanded(
                               child: Divider(
                                 color: cs.outlineVariant.withOpacity(0.7),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 24),
-
-                        // Social Login Buttons
-                        Row(
-                          children: [
-                            Expanded(
-                              child: OutlinedButton.icon(
-                                onPressed: _handleGoogleSignIn,
-                                icon: SvgPicture.asset(
-                                  'assets/svg/google_logo.svg',
-                                  width: 20,
-                                  height: 20,
-                                  colorFilter: isDarkMode
-                                      ? const ColorFilter.mode(
-                                          AppColors.darkTextPrimary,
-                                          BlendMode.srcIn,
-                                        )
-                                      : null,
-                                ),
-                                label: Text('Google'),
-                                style: OutlinedButton.styleFrom(
-                                  foregroundColor: cs.onSurface,
-                                  side: BorderSide(
-                                    color: cs.outlineVariant.withOpacity(0.8),
-                                  ),
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 16,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: OutlinedButton.icon(
-                                onPressed: _handleAppleSignIn,
-                                icon: SvgPicture.asset(
-                                  'assets/svg/apple_logo.svg',
-                                  width: 20,
-                                  height: 20,
-                                  colorFilter: isDarkMode
-                                      ? const ColorFilter.mode(
-                                          AppColors.darkTextPrimary,
-                                          BlendMode.srcIn,
-                                        )
-                                      : null,
-                                ),
-                                label: Text('Apple'),
-                                style: OutlinedButton.styleFrom(
-                                  foregroundColor: cs.onSurface,
-                                  side: BorderSide(
-                                    color: cs.outlineVariant.withOpacity(0.8),
-                                  ),
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 16,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
                               ),
                             ),
                           ],

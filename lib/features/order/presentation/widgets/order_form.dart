@@ -3,7 +3,6 @@ import 'package:click_shop/features/auth/domain/usecases/get_currentuacase.dart'
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-// import your providers / models
 import 'package:click_shop/features/order/presentation/view_model/order_view_model.dart';
 
 Future<bool?> showCheckoutSheet({
@@ -43,7 +42,9 @@ class _CheckoutBottomSheetState extends ConsumerState<_CheckoutBottomSheet> {
   late final TextEditingController address2Ctrl;
   late final TextEditingController cityCtrl;
   late final TextEditingController zipCtrl;
-
+  String? nameError;
+  String? phoneError;
+  String? address1Error;
   @override
   void initState() {
     super.initState();
@@ -70,11 +71,28 @@ class _CheckoutBottomSheetState extends ConsumerState<_CheckoutBottomSheet> {
   }
 
   bool _validShipping() {
-    // your schema has optional fields, but UX-wise require key fields
-    if (nameCtrl.text.trim().length < 2) return false;
-    if (phoneCtrl.text.trim().length < 7) return false;
-    if (address1Ctrl.text.trim().length < 3) return false;
-    return true;
+    bool ok = true;
+
+    setState(() {
+      nameError = null;
+      phoneError = null;
+      address1Error = null;
+
+      if (nameCtrl.text.trim().length < 2) {
+        nameError = "Please enter your name";
+        ok = false;
+      }
+      if (phoneCtrl.text.trim().length < 7) {
+        phoneError = "Please enter a valid phone number";
+        ok = false;
+      }
+      if (address1Ctrl.text.trim().length < 3) {
+        address1Error = "Please enter delivery address";
+        ok = false;
+      }
+    });
+
+    return ok;
   }
 
   Map<String, dynamic> _shippingToJson() {
@@ -212,6 +230,9 @@ class _CheckoutBottomSheetState extends ConsumerState<_CheckoutBottomSheet> {
                                 address2Ctrl: address2Ctrl,
                                 cityCtrl: cityCtrl,
                                 zipCtrl: zipCtrl,
+                                nameError: nameError,
+                                phoneError: phoneError,
+                                address1Error: address1Error,
                               ),
                             )
                           : const SizedBox.shrink(key: ValueKey("noForm")),
@@ -290,17 +311,7 @@ class _CheckoutBottomSheetState extends ConsumerState<_CheckoutBottomSheet> {
                         onPressed: orderState.isLoading
                             ? null
                             : () async {
-                                // Validate shipping before ordering
-                                if (!_validShipping()) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text(
-                                        "Please fill Name, Phone, Address",
-                                      ),
-                                    ),
-                                  );
-                                  return;
-                                }
+                                if (!_validShipping()) return;
 
                                 // OPTIONAL: save address to user profile first
                                 // await ref.read(authViewModelProvider.notifier).updateShippingAddress(_shippingToJson());
@@ -427,7 +438,9 @@ class _ShippingForm extends StatelessWidget {
   final TextEditingController address2Ctrl;
   final TextEditingController cityCtrl;
   final TextEditingController zipCtrl;
-
+  final String? nameError;
+  final String? phoneError;
+  final String? address1Error;
   const _ShippingForm({
     required this.nameCtrl,
     required this.phoneCtrl,
@@ -435,6 +448,9 @@ class _ShippingForm extends StatelessWidget {
     required this.address2Ctrl,
     required this.cityCtrl,
     required this.zipCtrl,
+    this.nameError,
+    this.phoneError,
+    this.address1Error,
   });
 
   @override
@@ -450,16 +466,33 @@ class _ShippingForm extends StatelessWidget {
       ),
       child: Column(
         children: [
-          _field(context, "Full Name", nameCtrl, TextInputType.name),
+          _field(
+            context,
+            "Full Name",
+            nameCtrl,
+            TextInputType.name,
+            errorText: nameError,
+          ),
           const SizedBox(height: 10),
-          _field(context, "Phone", phoneCtrl, TextInputType.phone),
+
+          _field(
+            context,
+            "Phone",
+            phoneCtrl,
+            TextInputType.phone,
+            errorText: phoneError,
+          ),
           const SizedBox(height: 10),
+
           _field(
             context,
             "Address Line 1",
             address1Ctrl,
             TextInputType.streetAddress,
+            errorText: address1Error,
           ),
+          const SizedBox(height: 10),
+
           const SizedBox(height: 10),
           _field(
             context,
@@ -498,8 +531,9 @@ class _ShippingForm extends StatelessWidget {
     BuildContext context,
     String label,
     TextEditingController c,
-    TextInputType type,
-  ) {
+    TextInputType type, {
+    String? errorText,
+  }) {
     final cs = Theme.of(context).colorScheme;
 
     return TextField(
@@ -508,6 +542,7 @@ class _ShippingForm extends StatelessWidget {
       style: TextStyle(color: cs.onSurface),
       decoration: InputDecoration(
         labelText: label,
+        errorText: errorText, // ✅ shows warning below the field
         labelStyle: TextStyle(color: cs.onSurface.withOpacity(0.6)),
         isDense: true,
         filled: true,

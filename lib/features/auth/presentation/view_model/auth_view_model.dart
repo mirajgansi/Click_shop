@@ -97,7 +97,7 @@ class AuthViewModel extends Notifier<AuthState> {
     final result = await _loginUsecase(
       LoginUsecaseParams(email: email, password: password),
     );
-    await _initAndSendFcmToken();
+    _initAndSendFcmToken();
 
     result.fold(
       (failure) => state = state.copyWith(
@@ -122,18 +122,29 @@ class AuthViewModel extends Notifier<AuthState> {
   }
 
   Future<void> _initAndSendFcmToken() async {
-    // Android 13+ runtime permission (optional but recommended)
-    await FirebaseMessaging.instance.requestPermission();
+    try {
+      await FirebaseMessaging.instance.requestPermission();
 
-    final token = await FirebaseMessaging.instance.getToken();
-    if (token == null) return;
+      final token = await FirebaseMessaging.instance.getToken();
 
-    // debug
-    print("FCM TOKEN: $token");
+      if (token == null || token.isEmpty) {
+        print("FCM: token null, skipping");
+        return;
+      }
 
-    await ref
-        .read(saveFcmTokenUsecaseProvider)
-        .call(SaveFcmTokenParams(token: token));
+      print("FCM TOKEN: $token");
+
+      final result = await ref
+          .read(saveFcmTokenUsecaseProvider)
+          .call(SaveFcmTokenParams(token: token));
+
+      result.fold(
+        (failure) => print("FCM save failed: ${failure.message}"),
+        (_) => print("FCM saved successfully"),
+      );
+    } catch (e) {
+      print("FCM ERROR (ignored): $e");
+    }
   }
 
   Future<void> getCurrentUser() async {

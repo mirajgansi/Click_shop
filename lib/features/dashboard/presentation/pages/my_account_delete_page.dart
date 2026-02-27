@@ -180,75 +180,96 @@ class _DeleteAccountScreenState extends ConsumerState<DeleteAccountScreen> {
                   ),
                 ),
 
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: cs.error, // ✅ theme error (red)
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    elevation: 0,
-                  ),
-                  onPressed: isLoading
-                      ? null
-                      : () async {
-                          if (!(_formKey.currentState?.validate() ?? false)) {
-                            return;
-                          }
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final isTablet = constraints.maxWidth >= 600;
 
-                          final ok = await showDialog<bool>(
-                            context: context,
-                            builder: (_) => AlertDialog(
-                              backgroundColor: cs.surface,
-                              title: Text(
-                                "Delete account?",
-                                style: TextStyle(color: cs.onSurface),
-                              ),
-                              content: Text(
-                                "This action is permanent and cannot be undone.",
-                                style: TextStyle(
-                                  color: cs.onSurface.withOpacity(0.75),
-                                ),
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () =>
-                                      Navigator.pop(context, false),
-                                  child: const Text("Cancel"),
-                                ),
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context, true),
-                                  style: TextButton.styleFrom(
-                                    foregroundColor: cs.error,
+                  final double buttonWidth = isTablet ? 420 : double.infinity;
+                  final double buttonHeight = isTablet ? 56 : 50;
+
+                  return Center(
+                    child: SizedBox(
+                      width: buttonWidth,
+                      height: buttonHeight,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: cs.error,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 0,
+                        ),
+                        onPressed: isLoading
+                            ? null
+                            : () async {
+                                if (!(_formKey.currentState?.validate() ??
+                                    false)) {
+                                  return;
+                                }
+
+                                final ok = await showDialog<bool>(
+                                  context: context,
+                                  builder: (_) => AlertDialog(
+                                    backgroundColor: cs.surface,
+                                    title: Text(
+                                      "Delete account?",
+                                      style: TextStyle(color: cs.onSurface),
+                                    ),
+                                    content: Text(
+                                      "This action is permanent and cannot be undone.",
+                                      style: TextStyle(
+                                        color: cs.onSurface.withOpacity(0.75),
+                                      ),
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.pop(context, false),
+                                        child: const Text("Cancel"),
+                                      ),
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.pop(context, true),
+                                        style: TextButton.styleFrom(
+                                          foregroundColor: cs.error,
+                                        ),
+                                        child: const Text("Delete"),
+                                      ),
+                                    ],
                                   ),
-                                  child: const Text("Delete"),
-                                ),
-                              ],
-                            ),
-                          );
+                                );
 
-                          if (ok != true) return;
+                                if (ok != true) return;
 
-                          await vm.deleteMeWithPassword(
-                            _passwordController.text.trim(),
-                          );
+                                await vm.deleteMeWithPassword(
+                                  _passwordController.text.trim(),
+                                );
 
-                          if (!context.mounted) return;
+                                if (!context.mounted) return;
 
-                          final newState = ref.read(AuthViewModelProvider);
-                          if (newState.status != AuthStatus.error) {
-                            Navigator.pushNamedAndRemoveUntil(
-                              context,
-                              '/login',
-                              (route) => false,
-                            );
-                          }
-                        },
-                  child: Text(isLoading ? "Deleting..." : "Delete account"),
-                ),
+                                final newState = ref.read(
+                                  AuthViewModelProvider,
+                                );
+                                if (newState.status != AuthStatus.error) {
+                                  Navigator.pushNamedAndRemoveUntil(
+                                    context,
+                                    '/login',
+                                    (route) => false,
+                                  );
+                                }
+                              },
+                        child: Text(
+                          isLoading ? "Deleting..." : "Delete account",
+                          style: TextStyle(
+                            fontSize: isTablet ? 16 : 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
               ),
             ],
           ),

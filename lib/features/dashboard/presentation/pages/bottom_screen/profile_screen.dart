@@ -448,7 +448,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   ],
                 ),
 
-                SizedBox(height: 200),
+                SizedBox(height: 120),
 
                 SizedBox(
                   width: double.infinity,
@@ -465,7 +465,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                         (route) => false,
                       );
                     },
-                    height: 12,
+                    height: 60,
                     borderRadius: 12,
                   ),
                 ),

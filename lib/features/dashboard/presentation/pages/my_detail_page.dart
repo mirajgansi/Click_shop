@@ -39,7 +39,8 @@ class _MyDetailsScreenState extends ConsumerState<MyDetailsScreen> {
 
   bool _filledOnce = false;
   final double avatarRadius = 90;
-
+  static const List<String> _genderOptions = ["male", "female", "other"];
+  String? _selectedGender;
   @override
   void initState() {
     super.initState();
@@ -191,8 +192,10 @@ class _MyDetailsScreenState extends ConsumerState<MyDetailsScreen> {
     emailController.text = user.email;
     phoneController.text = user.phoneNumber ?? "";
     locationController.text = user.location ?? "";
-    genderController.text = user.gender ?? "";
     dobController.text = user.dob ?? "";
+
+    final g = (user.gender ?? "").toLowerCase().trim();
+    _selectedGender = _genderOptions.contains(g) ? g : null;
   }
 
   @override
@@ -310,11 +313,27 @@ class _MyDetailsScreenState extends ConsumerState<MyDetailsScreen> {
               ),
               const SizedBox(height: 12),
 
-              MyTextFieldWidgets(
-                controller: genderController,
-                hintText: "Male / Female / Other",
-                text: "Gender",
-                validator: (_) => null,
+              DropdownButtonFormField<String>(
+                value: _selectedGender,
+                decoration: const InputDecoration(
+                  labelText: "Gender",
+                  hintText: "Select gender",
+                  border: OutlineInputBorder(),
+                ),
+                items: _genderOptions
+                    .map(
+                      (g) => DropdownMenuItem(
+                        value: g,
+                        child: Text(
+                          g[0].toUpperCase() + g.substring(1),
+                        ), // Male/Female/Other
+                      ),
+                    )
+                    .toList(),
+                onChanged: (val) {
+                  setState(() => _selectedGender = val);
+                },
+                validator: (_) => null, // optional
               ),
               const SizedBox(height: 12),
 

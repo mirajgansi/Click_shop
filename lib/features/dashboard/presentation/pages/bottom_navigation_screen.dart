@@ -8,10 +8,10 @@ import 'package:click_shop/features/dashboard/presentation/pages/notification_pa
 import 'package:click_shop/features/dashboard/presentation/providers/notification_settings_provider.dart';
 import 'package:click_shop/features/dashboard/presentation/view_model/notification_view_model.dart';
 import 'package:click_shop/features/dashboard/presentation/widgets/my_notification_banner.dart';
-import 'package:click_shop/features/dashboard/presentation/pages/bottom_screen/favriout_page.dart';
+import 'package:click_shop/features/dashboard/presentation/pages/favriout_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
@@ -23,40 +23,21 @@ class DashboardScreen extends ConsumerStatefulWidget {
 class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   int _selectedIndex = 0;
 
-  final List<String> _titles = [
+  final List<Widget> _pages = const [
+    HomeScreen(),
+    ExploreScreen(),
+    CartScreen(),
+    MyOrdersPage(),
+    ProfileScreen(),
+  ];
+
+  final List<String> _titles = const [
     "Home",
     "Explore",
     "My Cart",
     "My Orders",
-    "Favorites",
     "Account",
   ];
-
-  final List<Widget> lstBottomScreen = [
-    const HomeScreen(),
-    const ExploreScreen(),
-    const CartScreen(),
-    const MyOrdersPage(),
-    const FavoriteProductsScreen(),
-    const ProfileScreen(),
-  ];
-
-  BottomNavigationBarItem _svgNavItem({
-    required String asset,
-    required String label,
-    required int index,
-    required Color color,
-  }) {
-    return BottomNavigationBarItem(
-      icon: SvgPicture.asset(
-        asset,
-        width: 25,
-        height: 25,
-        colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
-      ),
-      label: label,
-    );
-  }
 
   late final ProviderSubscription<AsyncValue<dynamic>> _sub;
 
@@ -68,17 +49,14 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       socketNotificationStreamProvider,
       (prev, next) {
         next.whenData((data) {
-          // If this widget is gone, do nothing
           if (!mounted) return;
 
-          // update state
           ref
               .read(notificationViewModelProvider.notifier)
               .onSocketNotification(data);
 
           final enabled = ref.read(notificationEnabledProvider);
 
-          // show toast only when OFF
           if (!enabled) {
             final title = (data is Map && data['title'] != null)
                 ? data['title'].toString()
@@ -101,9 +79,63 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     super.dispose();
   }
 
+  void _goTo(int index) {
+    setState(() => _selectedIndex = index);
+  }
+
+  Widget _navItem({
+    required String asset,
+    required String label,
+    required int index,
+    required Color activeColor,
+    required Color inactiveColor,
+  }) {
+    final isActive = _selectedIndex == index;
+
+    return Expanded(
+      child: InkWell(
+        onTap: () => _goTo(index),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SvgPicture.asset(
+                asset,
+                width: 22,
+                height: 22,
+                colorFilter: ColorFilter.mode(
+                  isActive ? activeColor : inactiveColor,
+                  BlendMode.srcIn,
+                ),
+              ),
+              const SizedBox(height: 2),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    color: isActive ? activeColor : inactiveColor,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+
+    final active = cs.primary; // or const Color(0xFF53B175)
+    final inactive = cs.onSurface.withOpacity(0.65);
 
     return Scaffold(
       backgroundColor: cs.surface,
@@ -116,14 +148,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             Image.asset('assets/images/happy.png', width: 40, height: 40),
             const SizedBox(width: 10),
             Text(
-              [
-                "Home",
-                "Explore",
-                "My Cart",
-                "My Orders",
-                "Favorites",
-                "Account",
-              ][_selectedIndex],
+              _titles[_selectedIndex],
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w800,
@@ -133,7 +158,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           ],
         ),
         actions: [
-          // ❤️ FAVORITES BUTTON
           IconButton(
             icon: const Icon(Icons.favorite_border),
             onPressed: () {
@@ -145,7 +169,6 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               );
             },
           ),
-
           Consumer(
             builder: (context, ref, _) {
               final state = ref.watch(notificationViewModelProvider);
@@ -199,59 +222,80 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
           ),
         ],
       ),
-      body: [
-        const HomeScreen(),
-        const ExploreScreen(),
-        const CartScreen(),
-        const MyOrdersPage(),
-        const FavoriteProductsScreen(),
-        const ProfileScreen(),
-      ][_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        currentIndex: _selectedIndex,
-        backgroundColor: cs.surface,
-        selectedItemColor: cs.primary,
-        unselectedItemColor: cs.onSurface.withOpacity(0.6),
-        onTap: (index) => setState(() => _selectedIndex = index),
-        items: [
-          _svgNavItem(
-            asset: 'assets/icons/home.svg',
-            label: 'Home',
-            index: 0,
-            color: _selectedIndex == 0 ? const Color(0xFF53B175) : Colors.black,
+
+      // keeps state if you switch tabs often
+      body: IndexedStack(index: _selectedIndex, children: _pages),
+
+      // CART IN CENTER
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: SizedBox(
+        height: 62,
+        width: 62,
+        child: FloatingActionButton(
+          elevation: 6,
+          backgroundColor: active,
+          onPressed: () => _goTo(2), // cart page index
+          shape: const CircleBorder(),
+          child: SvgPicture.asset(
+            'assets/icons/cart.svg',
+            width: 26,
+            height: 26,
+            colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
           ),
-          _svgNavItem(
-            asset: 'assets/icons/explore.svg',
-            label: 'Explore',
-            index: 1,
-            color: _selectedIndex == 1 ? const Color(0xFF53B175) : Colors.black,
+        ),
+      ),
+
+      bottomNavigationBar: BottomAppBar(
+        color: cs.surface,
+        elevation: 10,
+        shape: const CircularNotchedRectangle(),
+        notchMargin: 10,
+        child: SizedBox(
+          height: 70,
+          child: Row(
+            children: [
+              _navItem(
+                asset: 'assets/icons/home.svg',
+                label: 'Home',
+                index: 0,
+                activeColor: active,
+                inactiveColor: inactive,
+              ),
+              _navItem(
+                asset: 'assets/icons/explore.svg',
+                label: 'Explore',
+                index: 1,
+                activeColor: active,
+                inactiveColor: inactive,
+              ),
+
+              // space for the center FAB notch
+              const SizedBox(width: 62),
+
+              _navItem(
+                asset: 'assets/icons/delivery.svg',
+                label: 'Order',
+                index: 3,
+                activeColor: active,
+                inactiveColor: inactive,
+              ),
+              // _navItem(
+              //   asset: 'assets/icons/heart.svg',
+              //   label: 'Fav',
+              //   index: 4,
+              //   activeColor: active,
+              //   inactiveColor: inactive,
+              // ),
+              _navItem(
+                asset: 'assets/icons/account.svg',
+                label: 'Account',
+                index: 4,
+                activeColor: active,
+                inactiveColor: inactive,
+              ),
+            ],
           ),
-          _svgNavItem(
-            asset: 'assets/icons/cart.svg',
-            label: 'Cart',
-            index: 2,
-            color: _selectedIndex == 2 ? const Color(0xFF53B175) : Colors.black,
-          ),
-          _svgNavItem(
-            asset: 'assets/icons/delivery.svg',
-            label: 'Order',
-            index: 3,
-            color: _selectedIndex == 3 ? const Color(0xFF53B175) : Colors.black,
-          ),
-          _svgNavItem(
-            asset: 'assets/icons/heart.svg',
-            label: 'Fav',
-            index: 4,
-            color: _selectedIndex == 4 ? const Color(0xFF53B175) : Colors.black,
-          ),
-          _svgNavItem(
-            asset: 'assets/icons/account.svg',
-            label: 'Account',
-            index: 5,
-            color: _selectedIndex == 5 ? const Color(0xFF53B175) : Colors.black,
-          ),
-        ],
+        ),
       ),
     );
   }

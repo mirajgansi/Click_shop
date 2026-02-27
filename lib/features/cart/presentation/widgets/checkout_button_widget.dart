@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 
@@ -39,7 +38,7 @@ class _CheckoutButtonState extends State<CheckoutButton> {
       _lastY = y;
       _lastZ = z;
 
-      final shakeThreshold = 15;
+      const shakeThreshold = 15.0;
       final currentTime = DateTime.now().millisecondsSinceEpoch;
 
       if ((deltaX > shakeThreshold ||
@@ -47,7 +46,6 @@ class _CheckoutButtonState extends State<CheckoutButton> {
               deltaZ > shakeThreshold) &&
           (currentTime - _lastShakeTime > 1000)) {
         _lastShakeTime = currentTime;
-
         widget.onCheckout();
       }
     });
@@ -61,48 +59,63 @@ class _CheckoutButtonState extends State<CheckoutButton> {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 56,
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF4CAF50),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isTablet = screenWidth >= 600;
+
+    final double maxWidth = isTablet ? 520 : double.infinity;
+    final double height = isTablet ? 64 : 56;
+
+    final double titleSize = isTablet ? 16 : 14;
+    final double priceSize = isTablet ? 15 : 14;
+
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: maxWidth),
+      child: SizedBox(
+        height: height,
+        width: double.infinity,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF4CAF50),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            elevation: 0,
           ),
-          elevation: 0,
-        ),
-        onPressed: widget.onCheckout,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Expanded(
-              child: Center(
+          onPressed: widget.onCheckout,
+          child: Row(
+            children: [
+              Expanded(
                 child: Text(
                   "Go to\nCheckout",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontWeight: FontWeight.w800,
-                    fontSize: 14,
+                    fontSize: titleSize,
                     color: Colors.white,
+                    height: 1.1,
                   ),
                 ),
               ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.25),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Text(
-                "Rs.${widget.total}",
-                style: const TextStyle(
-                  fontWeight: FontWeight.w800,
-                  color: Colors.black,
+              Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: isTablet ? 16 : 12,
+                  vertical: isTablet ? 10 : 8,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.25),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Text(
+                  "Rs.${widget.total.toStringAsFixed(0)}",
+                  style: TextStyle(
+                    fontWeight: FontWeight.w800,
+                    fontSize: priceSize,
+                    color: Colors.black,
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

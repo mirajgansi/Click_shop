@@ -11,6 +11,7 @@ class MyButtonWidgets extends StatelessWidget {
     this.gradient,
     required this.height,
     required this.borderRadius,
+    this.backgroundColor,
   });
 
   final String text;
@@ -20,58 +21,73 @@ class MyButtonWidgets extends StatelessWidget {
   final double height;
   final double borderRadius;
   final Widget? icon;
+  final Color? backgroundColor;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: height,
-      decoration: BoxDecoration(
-        gradient:
-            gradient ??
-            const LinearGradient(
-              colors: [
-                Color.fromARGB(255, 17, 203, 73),
-                Color.fromARGB(255, 118, 212, 11),
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-        borderRadius: BorderRadius.circular(borderRadius),
-        boxShadow: AppColors.buttonShadow,
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: isLoading ? null : onPressed,
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isTablet = screenWidth >= 600;
+
+    // 👇 Control max width for tablet
+    final double buttonWidth = isTablet ? 400 : double.infinity;
+
+    return Center(
+      child: Container(
+        width: buttonWidth,
+        height: height,
+        decoration: BoxDecoration(
+          gradient:
+              gradient ??
+              const LinearGradient(
+                colors: [
+                  Color.fromARGB(255, 17, 203, 73),
+                  Color.fromARGB(255, 118, 212, 11),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
           borderRadius: BorderRadius.circular(borderRadius),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Center(
-              child: isLoading
-                  ? const SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2.5,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                      ),
-                    )
-                  : Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (icon != null) ...[icon!, const SizedBox(width: 12)],
-                        Text(
-                          text,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0.5,
+          boxShadow: AppColors.buttonShadow,
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: isLoading ? null : onPressed,
+            borderRadius: BorderRadius.circular(borderRadius),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Center(
+                child: isLoading
+                    ? const SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.5,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Colors.white,
                           ),
                         ),
-                      ],
-                    ),
+                      )
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (icon != null) ...[
+                            icon!,
+                            const SizedBox(width: 12),
+                          ],
+                          Text(
+                            text,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ],
+                      ),
+              ),
             ),
           ),
         ),

@@ -248,21 +248,48 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           if (state.isLoading)
             SliverPadding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              sliver: SliverGrid(
-                delegate: SliverChildBuilderDelegate((context, index) {
-                  final yOffset = (index % 2 == 0) ? 0.0 : 22.0;
+              sliver: SliverLayoutBuilder(
+                builder: (context, constraints) {
+                  final width = constraints.crossAxisExtent;
 
-                  return Transform.translate(
-                    offset: Offset(0, yOffset),
-                    child: const ProductCardSkeleton(),
+                  int crossAxisCount;
+                  double aspectRatio;
+
+                  if (width >= 1200) {
+                    crossAxisCount = 6;
+                    aspectRatio = 0.95;
+                  } else if (width >= 900) {
+                    crossAxisCount = 5;
+                    aspectRatio = 0.9;
+                  } else if (width >= 600) {
+                    crossAxisCount = 4;
+                    aspectRatio = 0.85;
+                  } else {
+                    crossAxisCount = 2;
+                    aspectRatio = 0.82;
+                  }
+
+                  return SliverGrid(
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      final p = products[index];
+                      final yOffset = (index % 2 == 0) ? 0.0 : 22.0;
+
+                      return Transform.translate(
+                        offset: Offset(0, yOffset),
+                        child: CardWidget(
+                          key: ValueKey(p.id ?? index),
+                          product: p,
+                        ),
+                      );
+                    }, childCount: products.length),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: crossAxisCount,
+                      mainAxisSpacing: 18,
+                      crossAxisSpacing: 14,
+                      childAspectRatio: aspectRatio,
+                    ),
                   );
-                }, childCount: 8),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 18,
-                  crossAxisSpacing: 14,
-                  childAspectRatio: 0.72,
-                ),
+                },
               ),
             )
           else if (products.isEmpty)
@@ -279,22 +306,48 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           else
             SliverPadding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              sliver: SliverGrid(
-                delegate: SliverChildBuilderDelegate((context, index) {
-                  final p = products[index];
-                  final yOffset = (index % 2 == 0) ? 0.0 : 22.0;
+              sliver: SliverLayoutBuilder(
+                builder: (context, constraints) {
+                  final width = constraints.crossAxisExtent;
 
-                  return Transform.translate(
-                    offset: Offset(0, yOffset),
-                    child: CardWidget(key: ValueKey(p.id ?? index), product: p),
+                  int crossAxisCount;
+                  double aspectRatio;
+
+                  if (width >= 1200) {
+                    crossAxisCount = 6;
+                    aspectRatio = 0.95;
+                  } else if (width >= 900) {
+                    crossAxisCount = 5;
+                    aspectRatio = 0.9;
+                  } else if (width >= 600) {
+                    crossAxisCount = 4;
+                    aspectRatio = 0.85;
+                  } else {
+                    crossAxisCount = 2;
+                    aspectRatio = 0.82;
+                  }
+
+                  return SliverGrid(
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      final p = products[index];
+                      final yOffset = (index % 2 == 0) ? 0.0 : 22.0;
+
+                      return Transform.translate(
+                        offset: Offset(0, yOffset),
+                        child: CardWidget(
+                          key: ValueKey(p.id ?? index),
+                          product: p,
+                        ),
+                      );
+                    }, childCount: products.length),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: crossAxisCount,
+                      mainAxisSpacing: 18,
+                      crossAxisSpacing: 14,
+                      childAspectRatio: aspectRatio,
+                    ),
                   );
-                }, childCount: products.length),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 18,
-                  crossAxisSpacing: 14,
-                  childAspectRatio: 0.72,
-                ),
+                },
               ),
             ),
 
