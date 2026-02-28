@@ -1,4 +1,5 @@
 import 'package:click_shop/core/error/failures.dart';
+import 'package:click_shop/core/services/storage/user_session_service.dart';
 import 'package:click_shop/features/product/domain/entities/product_entity.dart'; // ✅ CHANGE PATH if needed
 import 'package:click_shop/features/product/domain/usecases/ger_trending_product_usecase.dart';
 import 'package:click_shop/features/product/domain/usecases/get_all_prodcut_usecase.dart';
@@ -14,6 +15,7 @@ import 'package:dartz/dartz.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// ------------------ Mocks ------------------
 class MockGetAllProductsUsecase extends Mock implements GetAllProductsUsecase {}
@@ -43,12 +45,15 @@ class FakeGetByIdParams extends Fake implements GetProductByIdParams {}
 class FakeSearchParams extends Fake implements SearchProductsParams {}
 
 void main() {
-  setUpAll(() {
+  setUpAll(() async {
+    TestWidgetsFlutterBinding.ensureInitialized();
+    SharedPreferences.setMockInitialValues({});
+
     registerFallbackValue(FakeGetByIdParams());
     registerFallbackValue(FakeSearchParams());
   });
 
-  ProviderContainer makeContainer({
+  Future<ProviderContainer> makeContainer({
     required MockGetAllProductsUsecase all,
     required MockGetProductByIdUsecase byId,
     required MockGetProductsByCategoryUsecase byCategory,
@@ -57,9 +62,12 @@ void main() {
     required MockGetTrendingProductsUsecase trending,
     required MockGetPopularProductsUsecase popular,
     required MockIncrementViewCountUsecase increment,
-  }) {
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+
     return ProviderContainer(
       overrides: [
+        SharedPreferencesProvider.overrideWithValue(prefs),
         getAllProductUsecaseProvider.overrideWithValue(all),
         getProductByIdUsecaseProvider.overrideWithValue(byId),
         getProductsByCategoryUsecaseProvider.overrideWithValue(byCategory),
@@ -100,7 +108,7 @@ void main() {
 
         when(() => mockAll()).thenAnswer((_) async => Right(products));
 
-        final container = makeContainer(
+        final container = await makeContainer(
           all: mockAll,
           byId: mockById,
           byCategory: mockByCategory,
@@ -138,7 +146,7 @@ void main() {
         (_) async => Left(ApiFailure(message: 'fail', statusCode: 500)),
       );
 
-      final container = makeContainer(
+      final container = await makeContainer(
         all: mockAll,
         byId: mockById,
         byCategory: mockByCategory,
@@ -184,7 +192,7 @@ void main() {
 
       when(() => mockRecent()).thenAnswer((_) async => Right(products));
 
-      final container = makeContainer(
+      final container = await makeContainer(
         all: mockAll,
         byId: mockById,
         byCategory: mockByCategory,
@@ -231,7 +239,7 @@ void main() {
         ]),
       );
 
-      final container = makeContainer(
+      final container = await makeContainer(
         all: mockAll,
         byId: mockById,
         byCategory: mockByCategory,
@@ -278,7 +286,7 @@ void main() {
         ]),
       );
 
-      final container = makeContainer(
+      final container = await makeContainer(
         all: mockAll,
         byId: mockById,
         byCategory: mockByCategory,
@@ -323,7 +331,7 @@ void main() {
 
       when(() => mockById(any())).thenAnswer((_) async => Right(product));
 
-      final container = makeContainer(
+      final container = await makeContainer(
         all: mockAll,
         byId: mockById,
         byCategory: mockByCategory,
@@ -370,7 +378,7 @@ void main() {
         ]),
       );
 
-      final container = makeContainer(
+      final container = await makeContainer(
         all: mockAll,
         byId: mockById,
         byCategory: mockByCategory,
@@ -417,7 +425,7 @@ void main() {
         ]),
       );
 
-      final container = makeContainer(
+      final container = await makeContainer(
         all: mockAll,
         byId: mockById,
         byCategory: mockByCategory,
@@ -453,7 +461,7 @@ void main() {
         () => mockIncrement(any()),
       ).thenAnswer((_) async => const Right(true));
 
-      final container = makeContainer(
+      final container = await makeContainer(
         all: mockAll,
         byId: mockById,
         byCategory: mockByCategory,
@@ -494,7 +502,7 @@ void main() {
         () => mockPopular(),
       ).thenAnswer((_) async => const Right(<ProductEntity>[]));
 
-      final container = makeContainer(
+      final container = await makeContainer(
         all: mockAll,
         byId: mockById,
         byCategory: mockByCategory,
