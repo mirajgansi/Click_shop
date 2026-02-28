@@ -9,9 +9,7 @@ import 'package:permission_handler/permission_handler.dart';
 class NotificationSettingsPage extends ConsumerWidget {
   const NotificationSettingsPage({super.key});
 
-  // ✅ Called when user toggles ON
   Future<void> _enable(BuildContext context, WidgetRef ref) async {
-    // 1) Permission handler check (Android 13+, also ok for iOS)
     final status = await Permission.notification.status;
 
     if (status.isPermanentlyDenied) {
@@ -36,7 +34,6 @@ class NotificationSettingsPage extends ConsumerWidget {
       }
     }
 
-    // 2) iOS permission via Firebase Messaging (safe to call on Android too)
     final settings = await FirebaseMessaging.instance.requestPermission(
       alert: true,
       badge: true,

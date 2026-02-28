@@ -14,6 +14,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+enum HomeFeedType { all, trending, popular, recent }
+
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
@@ -101,11 +103,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Future<void> onRefresh() async {
-    final vm = ref.read(productViewModelProvider.notifier);
-
-    await vm.initHome();
-    await vm.loadTrending();
-    await vm.loadPopular();
+    await _selectFeed(_feed);
   }
 
   late final SocketService _socket;
@@ -114,6 +112,30 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   void initState() {
     super.initState();
     _socket = ref.read(socketServiceProvider);
+  }
+
+  HomeFeedType _feed = HomeFeedType.all;
+
+  Future<void> _selectFeed(HomeFeedType type) async {
+    setState(() => _feed = type);
+
+    if (q.trim().isNotEmpty) return;
+
+    final vm = ref.read(productViewModelProvider.notifier);
+    switch (type) {
+      case HomeFeedType.all:
+        await vm.loadProducts();
+        break;
+      case HomeFeedType.trending:
+        await vm.loadTrending();
+        break;
+      case HomeFeedType.popular:
+        await vm.loadPopular();
+        break;
+      case HomeFeedType.recent:
+        await vm.loadRecent();
+        break;
+    }
   }
 
   @override
@@ -128,14 +150,41 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final state = ref.watch(productViewModelProvider);
     final isSearching = q.trim().isNotEmpty;
 
-    List<ProductEntity> listToShow = state.allProducts;
+    List<ProductEntity> listToShow;
 
+    if (isSearching) {
+      listToShow = state.allProducts;
+    } else {
+      switch (_feed) {
+        case HomeFeedType.all:
+          listToShow = state.allProducts;
+          break;
+        case HomeFeedType.trending:
+          listToShow = state.trendingProducts;
+          break;
+        case HomeFeedType.popular:
+          listToShow = state.popularProducts;
+          break;
+        case HomeFeedType.recent:
+          listToShow = state.recentProducts;
+          break;
+      }
+    }
     List<ProductEntity> filterLocal(List<ProductEntity> list) {
       if (!isSearching) return list;
       final s = q.trim().toLowerCase();
       return list.where((p) => p.name.toLowerCase().contains(s)).toList();
     }
 
+    final bool isGridLoading = isSearching
+        ? state.isLoading
+        : (_feed == HomeFeedType.all
+              ? state.isLoading
+              : _feed == HomeFeedType.trending
+              ? state.isTrendingLoading
+              : _feed == HomeFeedType.popular
+              ? state.isPopularLoading
+              : state.isRecentLoading);
     final products = filterLocal(listToShow).take(20).toList();
     final filteredCats = appCategories;
 
@@ -158,6 +207,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   if (query.isNotEmpty) {
                     ref.read(productViewModelProvider.notifier).search(query);
                   } else {
+                    setState(() => _feed = HomeFeedType.all);
                     ref.read(productViewModelProvider.notifier).initHome();
                   }
                 },
@@ -168,7 +218,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ? IconButton(
                           onPressed: () {
                             _searchCtrl.clear();
-                            setState(() => q = "");
+                            setState(() {
+                              q = "";
+                              _feed = HomeFeedType.all;
+                            });
                             ref
                                 .read(productViewModelProvider.notifier)
                                 .initHome();
@@ -237,15 +290,36 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           // ---------------- TITLE ----------------
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 18, 16, 10),
-              child: _SectionHeader(
-                title: isSearching ? "Search Results" : "All Products",
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+              child: Wrap(
+                spacing: 10,
+                children: [
+                  ChoiceChip(
+                    label: const Text("All"),
+                    selected: _feed == HomeFeedType.all,
+                    onSelected: (_) => _selectFeed(HomeFeedType.all),
+                  ),
+                  ChoiceChip(
+                    label: const Text("Trending"),
+                    selected: _feed == HomeFeedType.trending,
+                    onSelected: (_) => _selectFeed(HomeFeedType.trending),
+                  ),
+                  ChoiceChip(
+                    label: const Text("Popular"),
+                    selected: _feed == HomeFeedType.popular,
+                    onSelected: (_) => _selectFeed(HomeFeedType.popular),
+                  ),
+                  ChoiceChip(
+                    label: const Text("Recently Added"),
+                    selected: _feed == HomeFeedType.recent,
+                    onSelected: (_) => _selectFeed(HomeFeedType.recent),
+                  ),
+                ],
               ),
             ),
           ),
-
           // ---------------- PRODUCTS ----------------
-          if (state.isLoading)
+          if (isGridLoading)
             SliverPadding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               sliver: SliverLayoutBuilder(
@@ -271,17 +345,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
                   return SliverGrid(
                     delegate: SliverChildBuilderDelegate((context, index) {
-                      final p = products[index];
                       final yOffset = (index % 2 == 0) ? 0.0 : 22.0;
 
                       return Transform.translate(
                         offset: Offset(0, yOffset),
-                        child: CardWidget(
-                          key: ValueKey(p.id ?? index),
-                          product: p,
-                        ),
+                        child: const ProductCardSkeleton(),
                       );
-                    }, childCount: products.length),
+                    }, childCount: crossAxisCount * 6),
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: crossAxisCount,
                       mainAxisSpacing: 18,
@@ -335,7 +405,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       return Transform.translate(
                         offset: Offset(0, yOffset),
                         child: CardWidget(
-                          key: ValueKey(p.id ?? index),
+                          key: ValueKey('${_feed.name}-${p.id}'),
                           product: p,
                         ),
                       );

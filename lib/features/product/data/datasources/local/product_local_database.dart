@@ -126,8 +126,7 @@ class ProdcutLocalDatabase implements IProductLocalDatabase {
   @override
   Future<List<ProductHiveModel>> getRecent() async {
     try {
-      final items = await _hiveService.getRecentFromCache();
-      return items.isNotEmpty ? items : await _hiveService.getAllProducts();
+      return await _hiveService.getRecentFromCache();
     } catch (_) {
       return [];
     }
@@ -136,8 +135,7 @@ class ProdcutLocalDatabase implements IProductLocalDatabase {
   @override
   Future<List<ProductHiveModel>> getTrending() async {
     try {
-      final items = await _hiveService.getTrendingFromCache();
-      return items.isNotEmpty ? items : await _hiveService.getAllProducts();
+      return await _hiveService.getTrendingFromCache();
     } catch (_) {
       return [];
     }
@@ -146,8 +144,7 @@ class ProdcutLocalDatabase implements IProductLocalDatabase {
   @override
   Future<List<ProductHiveModel>> getPopular() async {
     try {
-      final items = await _hiveService.getPopularFromCache();
-      return items.isNotEmpty ? items : await _hiveService.getAllProducts();
+      return await _hiveService.getPopularFromCache();
     } catch (_) {
       return [];
     }

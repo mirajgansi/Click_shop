@@ -33,7 +33,6 @@ class CardWidget extends ConsumerWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(14),
 
-          // 👇 OUTER soft gradient glow
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,

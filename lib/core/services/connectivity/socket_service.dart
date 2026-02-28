@@ -13,7 +13,7 @@ class SocketService {
     _socket = IO.io(
       "http://192.168.1.105:5050",
       IO.OptionBuilder()
-          .setTransports(['websocket', 'polling']) // safer
+          .setTransports(['websocket', 'polling'])
           .disableAutoConnect()
           .build(),
     );
@@ -35,18 +35,18 @@ class SocketService {
 
     _socket!.on("notification", (data) {
       print("🔔 NOTIFICATION: $data");
-      _notificationCtrl.add(data); // ✅ stream event
+      _notificationCtrl.add(data);
     });
   }
 
   void disconnect() {
     _socket?.disconnect();
-    _socket?.dispose(); // socket_io_client supports dispose
+    _socket?.dispose();
     _socket = null;
   }
 
   void dispose() {
     disconnect();
-    _notificationCtrl.close(); // ✅ important
+    _notificationCtrl.close();
   }
 }

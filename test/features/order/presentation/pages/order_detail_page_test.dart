@@ -27,7 +27,6 @@ class FakeOrderViewModel extends OrderViewModel {
   Future<void> getOrderById(String orderId) async {
     getByIdCalls++;
 
-    // ✅ no Future.delayed / no timers
     state = state.copyWith(
       isLoading: false,
       errorMessage: null,
@@ -39,12 +38,10 @@ class FakeOrderViewModel extends OrderViewModel {
   Future<void> cancelMyOrder(String orderId) async {
     cancelCalls++;
 
-    // ✅ also no timers
     state = state.copyWith(errorMessage: errorAfterCancel);
   }
 }
 
-/// Helpers: build real entities (no mocks => no null crashes)
 OrderEntity makeOrder({
   required String id,
   required OrderStatus status,

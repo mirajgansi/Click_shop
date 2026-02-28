@@ -92,6 +92,7 @@ class ProductEntity extends Equatable {
 
     DateTime? createdAt,
     DateTime? updatedAt,
+    double? myRating,
   }) {
     return ProductEntity(
       id: id ?? this.id,
@@ -107,6 +108,7 @@ class ProductEntity extends Equatable {
       manufactureDate: manufactureDate ?? this.manufactureDate,
       expireDate: expireDate ?? this.expireDate,
       quantity: quantity ?? this.quantity,
+      myRating: myRating ?? this.myRating,
 
       averageRating: averageRating ?? this.averageRating,
       reviewCount: reviewCount ?? this.reviewCount,

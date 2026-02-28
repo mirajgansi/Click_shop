@@ -22,74 +22,81 @@ class CartSkeleton extends StatelessWidget {
       );
     }
 
-    return Scaffold(
-      backgroundColor: cs.surface,
-      body: ListView.separated(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 110),
-        itemCount: itemCount,
-        separatorBuilder: (_, __) => const SizedBox(height: 12),
-        itemBuilder: (_, __) {
-          return Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: cs.surface,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: cs.outlineVariant.withOpacity(0.4)),
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // image skeleton
-                box(h: 54, w: 54, radius: BorderRadius.circular(12)),
-                const SizedBox(width: 12),
-
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // title + close icon placeholder
-                      Row(
-                        children: [
-                          Expanded(child: box(h: 14)),
-                          const SizedBox(width: 10),
-                          box(h: 14, w: 14, radius: BorderRadius.circular(4)),
-                        ],
-                      ),
-                      const SizedBox(height: 8),
-
-                      // stock line
-                      box(h: 12, w: 90, radius: BorderRadius.circular(8)),
-                      const SizedBox(height: 12),
-
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          // qty pill skeleton
-                          box(h: 34, w: 110, radius: BorderRadius.circular(18)),
-                          // price skeleton
-                          box(h: 14, w: 70, radius: BorderRadius.circular(10)),
-                        ],
-                      ),
-                    ],
-                  ),
+    return Column(
+      children: [
+        Expanded(
+          child: ListView.separated(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+            itemCount: itemCount,
+            separatorBuilder: (_, __) => const SizedBox(height: 12),
+            itemBuilder: (_, __) {
+              return Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: cs.surface,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: cs.outlineVariant.withOpacity(0.4)),
                 ),
-              ],
-            ),
-          );
-        },
-      ),
-
-      // bottom checkout skeleton (looks like your real one)
-      bottomNavigationBar: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-          child: box(
-            h: 56,
-            w: double.infinity,
-            radius: BorderRadius.circular(16),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    box(h: 54, w: 54, radius: BorderRadius.circular(12)),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(child: box(h: 14)),
+                              const SizedBox(width: 10),
+                              box(
+                                h: 14,
+                                w: 14,
+                                radius: BorderRadius.circular(4),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          box(h: 12, w: 90, radius: BorderRadius.circular(8)),
+                          const SizedBox(height: 12),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              box(
+                                h: 34,
+                                w: 110,
+                                radius: BorderRadius.circular(18),
+                              ),
+                              box(
+                                h: 14,
+                                w: 70,
+                                radius: BorderRadius.circular(10),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
           ),
         ),
-      ),
+
+        SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            child: box(
+              h: 56,
+              w: double.infinity,
+              radius: BorderRadius.circular(16),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

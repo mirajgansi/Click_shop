@@ -31,15 +31,53 @@ class ProductRemoteDatabase implements IProductRemoteDatabase {
     return {"Authorization": "Bearer $token"};
   }
 
-  // Helper to parse list safely
-  List<ProductApiModel> _parseProductList(dynamic data) {
-    final list =
-        (data["data"]?["products"] ?? data["products"] ?? data["data"] ?? data)
-            as List;
-
+  // Helper to parse list safely (supports section-specific payload shapes)
+  List<ProductApiModel> _parseProductList(
+    dynamic data, {
+    List<String> preferredKeys = const [],
+  }) {
+    final list = _extractList(data, preferredKeys: preferredKeys);
     return list
         .map((e) => ProductApiModel.fromJson(e as Map<String, dynamic>))
         .toList();
+  }
+
+  List<dynamic> _extractList(
+    dynamic data, {
+    List<String> preferredKeys = const [],
+  }) {
+    if (data is List) return data;
+
+    if (data is Map<String, dynamic>) {
+      final dataNode = data["data"];
+
+      // 1) Prefer endpoint-specific keys first (both root and data node)
+      for (final key in preferredKeys) {
+        final fromRoot = data[key];
+        if (fromRoot is List) return fromRoot;
+
+        if (dataNode is Map<String, dynamic>) {
+          final fromData = dataNode[key];
+          if (fromData is List) return fromData;
+        }
+      }
+
+      // 2) Common generic list keys
+      final rootProducts = data["products"];
+      if (rootProducts is List) return rootProducts;
+
+      if (dataNode is List) return dataNode;
+
+      if (dataNode is Map<String, dynamic>) {
+        final dataProducts = dataNode["products"];
+        if (dataProducts is List) return dataProducts;
+
+        final dataItems = dataNode["items"];
+        if (dataItems is List) return dataItems;
+      }
+    }
+
+    throw const FormatException("Invalid product list response format");
   }
 
   // =============================
@@ -123,7 +161,10 @@ class ProductRemoteDatabase implements IProductRemoteDatabase {
 
       final res = await _apiClient.get(url);
 
-      final list = _parseProductList(res.data);
+      final list = _parseProductList(
+        res.data,
+        preferredKeys: const ["recent", "recentProducts", "items"],
+      );
 
       debugPrint(
         "🔵 RECENT RESULT: ${list.map((e) => e.name).take(5).toList()}",
@@ -146,7 +187,10 @@ class ProductRemoteDatabase implements IProductRemoteDatabase {
 
       final res = await _apiClient.get(url);
 
-      final list = _parseProductList(res.data);
+      final list = _parseProductList(
+        res.data,
+        preferredKeys: const ["trending", "trendingProducts", "items"],
+      );
 
       debugPrint(
         "🟢 TRENDING RESULT: ${list.map((e) => e.name).take(5).toList()}",
@@ -166,7 +210,10 @@ class ProductRemoteDatabase implements IProductRemoteDatabase {
 
       final res = await _apiClient.get(url);
 
-      final list = _parseProductList(res.data);
+      final list = _parseProductList(
+        res.data,
+        preferredKeys: const ["popular", "popularProducts", "items"],
+      );
 
       debugPrint(
         "🟣 POPULAR RESULT: ${list.map((e) => e.name).take(5).toList()}",

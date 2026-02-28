@@ -45,6 +45,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   void initState() {
     super.initState();
 
+    // ✅ load unread count when dashboard is shown
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(notificationViewModelProvider.notifier).loadUnreadCount();
+      ref.read(notificationViewModelProvider.notifier).load(); // optional
+    });
+
     _sub = ref.listenManual<AsyncValue<dynamic>>(
       socketNotificationStreamProvider,
       (prev, next) {
@@ -56,16 +62,13 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
               .onSocketNotification(data);
 
           final enabled = ref.read(notificationEnabledProvider);
-
           if (!enabled) {
             final title = (data is Map && data['title'] != null)
                 ? data['title'].toString()
                 : "New notification";
-
             final msg = (data is Map && data['message'] != null)
                 ? data['message'].toString()
                 : "";
-
             InAppNotification.showGlobal(title: title, message: msg);
           }
         });
