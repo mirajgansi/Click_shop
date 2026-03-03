@@ -70,7 +70,6 @@ class NotificationSettingsPage extends ConsumerWidget {
     }
   }
 
-  // ✅ Called when user toggles OFF
   Future<void> _disable(BuildContext context, WidgetRef ref) async {
     ref.read(notificationEnabledProvider.notifier).state = false;
     LocalNotificationService.instance.setEnabled(false);

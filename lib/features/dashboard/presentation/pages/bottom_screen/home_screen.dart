@@ -287,7 +287,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ],
 
-          // ---------------- TITLE ----------------
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
@@ -297,21 +296,25 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ChoiceChip(
                     label: const Text("All"),
                     selected: _feed == HomeFeedType.all,
+                    showCheckmark: false,
                     onSelected: (_) => _selectFeed(HomeFeedType.all),
                   ),
                   ChoiceChip(
                     label: const Text("Trending"),
                     selected: _feed == HomeFeedType.trending,
+                    showCheckmark: false,
                     onSelected: (_) => _selectFeed(HomeFeedType.trending),
                   ),
                   ChoiceChip(
                     label: const Text("Popular"),
                     selected: _feed == HomeFeedType.popular,
+                    showCheckmark: false,
                     onSelected: (_) => _selectFeed(HomeFeedType.popular),
                   ),
                   ChoiceChip(
                     label: const Text("Recently Added"),
                     selected: _feed == HomeFeedType.recent,
+                    showCheckmark: false,
                     onSelected: (_) => _selectFeed(HomeFeedType.recent),
                   ),
                 ],

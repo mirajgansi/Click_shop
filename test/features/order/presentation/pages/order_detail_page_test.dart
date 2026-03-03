@@ -183,10 +183,7 @@ void main() {
     await pumpDetail(tester, vm, orderId: 'S1');
 
     await tester.tap(find.byType(ElevatedButton));
-    await tester.pump(); // allow snackbar
-
-    // We can’t reliably assert SnackbarUtils implementation,
-    // but we CAN assert no dialog appeared:
+    await tester.pump(); 
     expect(find.text('Cancel Order?'), findsNothing);
   });
 
