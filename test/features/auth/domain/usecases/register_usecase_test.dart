@@ -54,10 +54,7 @@ void main() {
     });
 
     test("should return Failure when register fails", () async {
-      // arrange
-      final failure = LocalDatabaseFailure(
-        message: "Register failed",
-      ); // adjust if different
+      final failure = LocalDatabaseFailure(message: "Register failed");
       when(
         () => mockAuthRepository.register(tAuthEntity),
       ).thenAnswer((_) async => Left(failure));

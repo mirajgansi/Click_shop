@@ -61,6 +61,4 @@ class ItemTile extends StatelessWidget {
       ],
     );
   }
-
-  // Update base URL if needed
 }

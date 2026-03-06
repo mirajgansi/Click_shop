@@ -1,4 +1,5 @@
 import 'package:click_shop/core/utils/snackbar_utils.dart';
+import 'package:click_shop/features/driver/presentation/widgets/item_tile_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:click_shop/features/order/presentation/view_model/order_view_model.dart';
@@ -102,7 +103,15 @@ class _Body extends StatelessWidget {
         ),
         const SizedBox(height: 10),
 
-        ...order.items.map((item) => _ItemTile(item: item)),
+        ...order.items.map(
+          (item) => ItemTile(
+            name: item.name,
+            qty: item.quantity,
+            price: item.price,
+            total: item.lineTotal,
+            imagePath: item.image,
+          ),
+        ),
 
         const SizedBox(height: 14),
         _TotalsCard(order: order),
@@ -246,59 +255,6 @@ class _ShippingCard extends StatelessWidget {
                 .map((e) => e!)
                 .join(", "),
             style: TextStyle(color: cs.onSurface),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ItemTile extends StatelessWidget {
-  final OrderItemEntity item;
-
-  const _ItemTile({required this.item});
-
-  @override
-  Widget build(BuildContext context) {
-    final lineTotal = item.lineTotal;
-    final cs = Theme.of(context).colorScheme;
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: cs.outlineVariant.withOpacity(0.4)),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  item.name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w800,
-                    fontSize: 14,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  "Qty: ${item.quantity}  •  Rs.${item.price}",
-                  style: TextStyle(
-                    color: cs.onSurface.withOpacity(0.6),
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Text(
-            "Rs.$lineTotal",
-            style: const TextStyle(fontWeight: FontWeight.w800),
           ),
         ],
       ),

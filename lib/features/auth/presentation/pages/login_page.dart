@@ -158,17 +158,24 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
                         const SizedBox(height: 10),
 
-                        GestureDetector(
-                          onTap: () =>
-                              Navigator.pushNamed(context, '/forgotpassword'),
-                          child: Text(
-                            "Forgot Password?",
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: cs.primary,
-                              fontWeight: FontWeight.normal,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            GestureDetector(
+                              onTap: () => Navigator.pushNamed(
+                                context,
+                                '/forgotpassword',
+                              ),
+                              child: Text(
+                                "Forgot Password?",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: cs.primary,
+                                  fontWeight: FontWeight.normal,
+                                ),
+                              ),
                             ),
-                          ),
+                          ],
                         ),
 
                         const SizedBox(height: 20),
