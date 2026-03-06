@@ -306,7 +306,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     onSelected: (_) => _selectFeed(HomeFeedType.trending),
                   ),
                   ChoiceChip(
-                    label: const Text("Popular"),
+                    label: const Text("Top Viwed"),
                     selected: _feed == HomeFeedType.popular,
                     showCheckmark: false,
                     onSelected: (_) => _selectFeed(HomeFeedType.popular),

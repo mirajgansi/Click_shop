@@ -19,7 +19,6 @@ class _AppStartScreenState extends ConsumerState<AppStartScreen> {
     _ran = true;
 
     Future.microtask(() async {
-      // ✅ loads from API (whoAmI) or local cache
       await ref.read(AuthViewModelProvider.notifier).getCurrentUser();
 
       final authState = ref.read(AuthViewModelProvider);

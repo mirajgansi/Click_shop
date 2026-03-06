@@ -138,8 +138,10 @@ flutter:
     - assets/svg/
 
 flutter_launcher_icons:
-  android: "launcher_icons"
-  ios: "AppIcon"
+  android: true
+  ios: true
   image_path: "assets/images/happy.png"
   min_sdk_android: 21
   remove_alpha_ios: true
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/images/happy.png"

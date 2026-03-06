@@ -27,12 +27,10 @@ void main() {
 
   group("LoginUsecase", () {
     test("should return AuthEntity when login is successful", () async {
-      // arrange
       when(
         () => mockAuthRepository.login(tEmail, tPassword),
       ).thenAnswer((_) async => const Right(tAuthEntity));
 
-      // act
       final result = await loginUsecase(tParams);
 
       // assert
