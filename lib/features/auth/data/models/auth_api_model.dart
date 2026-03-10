@@ -1,10 +1,10 @@
-import 'package:click_shop/features/auth/domain/entities/auth_entity.dart';
 import 'package:click_shop/features/auth/data/models/auth_hive_model.dart';
+import 'package:click_shop/features/auth/domain/entities/auth_entity.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'auth_api_model.g.dart';
 
-@JsonSerializable()
+@JsonSerializable(includeIfNull: false)
 class AuthApiModel {
   @JsonKey(name: '_id')
   final String? userId;
@@ -16,7 +16,6 @@ class AuthApiModel {
   final String? confirmPassword;
 
   final String? image;
-
   final String? phoneNumber;
   final String? location;
   final String? gender;
@@ -40,10 +39,10 @@ class AuthApiModel {
     this.role,
   });
 
-  Map<String, dynamic> toJson() => _$AuthApiModelToJson(this);
-
   factory AuthApiModel.fromJson(Map<String, dynamic> json) =>
       _$AuthApiModelFromJson(json);
+
+  Map<String, dynamic> toJson() => _$AuthApiModelToJson(this);
 
   AuthEntity toEntity() {
     return AuthEntity(
@@ -79,7 +78,7 @@ class AuthApiModel {
 
   AuthHiveModel toHiveModel() {
     return AuthHiveModel(
-      userId: userId, // Mongo _id
+      userId: userId,
       email: email,
       username: username,
       password: password,

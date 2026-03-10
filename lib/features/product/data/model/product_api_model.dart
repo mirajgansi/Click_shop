@@ -5,9 +5,9 @@ part 'product_api_model.g.dart';
 
 @JsonSerializable()
 class RatingApiModel {
+  @JsonKey(fromJson: _userIdFromJson)
   final String userId;
 
-  // accept int/double
   @JsonKey(fromJson: _toDouble)
   final double rating;
 
@@ -17,6 +17,18 @@ class RatingApiModel {
       _$RatingApiModelFromJson(json);
 
   Map<String, dynamic> toJson() => _$RatingApiModelToJson(this);
+
+  static String _userIdFromJson(dynamic v) {
+    if (v == null) return '';
+
+    if (v is String) return v;
+
+    if (v is Map<String, dynamic>) {
+      return (v['_id'] ?? '').toString();
+    }
+
+    return v.toString();
+  }
 
   static double _toDouble(dynamic v) {
     if (v == null) return 0.0;

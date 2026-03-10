@@ -8,7 +8,7 @@ part of 'product_api_model.dart';
 
 RatingApiModel _$RatingApiModelFromJson(Map<String, dynamic> json) =>
     RatingApiModel(
-      userId: json['userId'] as String,
+      userId: RatingApiModel._userIdFromJson(json['userId']),
       rating: RatingApiModel._toDouble(json['rating']),
     );
 
